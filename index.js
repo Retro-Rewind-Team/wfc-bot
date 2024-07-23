@@ -57,7 +57,7 @@ var unbanCommand = new SlashCommandBuilder()
     .setDescription("Unban a user")
     .addStringOption(option =>
         option.setName("friend-code")
-            .setDescription("friend code to kick")
+            .setDescription("friend code to unban")
             .setRequired(true))
     .setDefaultMemberPermissions(PermissionFlagsBits.BanMembers);
 
