@@ -1,0 +1,14 @@
+{
+  "name": "wfc-moderation-bot",
+  "version": "1.0.0",
+  "description": "Discord bot to facilitate banning users by friend code for a wfc server",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "ppeb",
+  "license": "ISC",
+  "dependencies": {
+    "discord.js": "^14.15.3"
+  }
+}

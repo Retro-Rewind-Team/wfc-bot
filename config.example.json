@@ -1,0 +1,16 @@
+{
+  "token": "your bot's token",
+  "application-id": "your application id",
+  "wfc-server": "the wfc server to connect to, such as 'ppeb.me' or 'localhost'",
+  "wfc-port": 8080,
+  "wfc-secret": "your wfc secret key",
+  "allowed-servers": [
+    "Allow guild ids here. Required!"
+  ],
+  "allowed-users": [
+    "Allow user ids here. Required!"
+  ],
+  "allowed-channels": [
+    "Allow channel ids here. Required!"
+  ]
+}
