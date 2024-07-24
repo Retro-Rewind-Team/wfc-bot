@@ -1,5 +1,5 @@
 {
-  "name": "wfc-moderation-bot",
+  "name": "wfc-bot",
   "version": "1.0.0",
   "description": "Discord bot to facilitate banning users by friend code for a wfc server",
   "main": "index.js",

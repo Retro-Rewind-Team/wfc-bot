@@ -4,13 +4,12 @@
   "wfc-server": "the wfc server to connect to, such as 'ppeb.me' or 'localhost'",
   "wfc-port": 8080,
   "wfc-secret": "your wfc secret key",
+  "moderation-role": "The role needed for a user to use moderation commands",
   "allowed-servers": [
-    "Allow guild ids here. Required!"
-  ],
-  "allowed-users": [
-    "Allow user ids here. Required!"
+    "Allow guild ids here. Make this array empty to allow all guilds."
   ],
   "allowed-channels": [
-    "Allow channel ids here. Required!"
-  ]
+    "Allow channel ids here. Make this array empty to allow all channels."
+  ],
+  "logs-channel": "Channel id to send successful moderative actions to."
 }

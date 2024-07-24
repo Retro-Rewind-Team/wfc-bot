@@ -1,193 +1,100 @@
-const { Client, Events, GatewayIntentBits, SlashCommandBuilder, REST, Routes, PermissionFlagsBits } = require("discord.js");
+const { Client, Events, REST, Routes, IntentsBitField } = require("discord.js");
 const config = require("./config.json");
+const fs = require("fs");
+const path = require("path");
+const { exit } = require("process");
 
-const client = new Client({ intents: [GatewayIntentBits.Guilds] });
+const client = new Client({ intents: [IntentsBitField.Flags.Guilds, IntentsBitField.Flags.GuildMessages] });
 
-client.once(Events.ClientReady, readyClient => {
+module.exports = {
+    client: client
+};
+
+if (!config["moderation-role"]) {
+    console.error("No moderation role is set! Please set one to continue.");
+    exit(1);
+}
+
+client.once(Events.ClientReady, async function(readyClient) {
     console.log(`Logged in as ${readyClient.user.tag}`);
+
+    var channel = await client.channels.fetch(config["logs-channel"]);
+
+    if (!channel) {
+        console.error("Incorrect channel set for logs!");
+        exit(1);
+    }
+    else
+        console.log(`Logs set to send to ${channel.name}`);
+
+    // TODO: Set activity with user count?
+
+    // client.user.setPresence({
+    //     status: "online",
+    // });
 });
 
 client.login(config["token"]);
 
-const urlBase = `http://${config["wfc-server"]}:${config["wfc-port"]}/api/`;
+// TODO: Make this function not suck?
+function isAllowedInteraction(interaction, modOnly) {
+    var err = [];
 
-function makeUrl(path, opts) {
-    return `${urlBase}${path}?secret=${config["wfc-secret"]}${opts}`;
-}
-
-var banCommand = new SlashCommandBuilder()
-    .setName("ban")
-    .setDescription("Ban a user")
-    .addStringOption(option =>
-        option.setName("friend-code")
-            .setDescription("friend code to ban")
-            .setRequired(true))
-    .addStringOption(option =>
-        option.setName("reason")
-            .setDescription("ban reason")
-            .setRequired(true))
-    .addStringOption(option =>
-        option.setName("hidden-reason")
-            .setDescription("ban reason only visible to moderators"))
-    .addNumberOption(option =>
-        option.setName("days")
-            .setDescription("ban days length"))
-    .addNumberOption(option =>
-        option.setName("hours")
-            .setDescription("ban hours length"))
-    .addNumberOption(option =>
-        option.setName("minutes")
-            .setDescription("ban minutes length"))
-    .addBooleanOption(option =>
-        option.setName("tos")
-            .setDescription("tos violation (ban from entire service), default false"))
-    .setDefaultMemberPermissions(PermissionFlagsBits.BanMembers);
-
-var kickCommand = new SlashCommandBuilder()
-    .setName("kick")
-    .setDescription("Kick a user")
-    .addStringOption(option =>
-        option.setName("friend-code")
-            .setDescription("friend code to kick")
-            .setRequired(true))
-    .setDefaultMemberPermissions(PermissionFlagsBits.BanMembers);
-
-var unbanCommand = new SlashCommandBuilder()
-    .setName("unban")
-    .setDescription("Unban a user")
-    .addStringOption(option =>
-        option.setName("friend-code")
-            .setDescription("friend code to unban")
-            .setRequired(true))
-    .setDefaultMemberPermissions(PermissionFlagsBits.BanMembers);
-
-async function allowedInteraction(interaction) {
     var server = false, channel = false, user = false;
 
-    if (config["allowed-servers"].includes(interaction.guildId))
+    if (config["allowed-servers"].length == 0 || config["allowed-servers"].includes(interaction.guildId))
         server = true;
+    else
+        err.push("disallowed guild");
 
-    if (config["allowed-channels"].includes(interaction.channelId))
+    if (config["allowed-channels"].length == 0 || config["allowed-channels"].includes(interaction.channelId))
         channel = true;
+    else
+        err.push("disallowed channel");
 
-    if (config["allowed-users"].includes(interaction.user.id))
+    if (modOnly && !interaction.member.roles.cache.get(config["moderation-role"]))
+        err.push("incorrect role");
+    else
         user = true;
 
-    var ret = server && channel && user;
-
-    if (!ret) {
-        console.error(`User ${interaction.user.id} in channel ${interaction.channelId} in guild ${interaction.guildId} was not allowed! Failed checks: ${user ? "" : "user"} ${channel ? "" : "channel"} ${server ? "" : "server"}`);
-        await interaction.reply({ content: `Command not allowed! Failed checks: ${user ? "" : "user"} ${channel ? "" : "channel"} ${server ? "" : "server"}` });
-    }
-
-    return ret;
+    return [server && channel && user, err.join(", ")];
 }
 
-function fcToPid(friendCode) {
-    return parseInt(friendCode.replace(/-/g, ""), 10) >>> 0;
-}
+const commands = {};
+const commandsPath = path.join(__dirname, "commands");
+const commandFiles = fs.readdirSync(commandsPath).filter(file => file.endsWith(".js"));
 
-const fcRegex = new RegExp(/[0-9]{4}-[0-9]{4}-[0-9]{4}/);
-function validateFc(friendCode) {
-    return friendCode.match(fcRegex);
-}
+for (const file of commandFiles) {
+    const spec = require(path.join(commandsPath, file));
 
-async function makeRequest(interaction, fc, url) {
-    try {
-        var response = await fetch(url, { method: "GET" });
-
-        if (response.ok)
-            interaction.reply({ content: `Successfully performed operation on friend code ${fc}` });
-        else {
-            var rjson = await response.json();
-            console.log(rjson);
-            interaction.reply({ content: `Failed to perform operation on friend code ${fc}: error ${rjson ? rjson.error : "no error message provided"}` });
-        }
-    }
-    catch (error) {
-        console.error(`Error performing operation on friend code "${fc}": ${error}`);
-        await interaction.reply({ content: `Error performing operation on friend code "${fc}": ${error}` });
-    }
-}
-
-async function ban(interaction) {
-    var fc = interaction.options.getString("friend-code", true);
-    fc = fc.trim();
-
-    if (!validateFc(fc)) {
-        await interaction.reply({ content: `Error banning friend code "${fc}": Friend code is not in the correct format` });
-        return;
-    }
-
-    var pid = fcToPid(fc);
-    var reason = interaction.options.getString("reason", true);
-    var reason_hidden = interaction.options.getString("reason_hidden") ?? null;
-    var days = interaction.options.getNumber("days") ?? 0;
-    var hours = interaction.options.getNumber("hours") ?? 0;
-    var minutes = interaction.options.getNumber("minutes") ?? 0;
-    var tos = interaction.options.getBoolean("tos") ?? false;
-
-    if (hours + minutes + days == 0) {
-        await interaction.reply({ content: `Error banning friend code "${fc}": Ban length cannot be zero` });
-        return;
-    }
-
-    var url = makeUrl("ban", `&pid=${pid}&reason=${reason}&reason_hidden=${reason_hidden}&days=${days}&hours=${hours}&minutes=${minutes}&tos=${tos}`);
-
-    makeRequest(interaction, fc, url);
-}
-
-async function kick(interaction) {
-    var fc = interaction.options.getString("friend-code", true);
-    fc = fc.trim();
-
-    if (!validateFc(fc)) {
-        await interaction.reply({ content: `Error banning friend code "${fc}": Friend code is not in the correct format` });
-        return;
-    }
-
-    var pid = fcToPid(fc);
-
-    var url = makeUrl("kick", `&pid=${pid}`);
-
-    makeRequest(interaction, fc, url);
-}
-
-async function unban(interaction) {
-    var fc = interaction.options.getString("friend-code", true);
-    fc = fc.trim();
-
-    if (!validateFc(fc)) {
-        await interaction.reply({ content: `Error banning friend code "${fc}": Friend code is not in the correct format` });
-        return;
-    }
-
-    var pid = fcToPid(fc);
-
-    var url = makeUrl("unban", `&pid=${pid}`);
-
-    makeRequest(interaction, fc, url);
+    if ("data" in spec && "exec" in spec)
+        commands[path.basename(file, ".js")] = spec;
+    else
+        console.error(`The command at ${file} is missing a required data or exec property`);
 }
 
 client.on(Events.InteractionCreate, async interaction => {
     if (!interaction.isChatInputCommand())
         return;
 
-    if (!await allowedInteraction(interaction)) {
-        return;
-    }
-
     try {
-        if (interaction.commandName == "ban")
-            await ban(interaction);
-        else if (interaction.commandName == "kick")
-            await kick(interaction);
-        else if (interaction.commandName == "unban")
-            await unban(interaction);
-        else {
-            await interaction.reply({ content: `No command exists by the name of ${interaction.commandName}` });
+        for (const cname in commands) {
+            if (cname != interaction.commandName)
+                continue;
+
+            const command = commands[cname];
+            const [allowed, err] = isAllowedInteraction(interaction, command.modOnly);
+            if (!allowed) {
+                interaction.reply({ content: `Command ${cname} is not allowed! Error: ${err}` });
+                return;
+            }
+
+            await command.exec(interaction);
             return;
         }
+
+        await interaction.reply({ content: `No command exists by the name of ${interaction.commandName}` });
+        return;
     }
     catch (error) {
         console.error(error);
@@ -199,6 +106,11 @@ client.on(Events.InteractionCreate, async interaction => {
 });
 
 async function refreshCommands() {
+    const commandsJson = [];
+
+    for (const cname in commands)
+        commandsJson.push(commands[cname].data.toJSON());
+
     for (var j in config["allowed-servers"]) {
         var guildId = config["allowed-servers"][j];
 
@@ -208,8 +120,7 @@ async function refreshCommands() {
 
         const data = await rest.put(
             Routes.applicationGuildCommands(config["application-id"], guildId),
-            // TODO: If like way more commands are desired, then this should be abstracted...
-            { body: [banCommand.toJSON(), kickCommand.toJSON(), unbanCommand.toJSON()] }
+            { body: commandsJson }
         );
 
         console.log(`Successfully reloaded ${data.length} application (/) commands for guild ${guildId}`);
