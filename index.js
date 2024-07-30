@@ -75,7 +75,7 @@ async function fetchGroups() {
             }]
         });
 
-        console.log(`Successfully fetched groups and stats! Time is ${new Date(Date.now())}`);
+        console.log(`Successfully fetched groups and stats! Time is ${new Date(Date.now())}. ${presenceText}`);
     }
     catch (e) {
         console.error(`Failed to fetch groups and stats, error: ${e}`);
@@ -95,7 +95,7 @@ client.once(Events.ClientReady, async function(readyClient) {
         console.log(`Logs set to send to channel ${channel.name}`);
 
     // Runs once a minute
-    setTimeout(fetchGroups, 60000);
+    setInterval(fetchGroups, 60000);
     fetchGroups();
 });
 

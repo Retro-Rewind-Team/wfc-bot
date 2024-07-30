@@ -69,7 +69,11 @@ module.exports = {
         const embed = new EmbedBuilder()
             .setColor(getColor())
             .setTitle(`${action.charAt(0).toUpperCase() + action.slice(1)} performed by ${interaction.member.displayName}`)
-            .addFields({ name: "Moderator", value: `<@${interaction.member.id}>` }, { name: "Friend Code", value: fc })
+            .addFields(
+                { name: "Server", value: interaction.guild.name },
+                { name: "Moderator", value: `<@${interaction.member.id}>` },
+                { name: "Friend Code", value: fc }
+            )
             .setTimestamp();
 
         if (opts)
