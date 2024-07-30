@@ -25,7 +25,7 @@ function getColor() {
 }
 
 module.exports = {
-    getColor: getColor(),
+    getColor: getColor,
 
     fcToPid: function(friendCode) {
         return parseInt(friendCode.replace(/-/g, ""), 10) >>> 0;

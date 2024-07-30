@@ -6,11 +6,15 @@ const { exit } = require("process");
 
 const client = new Client({ intents: [IntentsBitField.Flags.Guilds, IntentsBitField.Flags.GuildMessages] });
 var groups = null;
+var stats = null;
 
 module.exports = {
     client: client,
     getGroups: function() {
         return groups;
+    },
+    getStats: function() {
+        return stats;
     }
 };
 
@@ -56,7 +60,7 @@ async function fetchGroups() {
     try {
         const groupsJson = (await queryJson(fetchGroupsUrl)) ?? throwInline("Empty or no json response from groups api.");
         groups = { timestamp: Date.now(), rooms: groupsJson };
-        const stats = await queryJson(fetchStatsUrl) ?? throwInline("Empty or no json response from stats api.");
+        stats = await queryJson(fetchStatsUrl) ?? throwInline("Empty or no json response from stats api.");
         const players = stats.mariokartwii.active;
         const rooms = stats.mariokartwii.groups;
 
@@ -74,7 +78,7 @@ async function fetchGroups() {
         console.log(`Successfully fetched groups and stats! Time is ${new Date(Date.now())}`);
     }
     catch (e) {
-        console.error(`Failed to fetch groups, error: ${e}`);
+        console.error(`Failed to fetch groups and stats, error: ${e}`);
     }
 }
 
