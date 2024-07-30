@@ -18,15 +18,15 @@ module.exports = {
         fc = fc.trim();
 
         if (!validateFc(fc)) {
-            await interaction.reply({ content: `Error banning friend code "${fc}": Friend code is not in the correct format` });
+            await interaction.reply({ content: `Error unbanning friend code "${fc}": Friend code is not in the correct format` });
             return;
         }
 
-        var pid = fcToPid(fc);
+        const pid = fcToPid(fc);
 
-        var url = makeUrl("unban", `&pid=${pid}`);
+        const url = makeUrl("unban", `&pid=${pid}`);
 
-        if (makeRequest(interaction, fc, url))
+        if (await makeRequest(interaction, fc, url))
             sendEmbedLog(interaction, "unban", fc);
     }
 };

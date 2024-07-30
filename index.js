@@ -1,18 +1,81 @@
-const { Client, Events, REST, Routes, IntentsBitField } = require("discord.js");
+const { Client, Events, IntentsBitField, REST, Routes } = require("discord.js");
 const config = require("./config.json");
 const fs = require("fs");
 const path = require("path");
 const { exit } = require("process");
 
 const client = new Client({ intents: [IntentsBitField.Flags.Guilds, IntentsBitField.Flags.GuildMessages] });
+var groups = null;
 
 module.exports = {
-    client: client
+    client: client,
+    getGroups: function() {
+        return groups;
+    }
 };
 
-if (!config["moderation-role"]) {
+if (!config["moderation-roles"] || config["moderation-roles"].length === 0) {
     console.error("No moderation role is set! Please set one to continue.");
     exit(1);
+}
+
+if (!config["logs-channel"]) {
+    console.error("No logs channel is set! Please set one to continue.");
+    exit(1);
+}
+
+const fetchGroupsUrl = `http://${config["wfc-server"]}:${config["wfc-port"]}/api/groups`;
+const fetchStatsUrl = `http://${config["wfc-server"]}:${config["wfc-port"]}/api/stats`;
+async function fetchGroups() {
+    function plural(count, text) {
+        return count == 1 ? text : text + "s";
+    }
+
+    function throwInline(err) {
+        throw new Error(err);
+    }
+
+    async function queryJson(url) {
+        var response = await fetch(url);
+
+        if (!response.ok) {
+            console.error(`Unable to fetch groups, status code: ${response.status}`);
+            return null;
+        }
+
+        var json = await response.json();
+
+        if (!json) {
+            console.error(`Invalid response from ${url}, unable to populate groups!`);
+            return null;
+        }
+
+        return json;
+    }
+
+    try {
+        const groupsJson = (await queryJson(fetchGroupsUrl)) ?? throwInline("Empty or no json response from groups api.");
+        groups = { timestamp: Date.now(), rooms: groupsJson };
+        const stats = await queryJson(fetchStatsUrl) ?? throwInline("Empty or no json response from stats api.");
+        const players = stats.mariokartwii.active;
+        const rooms = stats.mariokartwii.groups;
+
+        const presenceText = `${players} ${plural(players, "player")} in ${rooms} ${plural(rooms, "room")}!`;
+
+        client.user.setPresence({
+            status: "online",
+            activities: [{
+                name: "Stats",
+                type: 4,
+                state: presenceText,
+            }]
+        });
+
+        console.log(`Successfully fetched groups and stats! Time is ${new Date(Date.now())}`);
+    }
+    catch (e) {
+        console.error(`Failed to fetch groups, error: ${e}`);
+    }
 }
 
 client.once(Events.ClientReady, async function(readyClient) {
@@ -21,20 +84,27 @@ client.once(Events.ClientReady, async function(readyClient) {
     var channel = await client.channels.fetch(config["logs-channel"]);
 
     if (!channel) {
-        console.error("Incorrect channel set for logs!");
+        console.error("Invalid channelid set for logs!");
         exit(1);
     }
     else
-        console.log(`Logs set to send to ${channel.name}`);
+        console.log(`Logs set to send to channel ${channel.name}`);
 
-    // TODO: Set activity with user count?
-
-    // client.user.setPresence({
-    //     status: "online",
-    // });
+    // Runs once a minute
+    setTimeout(fetchGroups, 60000);
+    fetchGroups();
 });
 
 client.login(config["token"]);
+
+function hasAnyRoles(member, roles) {
+    for (const role of roles) {
+        if (member.roles.cache.get(role))
+            return true;
+    }
+
+    return false;
+}
 
 // TODO: Make this function not suck?
 function isAllowedInteraction(interaction, modOnly) {
@@ -42,18 +112,18 @@ function isAllowedInteraction(interaction, modOnly) {
 
     var server = false, channel = false, user = false;
 
-    if (config["allowed-servers"].length == 0 || config["allowed-servers"].includes(interaction.guildId))
+    if (!config["allowed-servers"] || config["allowed-servers"].length == 0 || config["allowed-servers"].includes(interaction.guildId))
         server = true;
     else
         err.push("disallowed guild");
 
-    if (config["allowed-channels"].length == 0 || config["allowed-channels"].includes(interaction.channelId))
+    if (!config["allowed-channels"] || config["allowed-channels"].length == 0 || config["allowed-channels"].includes(interaction.channelId))
         channel = true;
     else
         err.push("disallowed channel");
 
-    if (modOnly && !interaction.member.roles.cache.get(config["moderation-role"]))
-        err.push("incorrect role");
+    if (modOnly && !hasAnyRoles(interaction.member, config["moderation-roles"]))
+        err.push("insufficient roles");
     else
         user = true;
 

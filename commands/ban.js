@@ -43,12 +43,12 @@ module.exports = {
             return;
         }
 
-        var pid = fcToPid(fc);
-        var reason = interaction.options.getString("reason", true);
-        var reason_hidden = interaction.options.getString("hidden-reason") ?? null;
+        const pid = fcToPid(fc);
+        const reason = interaction.options.getString("reason", true);
+        const reason_hidden = interaction.options.getString("hidden-reason");
         var days = interaction.options.getNumber("days") ?? 0;
-        var hours = interaction.options.getNumber("hours") ?? 0;
-        var minutes = interaction.options.getNumber("minutes") ?? 0;
+        const hours = interaction.options.getNumber("hours") ?? 0;
+        const minutes = interaction.options.getNumber("minutes") ?? 0;
 
         var perm = false;
         if (hours + minutes + days == 0) {
@@ -58,9 +58,9 @@ module.exports = {
             days = 100000;
         }
 
-        var url = makeUrl("ban", `&pid=${pid}&reason=${reason}&reason_hidden=${reason_hidden}&days=${days}&hours=${hours}&minutes=${minutes}&tos=true`);
+        const url = makeUrl("ban", `&pid=${pid}&reason=${reason}&reason_hidden=${reason_hidden}&days=${days}&hours=${hours}&minutes=${minutes}&tos=true`);
 
-        if (makeRequest(interaction, fc, url)) {
+        if (await makeRequest(interaction, fc, url)) {
             sendEmbedLog(interaction, "ban", fc, [
                 { name: "Ban Length", value: perm ? "Permanent" : `${days} ${p(days, "day")}, ${hours} ${p(hours, "hour")}, ${minutes} ${p(minutes, "minute")}` },
                 { name: "Reason", value: reason },

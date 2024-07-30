@@ -25,6 +25,8 @@ function getColor() {
 }
 
 module.exports = {
+    getColor: getColor(),
+
     fcToPid: function(friendCode) {
         return parseInt(friendCode.replace(/-/g, ""), 10) >>> 0;
     },
@@ -33,15 +35,19 @@ module.exports = {
         return friendCode.match(fcRegex);
     },
 
+    plural: function(count, text) {
+        return count == 1 ? text : text + "s";
+    },
+
     makeRequest: async function(interaction, fc, url) {
         try {
             var response = await fetch(url, { method: "GET" });
+            var rjson = await response.json();
 
-            if (response.ok)
+            if (response.ok && !rjson.error)
                 return true;
             else {
-                var rjson = await response.json();
-                console.log(rjson);
+                console.error(`Failed to make request ${url}, response: ${rjson ? rjson.error : "no error message provided"}`);
                 interaction.reply({ content: `Failed to perform operation on friend code "${fc}": error ${rjson ? rjson.error : "no error message provided"}` });
 
                 return false;
@@ -71,6 +77,6 @@ module.exports = {
 
         await client.channels.cache.get(config["logs-channel"]).send({ embeds: [embed] });
 
-        interaction.reply({ content: `Successful ${action} performed on friend code ${fc}` });
+        interaction.reply({ content: `Successful ${action} performed on friend code "${fc}"` });
     }
 };
