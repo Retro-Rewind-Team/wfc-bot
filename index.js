@@ -18,8 +18,8 @@ module.exports = {
     }
 };
 
-if (!config["moderation-roles"] || config["moderation-roles"].length === 0) {
-    console.error("No moderation role is set! Please set one to continue.");
+if (!config["moderation-roles"] || typeof config["moderation-roles"] != "object" || config["moderation-roles"].length === 0) {
+    console.error("No moderation role is set or it is set incorrectly! Correct this to continue.");
     exit(1);
 }
 
