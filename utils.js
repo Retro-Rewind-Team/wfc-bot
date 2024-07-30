@@ -1,4 +1,4 @@
-const { client } = require("./index.js");
+const { client, getGroups } = require("./index.js");
 const config = require("./config.json");
 const { EmbedBuilder } = require("discord.js");
 
@@ -22,6 +22,19 @@ function getColor() {
         currentColor = 0;
 
     return colors[currentColor];
+}
+
+function getMiiName(fc) {
+    const rooms = getGroups().rooms;
+
+    for (const room of rooms) {
+        for (const idx in room.players) {
+            if (room.players[idx].fc == fc)
+                return room.players[idx].name;
+        }
+    }
+
+    return null;
 }
 
 module.exports = {
@@ -72,7 +85,8 @@ module.exports = {
             .addFields(
                 { name: "Server", value: interaction.guild.name },
                 { name: "Moderator", value: `<@${interaction.member.id}>` },
-                { name: "Friend Code", value: fc }
+                { name: "Friend Code", value: fc },
+                { name: "Mii Name", value: getMiiName(fc) ?? "Unknown" }
             )
             .setTimestamp();
 
