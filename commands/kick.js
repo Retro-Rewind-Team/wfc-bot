@@ -11,6 +11,9 @@ module.exports = {
             option.setName("friend-code")
                 .setDescription("friend code to kick")
                 .setRequired(true))
+        .addStringOption(option => option.setName("reason")
+            .setDescription("ban reason")
+            .setRequired(true))
         .setDefaultMemberPermissions(PermissionFlagsBits.BanMembers),
 
     exec: async function(interaction) {
@@ -23,10 +26,11 @@ module.exports = {
         }
 
         const pid = fcToPid(fc);
+        const reason = interaction.options.getString("reason", true);
 
         const url = makeUrl("kick", `&pid=${pid}`);
 
         if (await makeRequest(interaction, fc, url))
-            sendEmbedLog(interaction, "kick", fc);
+            sendEmbedLog(interaction, "kick", fc, [{ name: "Reason", value: reason }]);
     }
 };

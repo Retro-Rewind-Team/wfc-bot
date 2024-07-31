@@ -11,6 +11,9 @@ module.exports = {
             option.setName("friend-code")
                 .setDescription("friend code to unban")
                 .setRequired(true))
+        .addStringOption(option => option.setName("reason")
+            .setDescription("ban reason")
+            .setRequired(true))
         .setDefaultMemberPermissions(PermissionFlagsBits.BanMembers),
 
     exec: async function(interaction) {
@@ -23,10 +26,11 @@ module.exports = {
         }
 
         const pid = fcToPid(fc);
+        const reason = interaction.options.getString("reason", true);
 
         const url = makeUrl("unban", `&pid=${pid}`);
 
         if (await makeRequest(interaction, fc, url))
-            sendEmbedLog(interaction, "unban", fc);
+            sendEmbedLog(interaction, "unban", fc, [{ name: "Reason", value: reason }]);
     }
 };
