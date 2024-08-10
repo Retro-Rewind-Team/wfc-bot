@@ -78,7 +78,7 @@ module.exports = {
         return `${urlBase}${path}?secret=${config["wfc-secret"]}${opts}`;
     },
 
-    sendEmbedLog: async function(interaction, action, fc, opts) {
+    sendEmbedLog: async function(interaction, action, fc, hideMiiName = false, opts) {
         const embed = new EmbedBuilder()
             .setColor(getColor())
             .setTitle(`${action.charAt(0).toUpperCase() + action.slice(1)} performed by ${interaction.member.displayName}`)
@@ -86,7 +86,7 @@ module.exports = {
                 { name: "Server", value: interaction.guild.name },
                 { name: "Moderator", value: `<@${interaction.member.id}>` },
                 { name: "Friend Code", value: fc },
-                { name: "Mii Name", value: getMiiName(fc) ?? "Unknown" }
+                { name: "Mii Name", value: hideMiiName ? "\\*\\*\\*\\*\\*" : getMiiName(fc) ?? "Unknown" }
             )
             .setTimestamp();
 

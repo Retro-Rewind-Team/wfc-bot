@@ -14,6 +14,9 @@ module.exports = {
         .addStringOption(option => option.setName("reason")
             .setDescription("ban reason")
             .setRequired(true))
+        .addBooleanOption(option =>
+            option.setName("hide-name")
+                .setDescription("hide mii name in logs"))
         .setDefaultMemberPermissions(PermissionFlagsBits.BanMembers),
 
     exec: async function(interaction) {
@@ -27,10 +30,11 @@ module.exports = {
 
         const pid = fcToPid(fc);
         const reason = interaction.options.getString("reason", true);
+        const hide = interaction.options.getBoolean("hide-name") ?? false;
 
         const url = makeUrl("kick", `&pid=${pid}`);
 
         if (await makeRequest(interaction, fc, url))
-            sendEmbedLog(interaction, "kick", fc, [{ name: "Reason", value: reason }]);
+            sendEmbedLog(interaction, "kick", fc, hide, [{ name: "Reason", value: reason }]);
     }
 };
