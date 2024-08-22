@@ -37,13 +37,11 @@ module.exports = {
 
         const url = makeUrl("unban", `&pid=${pid}`);
 
-        if (await makeRequest(interaction, fc, url))
+        if (await makeRequest(interaction, fc, url)) {
             sendEmbedLog(interaction, "unban", fc, [
                 { name: "Reason", value: reason },
-                { name: "Hidden Reason", value: reason_hidden }]
-            );
-            sendEmbedPublicLog(interaction, "unban", fc, hide, [
-                { name: "Reason", value: reason },
-            );
+                { name: "Hidden Reason", value: reason_hidden }
+            ], hide);
+        }
     }
 };

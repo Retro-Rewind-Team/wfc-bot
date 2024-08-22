@@ -21,7 +21,7 @@ module.exports = {
                 .setDescription("hide mii name in logs"))
         .setDefaultMemberPermissions(PermissionFlagsBits.BanMembers),
 
-    exec: async function (interaction) {
+    exec: async function(interaction) {
         var fc = interaction.options.getString("friend-code", true);
         fc = fc.trim();
 
@@ -37,13 +37,11 @@ module.exports = {
 
         const url = makeUrl("kick", `&pid=${pid}`);
 
-        if (await makeRequest(interaction, fc, url))
+        if (await makeRequest(interaction, fc, url)) {
             sendEmbedLog(interaction, "kick", fc, [
                 { name: "Reason", value: reason },
-                { name: "Hidden Reason", value: reason_hidden }]
-            );
-            sendEmbedPublicLog(interaction, "kick", fc, hide, [
-                { name: "Reason", value: reason },
-            );
+                { name: "Hidden Reason", value: reason_hidden, hidden: true }
+            ], hide);
+        }
     }
 };

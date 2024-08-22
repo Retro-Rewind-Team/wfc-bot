@@ -22,7 +22,7 @@ module.exports = {
             .setDescription("ban reason")
             .setRequired(true))
         .addStringOption(option => option.setName("hidden-reason")
-             .setDescription("ban reason only visible to moderators"))
+            .setDescription("ban reason only visible to moderators"))
         .addNumberOption(option => option.setName("days")
             .setDescription("ban days length"))
         .addNumberOption(option => option.setName("hours")
@@ -69,14 +69,9 @@ module.exports = {
             sendEmbedLog(interaction, "ban", fc, [
                 { name: "Ban Length", value: perm ? "Permanent" : `${days} ${p(days, "day")}, ${hours} ${p(hours, "hour")}, ${minutes} ${p(minutes, "minute")}` },
                 { name: "Reason", value: reason },
-                { name: "Hidden Reason", value: reason_hidden ?? "None" },
-                { name: "TOS", value: tos.toString() }]
-            );
-            sendEmbedPublicLog(interaction, "ban", fc, hide, [
-                { name: "Ban Length", value: perm ? "Permanent" : `${days} ${p(days, "day")}, ${hours} ${p(hours, "hour")}, ${minutes} ${p(minutes, "minute")}` },
-                { name: "Reason", value: reason },
-                { name: "TOS", value: tos.toString() }]
-            );
+                { name: "Hidden Reason", value: reason_hidden ?? "None", hidden: true },
+                { name: "TOS", value: tos.toString() }
+            ], hide);
         }
     }
 };

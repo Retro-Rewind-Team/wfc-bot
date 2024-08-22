@@ -78,41 +78,43 @@ module.exports = {
         return `${urlBase}${path}?secret=${config["wfc-secret"]}${opts}`;
     },
 
-    sendEmbedLog: async function(interaction, action, fc, opts) {
-        const embed = new EmbedBuilder()
+    sendEmbedLog: async function(interaction, action, fc, opts, hideMiiName = false) {
+        const miiName = getMiiName(fc) ?? "Unknown";
+
+        const privEmbed = new EmbedBuilder()
             .setColor(getColor())
             .setTitle(`${action.charAt(0).toUpperCase() + action.slice(1)} performed by ${interaction.member.displayName}`)
             .addFields(
                 { name: "Server", value: interaction.guild.name },
                 { name: "Moderator", value: `<@${interaction.member.id}>` },
                 { name: "Friend Code", value: fc },
-                { name: "Mii Name", value: getMiiName(fc) ?? "Unknown" }
+                { name: "Mii Name", value: miiName }
             )
             .setTimestamp();
 
         if (opts)
-            embed.addFields(...opts);
+            privEmbed.addFields(...opts);
 
-        await client.channels.cache.get(config["logs-channel"]).send({ embeds: [embed] });
+        await client.channels.cache.get(config["logs-channel"]).send({ embeds: [privEmbed] });
 
-        interaction.reply({ content: `Successful ${action} performed on friend code "${fc}"` });
-    },
-
-    sendEmbedPublicLog: async function(interaction, action, fc, hideMiiName = false, opts) {
-        const embed = new EmbedBuilder()
+        const pubEmbed = new EmbedBuilder()
             .setColor(getColor())
             .setTitle(`${action.charAt(0).toUpperCase() + action.slice(1)} performed by moderator`)
             .addFields(
                 { name: "Server", value: interaction.guild.name },
                 { name: "Friend Code", value: fc },
-                { name: "Mii Name", value: hideMiiName ? "\\*\\*\\*\\*\\*" : getMiiName(fc) ?? "Unknown" }
+                { name: "Mii Name", value: hideMiiName ? "\\*\\*\\*\\*\\*" : miiName }
             )
             .setTimestamp();
 
-        if (opts)
-            embed.addFields(...opts);
+        if (opts) {
+            const filtered = opts.filter((opt) => !opt["hidden"]);
 
-        await client.channels.cache.get(config["public-logs-channel"]).send({ embeds: [embed] });
+            pubEmbed.addFields(...filtered);
+        }
+
+        await client.channels.cache.get(config["public-logs-channel"]).send({ embeds: [pubEmbed] });
 
         interaction.reply({ content: `Successful ${action} performed on friend code "${fc}"` });
     },
+};
