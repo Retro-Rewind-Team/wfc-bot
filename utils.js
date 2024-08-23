@@ -137,7 +137,6 @@ module.exports = {
             .setColor(getColor())
             .setTitle(`${action.charAt(0).toUpperCase() + action.slice(1)} performed by moderator`)
             .addFields(
-                { name: "Server", value: interaction.guild.name },
                 { name: "Friend Code", value: fc },
                 { name: "Mii Name", value: hideMiiName ? "\\*\\*\\*\\*\\*" : miiName }
             )
