@@ -1,5 +1,5 @@
 const { SlashCommandBuilder, PermissionFlagsBits } = require("discord.js");
-const { fcToPid, makeRequest, makeUrl, sendEmbedLog, validateFc } = require("../utils.js");
+const { fcToPid, makeRequest, makeUrl, sendEmbedLog, validateFc, sendEmbedPublicLog } = require("../utils.js");
 
 module.exports = {
     modOnly: true,
@@ -14,6 +14,8 @@ module.exports = {
         .addStringOption(option => option.setName("reason")
             .setDescription("ban reason")
             .setRequired(true))
+        .addStringOption(option => option.setName("hidden-reason")
+            .setDescription("ban reason only visible to moderators"))
         .addBooleanOption(option =>
             option.setName("hide-name")
                 .setDescription("hide mii name in logs"))
@@ -30,11 +32,16 @@ module.exports = {
 
         const pid = fcToPid(fc);
         const reason = interaction.options.getString("reason", true);
+        const reason_hidden = interaction.options.getString("hidden-reason");
         const hide = interaction.options.getBoolean("hide-name") ?? false;
 
         const url = makeUrl("kick", `&pid=${pid}`);
 
-        if (await makeRequest(interaction, fc, url))
-            sendEmbedLog(interaction, "kick", fc, hide, [{ name: "Reason", value: reason }]);
+        if (await makeRequest(interaction, fc, url)) {
+            sendEmbedLog(interaction, "kick", fc, [
+                { name: "Reason", value: reason },
+                { name: "Hidden Reason", value: reason_hidden, hidden: true }
+            ], hide);
+        }
     }
 };

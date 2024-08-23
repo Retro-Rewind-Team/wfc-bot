@@ -28,6 +28,11 @@ if (!config["logs-channel"]) {
     exit(1);
 }
 
+if (!config["public-logs-channel"]) {
+    console.error("No public logs channel is set! Please set one to continue.");
+    exit(1);
+}
+
 const fetchGroupsUrl = `http://${config["wfc-server"]}:${config["wfc-port"]}/api/groups`;
 const fetchStatsUrl = `http://${config["wfc-server"]}:${config["wfc-port"]}/api/stats`;
 async function fetchGroups() {
@@ -94,6 +99,14 @@ client.once(Events.ClientReady, async function(readyClient) {
     else
         console.log(`Logs set to send to channel ${channel.name}`);
 
+    var pubchannel = await client.channels.fetch(config["public-logs-channel"]);
+
+    if (!pubchannel) {
+        console.error("Invalid channelid set for public logs!");
+        exit(1);
+    }
+    else
+        console.log(`Public logs set to send to channel ${pubchannel.name}`);
     // Runs once a minute
     setInterval(fetchGroups, 60000);
     fetchGroups();
