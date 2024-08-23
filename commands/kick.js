@@ -1,5 +1,5 @@
 const { SlashCommandBuilder, PermissionFlagsBits } = require("discord.js");
-const { fcToPid, makeRequest, makeUrl, sendEmbedLog, validateFc, sendEmbedPublicLog } = require("../utils.js");
+const { makeRequest, makeUrl, pidToFc, resolvePidFromString, sendEmbedLog, validateId } = require("../utils.js");
 
 module.exports = {
     modOnly: true,
@@ -8,8 +8,8 @@ module.exports = {
         .setName("kick")
         .setDescription("Kick a user")
         .addStringOption(option =>
-            option.setName("friend-code")
-                .setDescription("friend code to kick")
+            option.setName("id")
+                .setDescription("friend code or pid to kick")
                 .setRequired(true))
         .addStringOption(option => option.setName("reason")
             .setDescription("ban reason")
@@ -22,21 +22,22 @@ module.exports = {
         .setDefaultMemberPermissions(PermissionFlagsBits.BanMembers),
 
     exec: async function(interaction) {
-        var fc = interaction.options.getString("friend-code", true);
-        fc = fc.trim();
+        var id = interaction.options.getString("id", true);
+        id = id.trim();
 
-        if (!validateFc(fc)) {
-            await interaction.reply({ content: `Error kicking friend code "${fc}": Friend code is not in the correct format` });
+        if (!validateId(id)) {
+            await interaction.reply({ content: `Error banning friend code or pid "${id}": Incorrect format` });
             return;
         }
 
-        const pid = fcToPid(fc);
+        const pid = resolvePidFromString(id);
         const reason = interaction.options.getString("reason", true);
         const reason_hidden = interaction.options.getString("hidden-reason");
         const hide = interaction.options.getBoolean("hide-name") ?? false;
 
         const url = makeUrl("kick", `&pid=${pid}`);
 
+        const fc = pidToFc(pid);
         if (await makeRequest(interaction, fc, url)) {
             sendEmbedLog(interaction, "kick", fc, [
                 { name: "Reason", value: reason },

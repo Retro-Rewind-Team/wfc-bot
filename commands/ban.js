@@ -1,5 +1,5 @@
 const { SlashCommandBuilder, PermissionFlagsBits } = require("discord.js");
-const { fcToPid, makeRequest, makeUrl, sendEmbedLog, validateFc, sendEmbedPublicLog } = require("../utils.js");
+const { makeRequest, makeUrl, pidToFc, resolvePidFromString, sendEmbedLog, validateId } = require("../utils.js");
 
 
 function p(count, str) {
@@ -15,8 +15,8 @@ module.exports = {
     data: new SlashCommandBuilder()
         .setName("ban")
         .setDescription("Ban a user")
-        .addStringOption(option => option.setName("friend-code")
-            .setDescription("friend code to ban")
+        .addStringOption(option => option.setName("id")
+            .setDescription("friend code or pid to ban")
             .setRequired(true))
         .addStringOption(option => option.setName("reason")
             .setDescription("ban reason")
@@ -38,15 +38,15 @@ module.exports = {
         .setDefaultMemberPermissions(PermissionFlagsBits.BanMembers),
 
     exec: async function(interaction) {
-        var fc = interaction.options.getString("friend-code", true);
-        fc = fc.trim();
+        var id = interaction.options.getString("id", true);
+        id = id.trim();
 
-        if (!validateFc(fc)) {
-            await interaction.reply({ content: `Error banning friend code "${fc}": Friend code is not in the correct format` });
+        if (!validateId(id)) {
+            await interaction.reply({ content: `Error banning friend code or pid "${id}": Incorrect format` });
             return;
         }
 
-        const pid = fcToPid(fc);
+        const pid = resolvePidFromString(id);
         const reason = interaction.options.getString("reason", true);
         const reason_hidden = interaction.options.getString("hidden-reason");
         var days = interaction.options.getNumber("days") ?? 0;
@@ -65,6 +65,7 @@ module.exports = {
 
         const url = makeUrl("ban", `&pid=${pid}&reason=${reason}&reason_hidden=${reason_hidden}&days=${days}&hours=${hours}&minutes=${minutes}&tos=${tos}`);
 
+        const fc = pidToFc(pid);
         if (await makeRequest(interaction, fc, url)) {
             sendEmbedLog(interaction, "ban", fc, [
                 { name: "Ban Length", value: perm ? "Permanent" : `${days} ${p(days, "day")}, ${hours} ${p(hours, "hour")}, ${minutes} ${p(minutes, "minute")}` },
