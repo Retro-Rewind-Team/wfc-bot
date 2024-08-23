@@ -41,7 +41,7 @@ module.exports = {
         if (await makeRequest(interaction, fc, url)) {
             sendEmbedLog(interaction, "kick", fc, [
                 { name: "Reason", value: reason },
-                { name: "Hidden Reason", value: reason_hidden, hidden: true }
+                { name: "Hidden Reason", value: reason_hidden ?? "None", hidden: true }
             ], hide);
         }
     }

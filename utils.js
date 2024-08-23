@@ -57,25 +57,30 @@ module.exports = {
 
     pidToFc: function(pid) {
         if (pid == 0)
-            return 0;
+            return "0000-0000-0000";
         else {
-            const buffer = new Uint8Array(8);
+            try {
+                const buffer = new Uint8Array(8);
 
-            // buffer is pid in little endian, followed by RMCJ in little endian
-            buffer[0] = pid >> 0;
-            buffer[1] = pid >> 8;
-            buffer[2] = pid >> 16;
-            buffer[3] = pid >> 24;
+                // buffer is pid in little endian, followed by RMCJ in little endian
+                buffer[0] = pid >> 0;
+                buffer[1] = pid >> 8;
+                buffer[2] = pid >> 16;
+                buffer[3] = pid >> 24;
 
-            buffer[4] = ("J").charCodeAt(0); // the reversed online relevant game id
-            buffer[5] = ("C").charCodeAt(0);
-            buffer[6] = ("M").charCodeAt(0);
-            buffer[7] = ("R").charCodeAt(0);
+                buffer[4] = ("J").charCodeAt(0); // the reversed online relevant game id
+                buffer[5] = ("C").charCodeAt(0);
+                buffer[6] = ("M").charCodeAt(0);
+                buffer[7] = ("R").charCodeAt(0);
 
-            const md5 = crypto.createHash("md5").update(buffer).digest();
-            var fc = ((BigInt(md5.at(0) >> 1) << 32n) | BigInt(pid)).toString();
+                const md5 = crypto.createHash("md5").update(buffer).digest();
+                var fc = ((BigInt(md5.at(0) >> 1) << 32n) | BigInt(pid)).toString();
 
-            return `${fc.slice(0, 4)}-${fc.slice(4, 8)}-${fc.slice(8, 12)}`;
+                return `${fc.slice(0, 4)}-${fc.slice(4, 8)}-${fc.slice(8, 12)}`;
+            }
+            catch {
+                return "0000-0000-0000";
+            }
         }
     },
 
