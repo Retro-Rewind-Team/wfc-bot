@@ -76,6 +76,9 @@ module.exports = {
                 const md5 = crypto.createHash("md5").update(buffer).digest();
                 var fc = ((BigInt(md5.at(0) >> 1) << 32n) | BigInt(pid)).toString();
 
+                if (fc.length < 12)
+                    fc = "0".repeat(12 - fc.length) + fc;
+
                 return `${fc.slice(0, 4)}-${fc.slice(4, 8)}-${fc.slice(8, 12)}`;
             }
             catch {
