@@ -97,19 +97,19 @@ module.exports = {
             var rjson = await response.json();
 
             if (response.ok && !rjson.error)
-                return true;
+                return [true, rjson];
             else {
                 console.error(`Failed to make request ${url}, response: ${rjson ? rjson.error : "no error message provided"}`);
                 interaction.reply({ content: `Failed to perform operation on friend code "${fc}": error ${rjson ? rjson.error : "no error message provided"}` });
 
-                return false;
+                return [false, rjson];
             }
         }
         catch (error) {
             console.error(`Error performing operation on friend code "${fc}": ${error}`);
             await interaction.reply({ content: `Error performing operation on friend code "${fc}": ${error}` });
 
-            return false;
+            return [false, null];
         }
     },
 

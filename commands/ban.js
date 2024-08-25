@@ -66,12 +66,14 @@ module.exports = {
         const url = makeUrl("ban", `&pid=${pid}&reason=${reason}&reason_hidden=${reason_hidden}&days=${days}&hours=${hours}&minutes=${minutes}&tos=${tos}`);
 
         const fc = pidToFc(pid);
-        if (await makeRequest(interaction, fc, url)) {
+        const [success, res] = await makeRequest(interaction, fc, url);
+        if (success) {
             sendEmbedLog(interaction, "ban", fc, [
                 { name: "Ban Length", value: perm ? "Permanent" : `${days} ${p(days, "day")}, ${hours} ${p(hours, "hour")}, ${minutes} ${p(minutes, "minute")}` },
                 { name: "Reason", value: reason },
                 { name: "Hidden Reason", value: reason_hidden ?? "None", hidden: true },
-                { name: "TOS", value: tos.toString() }
+                { name: "TOS", value: tos.toString() },
+                { name: "IP", value: res.ip ?? "Unknown", hidden: true }
             ], hide);
         }
     }
