@@ -2,10 +2,10 @@ const crypto = require("crypto");
 const { EmbedBuilder } = require("discord.js");
 const { client, getGroups } = require("./index.js");
 const config = require("./config.json");
-const urlBase = `http://${config["wfc-server"]}:${config["wfc-port"]}/api/`;
 
 const fcRegex = new RegExp(/[0-9]{4}-[0-9]{4}-[0-9]{4}/);
 const pidRegex = new RegExp(/^\d+$/);
+const urlBase = `http://${config["wfc-server"]}:${config["wfc-port"]}`;
 
 var currentColor = 0;
 const colors = [
@@ -91,15 +91,19 @@ module.exports = {
         return count == 1 ? text : text + "s";
     },
 
-    makeRequest: async function(interaction, fc, url) {
+    makeRequest: async function(interaction, fc, route, method, data) {
         try {
-            var response = await fetch(url, { method: "GET" });
+            var response = await fetch(urlBase + route, {
+                method: method,
+                body: JSON.stringify(data)
+            });
+
             var rjson = await response.json();
 
             if (response.ok && !rjson.error)
                 return [true, rjson];
             else {
-                console.error(`Failed to make request ${url}, response: ${rjson ? rjson.error : "no error message provided"}`);
+                console.error(`Failed to make request ${route}, response: ${rjson ? rjson.error : "no error message provided"}`);
                 interaction.reply({ content: `Failed to perform operation on friend code "${fc}": error ${rjson ? rjson.error : "no error message provided"}` });
 
                 return [false, rjson];
@@ -111,10 +115,6 @@ module.exports = {
 
             return [false, null];
         }
-    },
-
-    makeUrl: function(path, opts) {
-        return `${urlBase}${path}?secret=${config["wfc-secret"]}${opts}`;
     },
 
     sendEmbedLog: async function(interaction, action, fc, opts, hideMiiName = false) {

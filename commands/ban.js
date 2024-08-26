@@ -1,6 +1,6 @@
 const { SlashCommandBuilder, PermissionFlagsBits } = require("discord.js");
-const { makeRequest, makeUrl, pidToFc, resolvePidFromString, sendEmbedLog, validateId } = require("../utils.js");
-
+const { makeRequest, pidToFc, resolvePidFromString, sendEmbedLog, validateId } = require("../utils.js");
+const config = require("../config.json");
 
 function p(count, str) {
     if (count == 1)
@@ -48,7 +48,7 @@ module.exports = {
 
         const pid = resolvePidFromString(id);
         const reason = interaction.options.getString("reason", true);
-        const reason_hidden = interaction.options.getString("hidden-reason");
+        const reasonHidden = interaction.options.getString("hidden-reason");
         var days = interaction.options.getNumber("days") ?? 0;
         const hours = interaction.options.getNumber("hours") ?? 0;
         const minutes = interaction.options.getNumber("minutes") ?? 0;
@@ -63,15 +63,22 @@ module.exports = {
             days = 100000;
         }
 
-        const url = makeUrl("ban", `&pid=${pid}&reason=${reason}&reason_hidden=${reason_hidden}&days=${days}&hours=${hours}&minutes=${minutes}&tos=${tos}`);
-
         const fc = pidToFc(pid);
-        const [success, res] = await makeRequest(interaction, fc, url);
+        const [success, res] = await makeRequest(interaction, fc, "/api/ban", "POST", {
+            secret: config["wfc-secret"],
+            pid: pid,
+            days: days,
+            hours: hours,
+            minutes: minutes,
+            tos: tos,
+            reason: reason,
+            reasonHidden: reasonHidden ?? ""
+        });
         if (success) {
             sendEmbedLog(interaction, "ban", fc, [
                 { name: "Ban Length", value: perm ? "Permanent" : `${days} ${p(days, "day")}, ${hours} ${p(hours, "hour")}, ${minutes} ${p(minutes, "minute")}` },
                 { name: "Reason", value: reason },
-                { name: "Hidden Reason", value: reason_hidden ?? "None", hidden: true },
+                { name: "Hidden Reason", value: reasonHidden ?? "None", hidden: true },
                 { name: "TOS", value: tos.toString() },
                 { name: "IP", value: res.ip ?? "Unknown", hidden: true }
             ], hide);

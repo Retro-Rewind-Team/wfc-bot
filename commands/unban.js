@@ -1,5 +1,6 @@
 const { SlashCommandBuilder, PermissionFlagsBits } = require("discord.js");
-const { makeRequest, makeUrl, pidToFc, resolvePidFromString, sendEmbedLog, validateId } = require("../utils.js");
+const { makeRequest, pidToFc, resolvePidFromString, sendEmbedLog, validateId } = require("../utils.js");
+const config = require("../config.json");
 
 module.exports = {
     modOnly: true,
@@ -35,10 +36,8 @@ module.exports = {
         const reason_hidden = interaction.options.getString("hidden-reason");
         const hide = interaction.options.getBoolean("hide-name") ?? false;
 
-        const url = makeUrl("unban", `&pid=${pid}`);
-
         const fc = pidToFc(pid);
-        const [success, res] = await makeRequest(interaction, fc, url);
+        const [success, res] = await makeRequest(interaction, fc, "/api/unban", "POST", { secret: config["wfc-secret"], pid: pid });
         if (success) {
             sendEmbedLog(interaction, "unban", fc, [
                 { name: "Reason", value: reason },
