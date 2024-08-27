@@ -64,7 +64,7 @@ module.exports = {
         }
 
         const fc = pidToFc(pid);
-        const [success, res] = await makeRequest(interaction, fc, "/api/ban", "POST", {
+        const [success, res] = await makeRequest("/api/ban", "POST", {
             secret: config["wfc-secret"],
             pid: pid,
             days: days,
@@ -74,6 +74,7 @@ module.exports = {
             reason: reason,
             reasonHidden: reasonHidden ?? ""
         });
+
         if (success) {
             sendEmbedLog(interaction, "ban", fc, [
                 { name: "Ban Length", value: perm ? "Permanent" : `${days} ${p(days, "day")}, ${hours} ${p(hours, "hour")}, ${minutes} ${p(minutes, "minute")}` },
@@ -83,5 +84,7 @@ module.exports = {
                 { name: "IP", value: res.ip ?? "Unknown", hidden: true }
             ], hide);
         }
+        else
+            interaction.reply({ content: `Failed to ban friend code "${fc}": error ${res.error ?? "no error message provided"}` });
     }
 };

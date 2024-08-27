@@ -37,7 +37,7 @@ module.exports = {
         const hide = interaction.options.getBoolean("hide-name") ?? false;
 
         const fc = pidToFc(pid);
-        const [success, res] = await makeRequest(interaction, fc, "/api/kick", "POST", { secret: config["wfc-secret"], pid: pid });
+        const [success, res] = await makeRequest("/api/kick", "POST", { secret: config["wfc-secret"], pid: pid });
         if (success) {
             sendEmbedLog(interaction, "kick", fc, [
                 { name: "Reason", value: reason },
@@ -45,5 +45,7 @@ module.exports = {
                 { name: "IP", value: res.ip ?? "Unknown", hidden: true }
             ], hide);
         }
+        else
+            interaction.reply({ content: `Failed to unban friend code "${fc}": error ${res.error ?? "no error message provided"}` });
     }
 };

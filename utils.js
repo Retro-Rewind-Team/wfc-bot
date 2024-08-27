@@ -91,11 +91,11 @@ module.exports = {
         return count == 1 ? text : text + "s";
     },
 
-    makeRequest: async function(interaction, fc, route, method, data) {
+    makeRequest: async function(route, method, data) {
         try {
             var response = await fetch(urlBase + route, {
                 method: method,
-                body: JSON.stringify(data)
+                body: data ? JSON.stringify(data) : null
             });
 
             var rjson = await response.json();
@@ -104,16 +104,14 @@ module.exports = {
                 return [true, rjson];
             else {
                 console.error(`Failed to make request ${route}, response: ${rjson ? rjson.error : "no error message provided"}`);
-                interaction.reply({ content: `Failed to perform operation on friend code "${fc}": error ${rjson ? rjson.error : "no error message provided"}` });
 
                 return [false, rjson];
             }
         }
         catch (error) {
-            console.error(`Error performing operation on friend code "${fc}": ${error}`);
-            await interaction.reply({ content: `Error performing operation on friend code "${fc}": ${error}` });
+            console.error(`Failed to make request ${route}, error: ${error}`);
 
-            return [false, null];
+            return [false, { error: error }];
         }
     },
 
