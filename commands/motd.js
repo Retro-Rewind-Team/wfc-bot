@@ -17,7 +17,7 @@ module.exports = {
         var motd = interaction.options.getString("message");
 
         if (motd) {
-            motd = motd.replace("\\n", "\n");
+            motd = motd.replace(/\\n/g, "\n");
             const [success, res] = await makeRequest("/api/motd", "POST", { secret: config["wfc-secret"], motd: motd });
 
             if (success)
