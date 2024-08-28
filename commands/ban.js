@@ -76,12 +76,11 @@ module.exports = {
         });
 
         if (success) {
-            sendEmbedLog(interaction, "ban", fc, [
+            sendEmbedLog(interaction, "ban", fc, res.User, [
                 { name: "Ban Length", value: perm ? "Permanent" : `${days} ${p(days, "day")}, ${hours} ${p(hours, "hour")}, ${minutes} ${p(minutes, "minute")}` },
                 { name: "Reason", value: reason },
                 { name: "Hidden Reason", value: reasonHidden ?? "None", hidden: true },
                 { name: "TOS", value: tos.toString() },
-                { name: "IP", value: res.ip ?? "Unknown", hidden: true }
             ], hide);
         }
         else

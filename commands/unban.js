@@ -39,10 +39,9 @@ module.exports = {
         const fc = pidToFc(pid);
         const [success, res] = await makeRequest("/api/unban", "POST", { secret: config["wfc-secret"], pid: pid });
         if (success) {
-            sendEmbedLog(interaction, "unban", fc, [
+            sendEmbedLog(interaction, "unban", fc, res.User, [
                 { name: "Reason", value: reason },
                 { name: "Hidden Reason", value: reason_hidden ?? "None", hidden: true },
-                { name: "IP", value: res.ip ?? "Unknown", hidden: true }
             ], hide);
         }
         else

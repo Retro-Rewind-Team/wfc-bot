@@ -23,15 +23,15 @@ module.exports = {
             if (success)
                 interaction.reply({ content: `Set message of the day to: "${motd}"` });
             else
-                interaction.reply({ content: `Failed to set message of the day, error: ${res.error ?? "no error message provided"}` });
+                interaction.reply({ content: `Failed to set message of the day, error: ${res.Error ?? "no error message provided"}` });
         }
         else {
             const [success, res] = await makeRequest("/api/motd", "GET");
 
             if (success)
-                interaction.reply({ content: `Current message of the day is: "${res.motd}"` });
+                interaction.reply({ content: `Current message of the day is:\n${res.Motd}` });
             else
-                interaction.reply({ content: `Failed to fetch current message of the day, error: ${res.error ?? "no error message provided"}` });
+                interaction.reply({ content: `Failed to fetch current message of the day, error: ${res.Error ?? "no error message provided"}` });
         }
     }
 };

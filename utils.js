@@ -1,6 +1,6 @@
 const crypto = require("crypto");
 const { EmbedBuilder } = require("discord.js");
-const { client, getGroups } = require("./index.js");
+const { client } = require("./index.js");
 const config = require("./config.json");
 
 const fcRegex = new RegExp(/[0-9]{4}-[0-9]{4}-[0-9]{4}/);
@@ -24,19 +24,6 @@ function getColor() {
         currentColor = 0;
 
     return colors[currentColor];
-}
-
-function getMiiName(fc) {
-    const rooms = getGroups().rooms;
-
-    for (const room of rooms) {
-        for (const idx in room.players) {
-            if (room.players[idx].fc == fc)
-                return room.players[idx].name;
-        }
-    }
-
-    return null;
 }
 
 module.exports = {
@@ -115,8 +102,8 @@ module.exports = {
         }
     },
 
-    sendEmbedLog: async function(interaction, action, fc, opts, hideMiiName = false) {
-        const miiName = getMiiName(fc) ?? "Unknown";
+    sendEmbedLog: async function(interaction, action, fc, user, opts, hideMiiName = false) {
+        const miiName = user.LastInGameSn != "" ? user.LastInGameSn : "Unknown";
 
         const privEmbed = new EmbedBuilder()
             .setColor(getColor())
@@ -125,7 +112,8 @@ module.exports = {
                 { name: "Server", value: interaction.guild.name },
                 { name: "Moderator", value: `<@${interaction.member.id}>` },
                 { name: "Friend Code", value: fc },
-                { name: "Mii Name", value: miiName }
+                { name: "Mii Name", value: miiName },
+                { name: "IP", value: user.LastIPAddress != "" ? user.LastIPAddress : "Unknown", hidden: true }
             )
             .setTimestamp();
 
