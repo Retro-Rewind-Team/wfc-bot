@@ -84,6 +84,6 @@ module.exports = {
             ], hide);
         }
         else
-            interaction.reply({ content: `Failed to ban friend code "${fc}": error ${res.error ?? "no error message provided"}` });
+            interaction.reply({ content: `Failed to ban friend code "${fc}": error ${res.Error ?? "no error message provided"}` });
     }
 };

@@ -13,10 +13,10 @@ module.exports = {
                 .setDescription("friend code or pid to kick")
                 .setRequired(true))
         .addStringOption(option => option.setName("reason")
-            .setDescription("ban reason")
+            .setDescription("kick reason")
             .setRequired(true))
         .addStringOption(option => option.setName("hidden-reason")
-            .setDescription("ban reason only visible to moderators"))
+            .setDescription("kick reason only visible to moderators"))
         .addBooleanOption(option =>
             option.setName("hide-name")
                 .setDescription("hide mii name in logs"))
@@ -27,7 +27,7 @@ module.exports = {
         id = id.trim();
 
         if (!validateId(id)) {
-            await interaction.reply({ content: `Error banning friend code or pid "${id}": Incorrect format` });
+            await interaction.reply({ content: `Error kicking friend code or pid "${id}": Incorrect format` });
             return;
         }
 
@@ -45,6 +45,6 @@ module.exports = {
             ], hide);
         }
         else
-            interaction.reply({ content: `Failed to unban friend code "${fc}": error ${res.error ?? "no error message provided"}` });
+            interaction.reply({ content: `Failed to kick friend code "${fc}": error ${res.Error ?? "no error message provided"}` });
     }
 };

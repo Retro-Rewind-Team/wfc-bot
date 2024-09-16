@@ -80,23 +80,24 @@ module.exports = {
 
     makeRequest: async function(route, method, data) {
         try {
-            var response = await fetch(urlBase + route, {
+            const url = urlBase + route;
+            var response = await fetch(url, {
                 method: method,
                 body: data ? JSON.stringify(data) : null
             });
 
             var rjson = await response.json();
 
-            if (response.ok && !rjson.error)
+            if (response.ok && !rjson.Error)
                 return [true, rjson];
             else {
-                console.error(`Failed to make request ${route}, response: ${rjson ? rjson.error : "no error message provided"}`);
+                console.error(`Failed to make request ${url}, response: ${rjson ? rjson.Error : "no error message provided"}`);
 
                 return [false, rjson];
             }
         }
         catch (error) {
-            console.error(`Failed to make request ${route}, error: ${error}`);
+            console.error(`Failed to make request ${url}, error: ${error}`);
 
             return [false, { error: error }];
         }

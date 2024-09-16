@@ -6,17 +6,17 @@ module.exports = {
     modOnly: true,
 
     data: new SlashCommandBuilder()
-        .setName("unban")
-        .setDescription("Unban a user")
+        .setName("clear")
+        .setDescription("Clear a user from the database")
         .addStringOption(option =>
             option.setName("id")
-                .setDescription("friend code or pid to unban")
+                .setDescription("friend code or pid to clear")
                 .setRequired(true))
         .addStringOption(option => option.setName("reason")
-            .setDescription("unban reason")
+            .setDescription("clear reason")
             .setRequired(true))
         .addStringOption(option => option.setName("hidden-reason")
-            .setDescription("unban reason only visible to moderators"))
+            .setDescription("clear reason only visible to moderators"))
         .addBooleanOption(option =>
             option.setName("hide-name")
                 .setDescription("hide mii name in logs"))
@@ -27,7 +27,7 @@ module.exports = {
         id = id.trim();
 
         if (!validateId(id)) {
-            await interaction.reply({ content: `Error unbanning friend code or pid "${id}": Incorrect format` });
+            await interaction.reply({ content: `Error clearing friend code or pid "${id}": Incorrect format` });
             return;
         }
 
@@ -37,14 +37,14 @@ module.exports = {
         const hide = interaction.options.getBoolean("hide-name") ?? false;
 
         const fc = pidToFc(pid);
-        const [success, res] = await makeRequest("/api/unban", "POST", { secret: config["wfc-secret"], pid: pid });
+        const [success, res] = await makeRequest("/api/clear", "POST", { secret: config["wfc-secret"], pid: pid });
         if (success) {
-            sendEmbedLog(interaction, "unban", fc, res.User, [
+            sendEmbedLog(interaction, "clear", fc, res.User, [
                 { name: "Reason", value: reason },
                 { name: "Hidden Reason", value: reason_hidden ?? "None", hidden: true },
             ], hide);
         }
         else
-            interaction.reply({ content: `Failed to unban friend code "${fc}": error ${res.Error ?? "no error message provided"}` });
+            interaction.reply({ content: `Failed to clear friend code "${fc}": error ${res.Error ?? "no error message provided"}` });
     }
 };
