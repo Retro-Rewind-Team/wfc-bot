@@ -37,7 +37,7 @@ module.exports = {
         const hide = interaction.options.getBoolean("hide-name") ?? false;
 
         const fc = pidToFc(pid);
-        const [success, res] = await makeRequest("/api/kick", "POST", { secret: config["wfc-secret"], pid: pid });
+        const [success, res] = await makeRequest("/api/kick", "POST", { secret: config["wfc-secret"], pid: pid, reason: reason });
         if (success) {
             sendEmbedLog(interaction, "kick", fc, res.User, [
                 { name: "Reason", value: reason },
