@@ -35,6 +35,9 @@ module.exports = {
         .addBooleanOption(option =>
             option.setName("hide-name")
                 .setDescription("hide mii name in logs"))
+        .addBooleanOption(option =>
+            option.setName("hide-public")
+                .setDescription("hide public log message"))
         .setDefaultMemberPermissions(PermissionFlagsBits.BanMembers),
 
     exec: async function(interaction) {
@@ -54,6 +57,7 @@ module.exports = {
         const minutes = interaction.options.getNumber("minutes") ?? 0;
         const tos = interaction.options.getBoolean("tos") ?? true;
         const hide = interaction.options.getBoolean("hide-name") ?? false;
+        const hidePublic = interaction.options.getBoolean("hide-public") ?? false;
 
         var perm = false;
         if (hours + minutes + days == 0) {
@@ -81,7 +85,7 @@ module.exports = {
                 { name: "Reason", value: reason },
                 { name: "Hidden Reason", value: reasonHidden ?? "None", hidden: true },
                 { name: "TOS", value: tos.toString() },
-            ], hide);
+            ], hide, hidePublic);
         }
         else
             interaction.reply({ content: `Failed to ban friend code "${fc}": error ${res.Error ?? "no error message provided"}` });

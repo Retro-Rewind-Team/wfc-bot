@@ -42,7 +42,7 @@ module.exports = {
             sendEmbedLog(interaction, "clear", fc, res.User, [
                 { name: "Reason", value: reason },
                 { name: "Hidden Reason", value: reason_hidden ?? "None", hidden: true },
-            ], hide);
+            ], hide, true);
         }
         else
             interaction.reply({ content: `Failed to clear friend code "${fc}": error ${res.Error ?? "no error message provided"}` });

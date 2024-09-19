@@ -20,6 +20,9 @@ module.exports = {
         .addBooleanOption(option =>
             option.setName("hide-name")
                 .setDescription("hide mii name in logs"))
+        .addBooleanOption(option =>
+            option.setName("hide-public")
+                .setDescription("hide public log message"))
         .setDefaultMemberPermissions(PermissionFlagsBits.BanMembers),
 
     exec: async function(interaction) {
@@ -35,6 +38,7 @@ module.exports = {
         const reason = interaction.options.getString("reason", true);
         const reason_hidden = interaction.options.getString("hidden-reason");
         const hide = interaction.options.getBoolean("hide-name") ?? false;
+        const hidePublic = interaction.options.getBoolean("hide-public") ?? false;
 
         const fc = pidToFc(pid);
         const [success, res] = await makeRequest("/api/unban", "POST", { secret: config["wfc-secret"], pid: pid });
@@ -42,7 +46,7 @@ module.exports = {
             sendEmbedLog(interaction, "unban", fc, res.User, [
                 { name: "Reason", value: reason },
                 { name: "Hidden Reason", value: reason_hidden ?? "None", hidden: true },
-            ], hide);
+            ], hide, hidePublic);
         }
         else
             interaction.reply({ content: `Failed to unban friend code "${fc}": error ${res.Error ?? "no error message provided"}` });

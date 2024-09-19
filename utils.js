@@ -103,7 +103,7 @@ module.exports = {
         }
     },
 
-    sendEmbedLog: async function(interaction, action, fc, user, opts, hideMiiName = false) {
+    sendEmbedLog: async function(interaction, action, fc, user, opts, hideMiiName = false, noPublicEmbed = false) {
         const miiName = user.LastInGameSn != "" ? user.LastInGameSn : "Unknown";
 
         const privEmbed = new EmbedBuilder()
@@ -122,6 +122,10 @@ module.exports = {
             privEmbed.addFields(...opts);
 
         await client.channels.cache.get(config["logs-channel"]).send({ embeds: [privEmbed] });
+        interaction.reply({ content: `Successful ${action} performed on friend code "${fc}"` });
+
+        if (noPublicEmbed)
+            return;
 
         const pubEmbed = new EmbedBuilder()
             .setColor(getColor())
@@ -139,7 +143,5 @@ module.exports = {
         }
 
         await client.channels.cache.get(config["public-logs-channel"]).send({ embeds: [pubEmbed] });
-
-        interaction.reply({ content: `Successful ${action} performed on friend code "${fc}"` });
     },
 };
