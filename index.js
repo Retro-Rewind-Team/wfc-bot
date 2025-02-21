@@ -17,9 +17,17 @@ module.exports = {
         return stats;
     }
 };
-
+/*
 if (!config["moderation-roles"] || typeof config["moderation-roles"] != "object" || config["moderation-roles"].length === 0) {
     console.error("No moderation role is set or it is set incorrectly! Correct this to continue.");
+    exit(1);
+} */
+if (!config["allowed-moderators"] || typeof config["allowed-moderators"] != "object" || config["allowed-moderators"].length === 0) {
+    console.log("No moderators set!")
+}
+
+if (!config["allowed-admins"] || typeof config["allowed-admins"] != "object" || config["allowed-admins"].length === 0) {
+    console.error("No admins set! Please set one to continue.");
     exit(1);
 }
 
@@ -124,25 +132,32 @@ function hasAnyRoles(member, roles) {
 }
 
 // TODO: Make this function not suck?
-function isAllowedInteraction(interaction, modOnly) {
+function isAllowedInteraction(interaction, modOnly, adminOnly) {
     var err = [];
 
-    var server = false, channel = false, user = false;
+    var server = false, channel = false, user = true;
 
-    if (!config["allowed-servers"] || config["allowed-servers"].length == 0 || config["allowed-servers"].includes(interaction.guildId))
+    if (!config["allowed-servers"] || config["allowed-servers"].length == 0 || config["allowed-servers"].includes(interaction.guildId)) {
         server = true;
-    else
+    } else {
         err.push("disallowed guild");
+    }
 
-    if (!config["allowed-channels"] || config["allowed-channels"].length == 0 || config["allowed-channels"].includes(interaction.channelId))
+    if (!config["allowed-channels"] || config["allowed-channels"].length == 0 || config["allowed-channels"].includes(interaction.channelId)) {
         channel = true;
-    else
+    } else {
         err.push("disallowed channel");
+    }
 
-    if (modOnly && !hasAnyRoles(interaction.member, config["moderation-roles"]))
-        err.push("insufficient roles");
-    else
-        user = true;
+    if (adminOnly && !config["allowed-admins"].includes(interaction.user.id)) {
+        err.push("not an admin");
+        user = false;
+    }
+
+    if (modOnly && !config["allowed-moderators"].includes(interaction.user.id)) {
+        err.push("not a moderator");
+        user = false;
+    }
 
     return [server && channel && user, err.join(", ")];
 }
@@ -170,7 +185,7 @@ client.on(Events.InteractionCreate, async interaction => {
                 continue;
 
             const command = commands[cname];
-            const [allowed, err] = isAllowedInteraction(interaction, command.modOnly);
+            const [allowed, err] = isAllowedInteraction(interaction, command.modOnly, command.adminOnly);
             if (!allowed) {
                 interaction.reply({ content: `Command ${cname} is not allowed! Error: ${err}` });
                 return;
