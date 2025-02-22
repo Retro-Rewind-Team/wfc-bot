@@ -4,7 +4,6 @@ const { getColor } = require("../utils.js");
 
 module.exports = {
     modOnly: false,
-    adminOnly: false,
 
     data: new SlashCommandBuilder()
         .setName("status")

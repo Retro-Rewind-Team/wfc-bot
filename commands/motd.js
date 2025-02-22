@@ -4,7 +4,6 @@ const config = require("../config.json");
 
 module.exports = {
     modOnly: true,
-    adminOnly: false,
 
     data: new SlashCommandBuilder()
         .setName("motd")

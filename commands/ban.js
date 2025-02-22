@@ -11,7 +11,6 @@ function p(count, str) {
 
 module.exports = {
     modOnly: true,
-    adminOnly: false,
 
     data: new SlashCommandBuilder()
         .setName("ban")
