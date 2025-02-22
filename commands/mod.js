@@ -1,7 +1,23 @@
-const { SlashCommandBuilder, PermissionFlagsBits } = require("discord.js");
+const { SlashCommandBuilder, EmbedBuilder, PermissionFlagsBits } = require("discord.js");
+const { client } = require("../index.js");
 const config = require("../config.json");
 const fs = require("fs");
 const path = require("path");
+const { getColor } = require("../utils");
+
+async function sendEmbed(interaction, action, updatedUser) {
+    const embed = new EmbedBuilder()
+        .setColor(getColor())
+        .setTitle(`${action.charAt(0).toUpperCase() + action.slice(1)} performed by ${interaction.member.displayName}`)
+        .addFields(
+            { name: "Server", value: interaction.guild.name },
+            { name: "Moderator", value: `<@${interaction.member.id}>` },
+            { name: "Updated User", value: `<@${updatedUser.id}>` },
+        )
+        .setTimestamp();
+
+    await client.channels.cache.get(config["logs-channel"]).send({ embeds: [embed] });
+}
 
 module.exports = {
     modOnly: false,
@@ -33,11 +49,16 @@ module.exports = {
         const user = interaction.options.getUser("user");
         const configPath = path.join(__dirname, "../config.json");
 
+        if (!config["allowed-moderators"])
+            config["allowed-moderators"] = [];
+
         if (subcommand === "add") {
             if (!config["allowed-moderators"].includes(user.id)) {
                 config["allowed-moderators"].push(user.id);
                 fs.writeFileSync(configPath, JSON.stringify(config, null, 2));
                 await interaction.reply({ content: `User ${user.tag} has been added as a moderator.` });
+
+                sendEmbed(interaction, "Moderator Addition", user);
             } else {
                 await interaction.reply({ content: `User ${user.tag} is already a moderator.` });
             }
@@ -47,6 +68,8 @@ module.exports = {
                 config["allowed-moderators"].splice(index, 1);
                 fs.writeFileSync(configPath, JSON.stringify(config, null, 2));
                 await interaction.reply({ content: `User ${user.tag} has been removed as a moderator.` });
+
+                sendEmbed(interaction, "Moderator Removal", user);
             } else {
                 await interaction.reply({ content: `User ${user.tag} is not a moderator.` });
             }
