@@ -28,7 +28,7 @@ module.exports = {
                         .setDescription("The user to remove as a moderator")
                         .setRequired(true))),
 
-    exec: async function (interaction) {
+    exec: async function(interaction) {
         const subcommand = interaction.options.getSubcommand();
         const user = interaction.options.getUser("user");
         const configPath = path.join(__dirname, "../config.json");

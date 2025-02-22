@@ -23,7 +23,7 @@ if (!config["moderation-roles"] || typeof config["moderation-roles"] != "object"
     exit(1);
 } */
 if (!config["allowed-moderators"] || typeof config["allowed-moderators"] != "object" || config["allowed-moderators"].length === 0) {
-    console.log("No moderators set!")
+    console.log("No moderators set!");
 }
 
 if (!config["allowed-admins"] || typeof config["allowed-admins"] != "object" || config["allowed-admins"].length === 0) {
@@ -215,7 +215,7 @@ async function refreshCommands() {
     for (const cname in commands)
         commandsJson.push(commands[cname].data.toJSON());
 
-    console.log(`Refreshing global slash commands`);
+    console.log("Refreshing global slash commands");
 
     const rest = new REST().setToken(config["token"]);
 
