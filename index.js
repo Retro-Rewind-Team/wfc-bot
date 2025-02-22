@@ -122,14 +122,14 @@ client.once(Events.ClientReady, async function(readyClient) {
 
 client.login(config["token"]);
 
-function hasAnyRoles(member, roles) {
+/* function hasAnyRoles(member, roles) {
     for (const role of roles) {
         if (member.roles.cache.get(role))
             return true;
     }
 
     return false;
-}
+} */
 
 // TODO: Make this function not suck?
 function isAllowedInteraction(interaction, modOnly, adminOnly) {
@@ -137,6 +137,7 @@ function isAllowedInteraction(interaction, modOnly, adminOnly) {
 
     var server = false, channel = false, user = true;
 
+    /* Deprecated
     if (!config["allowed-servers"] || config["allowed-servers"].length == 0 || config["allowed-servers"].includes(interaction.guildId)) {
         server = true;
     } else {
@@ -148,6 +149,7 @@ function isAllowedInteraction(interaction, modOnly, adminOnly) {
     } else {
         err.push("disallowed channel");
     }
+    */
 
     if (adminOnly && !config["allowed-admins"].includes(interaction.user.id)) {
         err.push("not an admin");
@@ -213,20 +215,16 @@ async function refreshCommands() {
     for (const cname in commands)
         commandsJson.push(commands[cname].data.toJSON());
 
-    for (var j in config["allowed-servers"]) {
-        var guildId = config["allowed-servers"][j];
+    console.log(`Refreshing global slash commands`);
 
-        console.log(`refreshing slash commands for guild ${guildId}`);
+    const rest = new REST().setToken(config["token"]);
 
-        const rest = new REST().setToken(config["token"]);
+    const data = await rest.put(
+        Routes.applicationCommands(config["application-id"]),
+        { body: commandsJson }
+    );
 
-        const data = await rest.put(
-            Routes.applicationGuildCommands(config["application-id"], guildId),
-            { body: commandsJson }
-        );
-
-        console.log(`Successfully reloaded ${data.length} application (/) commands for guild ${guildId}`);
-    }
+    console.log(`Successfully reloaded ${data.length} global application (/) commands`);
 }
 
 for (var i in process.argv) {
