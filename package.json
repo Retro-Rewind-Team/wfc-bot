@@ -2,13 +2,22 @@
   "name": "wfc-bot",
   "version": "1.0.0",
   "description": "Discord bot to facilitate banning users by friend code for a wfc server",
-  "main": "index.js",
+  "main": "index.ts",
+  "type": "module",
   "scripts": {
+    "start": "cd build && node index.js",
+    "build": "tsc",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "ppeb",
   "license": "ISC",
   "dependencies": {
     "discord.js": "^14.15.3"
+  },
+  "devDependencies": {
+    "@types/node": "^22.13.5",
+    "discord-api-types": "^0.37.119",
+    "typescript": "^5.7.3",
+    "typescript-eslint": "^8.24.1"
   }
 }

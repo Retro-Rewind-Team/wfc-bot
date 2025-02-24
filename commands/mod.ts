@@ -1,25 +1,32 @@
-const { SlashCommandBuilder, EmbedBuilder, PermissionFlagsBits } = require("discord.js");
-const { client } = require("../index.js");
-const config = require("../config.json");
-const fs = require("fs");
-const path = require("path");
-const { getColor } = require("../utils");
+import { CacheType, ChatInputCommandInteraction, EmbedBuilder, GuildMember, PermissionFlagsBits, SlashCommandBuilder, TextChannel, User } from "discord.js";
+import { client } from "../index.js";
+import config from "../config.json" with { type: "json" };
+import fs from "fs";
+import path from "path";
+import { getColor } from "../utils.js";
 
-async function sendEmbed(interaction, action, updatedUser) {
+async function sendEmbed(interaction: ChatInputCommandInteraction<CacheType>, action: string, updatedUser: User) {
+    const member = interaction.member as GuildMember | null;
+
+    if (!member) {
+        console.error("Unable to send embed for mod command, member was null");
+        return;
+    }
+
     const embed = new EmbedBuilder()
         .setColor(getColor())
-        .setTitle(`${action.charAt(0).toUpperCase() + action.slice(1)} performed by ${interaction.member.displayName}`)
+        .setTitle(`${action.charAt(0).toUpperCase() + action.slice(1)} performed by ${member.displayName}`)
         .addFields(
-            { name: "Server", value: interaction.guild.name },
-            { name: "Moderator", value: `<@${interaction.member.id}>` },
+            { name: "Server", value: interaction.guild!.name },
+            { name: "Moderator", value: `<@${member.id}>` },
             { name: "Updated User", value: `<@${updatedUser.id}>` },
         )
         .setTimestamp();
 
-    await client.channels.cache.get(config["logs-channel"]).send({ embeds: [embed] });
+    await (client.channels.cache.get(config["logs-channel"]) as TextChannel | null)?.send({ embeds: [embed] });
 }
 
-module.exports = {
+export default {
     modOnly: false,
     adminOnly: true,
 
@@ -44,10 +51,10 @@ module.exports = {
                         .setDescription("The user to remove as a moderator")
                         .setRequired(true))),
 
-    exec: async function(interaction) {
+    exec: async function(interaction: ChatInputCommandInteraction<CacheType>) {
         const subcommand = interaction.options.getSubcommand();
-        const user = interaction.options.getUser("user");
-        const configPath = path.join(__dirname, "../config.json");
+        const user = interaction.options.getUser("user")!;
+        const configPath = path.join(import.meta.dirname, "../config.json");
 
         if (!config["allowed-moderators"])
             config["allowed-moderators"] = [];
@@ -59,9 +66,8 @@ module.exports = {
                 await interaction.reply({ content: `User ${user.tag} has been added as a moderator.` });
 
                 sendEmbed(interaction, "Moderator Addition", user);
-            } else {
+            } else
                 await interaction.reply({ content: `User ${user.tag} is already a moderator.` });
-            }
         } else if (subcommand === "remove") {
             const index = config["allowed-moderators"].indexOf(user.id);
             if (index > -1) {
@@ -70,9 +76,8 @@ module.exports = {
                 await interaction.reply({ content: `User ${user.tag} has been removed as a moderator.` });
 
                 sendEmbed(interaction, "Moderator Removal", user);
-            } else {
+            } else
                 await interaction.reply({ content: `User ${user.tag} is not a moderator.` });
-            }
         }
     }
 };

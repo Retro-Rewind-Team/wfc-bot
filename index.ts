@@ -1,27 +1,66 @@
-const { Client, Events, IntentsBitField, REST, Routes } = require("discord.js");
-const config = require("./config.json");
-const fs = require("fs");
-const path = require("path");
-const { exit } = require("process");
+import { CacheType, ChatInputCommandInteraction, Client, Events, IntentsBitField, REST, RESTPostAPIChatInputApplicationCommandsJSONBody, RESTPutAPIApplicationCommandsResult, Routes, SlashCommandOptionsOnlyBuilder, TextChannel } from "discord.js";
+import config from "./config.json" with { type: "json" };
+import * as fs from "fs";
+import * as path from "path";
+import { exit } from "process";
 
-const client = new Client({ intents: [IntentsBitField.Flags.Guilds, IntentsBitField.Flags.GuildMessages] });
-var groups = null;
-var stats = null;
+interface Mii {
+    data: string,
+    name: string,
+}
 
-module.exports = {
-    client: client,
-    getGroups: function() {
-        return groups;
-    },
-    getStats: function() {
-        return stats;
-    }
-};
-/*
-if (!config["moderation-roles"] || typeof config["moderation-roles"] != "object" || config["moderation-roles"].length === 0) {
-    console.error("No moderation role is set or it is set incorrectly! Correct this to continue.");
-    exit(1);
-} */
+interface Player {
+    count: string,
+    pid: string,
+    name: string,
+    conn_map: string,
+    conn_fail: string,
+    suspend: string,
+    fc: string,
+    ev: string,
+    eb: string,
+    mii: Mii[],
+}
+
+interface Group {
+    id: string,
+    game: string,
+    created: string,
+    type: string,
+    suspend: boolean,
+    host: string,
+    rk: string,
+    players: Player[],
+}
+
+interface Groups {
+    timestamp: number,
+    rooms: Group[],
+}
+
+interface Stat {
+    online: number,
+    active: number,
+    groups: number,
+}
+
+interface Stats {
+    global: Stat,
+    mariokartwii: Stat,
+}
+
+export const client = new Client({ intents: [IntentsBitField.Flags.Guilds, IntentsBitField.Flags.GuildMessages] });
+let groups: Groups | null = null;
+let stats: Stats | null = null;
+
+export function getGroups() {
+    return groups;
+}
+
+export function getStats() {
+    return stats;
+}
+
 if (!config["allowed-moderators"] || typeof config["allowed-moderators"] != "object" || config["allowed-moderators"].length === 0) {
     console.log("No moderators set!");
 }
@@ -44,23 +83,23 @@ if (!config["public-logs-channel"]) {
 const fetchGroupsUrl = `http://${config["wfc-server"]}:${config["wfc-port"]}/api/groups`;
 const fetchStatsUrl = `http://${config["wfc-server"]}:${config["wfc-port"]}/api/stats`;
 async function fetchGroups() {
-    function plural(count, text) {
+    function plural(count: number, text: string) {
         return count == 1 ? text : text + "s";
     }
 
-    function throwInline(err) {
+    function throwInline(err: string) {
         throw new Error(err);
     }
 
-    async function queryJson(url) {
-        var response = await fetch(url);
+    async function queryJson(url: string) {
+        const response = await fetch(url);
 
         if (!response.ok) {
             console.error(`Unable to fetch groups, status code: ${response.status}`);
             return null;
         }
 
-        var json = await response.json();
+        const json = await response.json();
 
         if (!json) {
             console.error(`Invalid response from ${url}, unable to populate groups!`);
@@ -74,12 +113,12 @@ async function fetchGroups() {
         const groupsJson = (await queryJson(fetchGroupsUrl)) ?? throwInline("Empty or no json response from groups api.");
         groups = { timestamp: Date.now(), rooms: groupsJson };
         stats = await queryJson(fetchStatsUrl) ?? throwInline("Empty or no json response from stats api.");
-        const players = stats.mariokartwii.active;
-        const rooms = stats.mariokartwii.groups;
+        const players = stats!.mariokartwii.active;
+        const rooms = stats!.mariokartwii.groups;
 
         const presenceText = `${players} ${plural(players, "player")} in ${rooms} ${plural(rooms, "room")}!`;
 
-        client.user.setPresence({
+        client.user?.setPresence({
             status: "online",
             activities: [{
                 name: "Stats",
@@ -98,23 +137,23 @@ async function fetchGroups() {
 client.once(Events.ClientReady, async function(readyClient) {
     console.log(`Logged in as ${readyClient.user.tag}`);
 
-    var channel = await client.channels.fetch(config["logs-channel"]);
+    const channel = await client.channels.fetch(config["logs-channel"]);
 
     if (!channel) {
         console.error("Invalid channelid set for logs!");
         exit(1);
     }
     else
-        console.log(`Logs set to send to channel ${channel.name}`);
+        console.log(`Logs set to send to channel ${(channel as TextChannel).name}`);
 
-    var pubchannel = await client.channels.fetch(config["public-logs-channel"]);
+    const pubchannel = await client.channels.fetch(config["public-logs-channel"]);
 
     if (!pubchannel) {
         console.error("Invalid channelid set for public logs!");
         exit(1);
     }
     else
-        console.log(`Public logs set to send to channel ${pubchannel.name}`);
+        console.log(`Public logs set to send to channel ${(pubchannel as TextChannel).name}`);
     // Runs once a minute
     setInterval(fetchGroups, 60000);
     fetchGroups();
@@ -122,34 +161,11 @@ client.once(Events.ClientReady, async function(readyClient) {
 
 client.login(config["token"]);
 
-/* function hasAnyRoles(member, roles) {
-    for (const role of roles) {
-        if (member.roles.cache.get(role))
-            return true;
-    }
-
-    return false;
-} */
-
 // TODO: Make this function not suck?
-function isAllowedInteraction(interaction, modOnly, adminOnly) {
-    var err = [];
+function isAllowedInteraction(interaction: ChatInputCommandInteraction<CacheType>, modOnly: boolean, adminOnly: boolean) {
+    const err: string[] = [];
 
-    var user = true;
-
-    /* Deprecated
-    if (!config["allowed-servers"] || config["allowed-servers"].length == 0 || config["allowed-servers"].includes(interaction.guildId)) {
-        server = true;
-    } else {
-        err.push("disallowed guild");
-    }
-
-    if (!config["allowed-channels"] || config["allowed-channels"].length == 0 || config["allowed-channels"].includes(interaction.channelId)) {
-        channel = true;
-    } else {
-        err.push("disallowed channel");
-    }
-    */
+    let user = true;
 
     if (adminOnly && !config["allowed-admins"].includes(interaction.user.id)) {
         err.push("not an admin");
@@ -164,15 +180,25 @@ function isAllowedInteraction(interaction, modOnly, adminOnly) {
     return [user, err.join(", ")];
 }
 
-const commands = {};
-const commandsPath = path.join(__dirname, "commands");
+interface Command {
+    modOnly: boolean,
+    adminOnly: boolean,
+    data: SlashCommandOptionsOnlyBuilder;
+    exec: (_: ChatInputCommandInteraction<CacheType>) => Promise<void>,
+}
+
+interface Dictionary<T> { [key: string]: T }
+
+const commands: Dictionary<Command> = {};
+const commandsPath = path.join(import.meta.dirname, "commands");
+// const commandFiles = fs.readdirSync(commandsPath).filter(file => file.endsWith(".ts"));
 const commandFiles = fs.readdirSync(commandsPath).filter(file => file.endsWith(".js"));
 
 for (const file of commandFiles) {
-    const spec = require(path.join(commandsPath, file));
+    const spec = await import(path.join(commandsPath, file));
 
     if ("data" in spec && "exec" in spec)
-        commands[path.basename(file, ".js")] = spec;
+        commands[path.basename(file, ".ts")] = spec;
     else
         console.error(`The command at ${file} is missing a required data or exec property`);
 }
@@ -210,7 +236,7 @@ client.on(Events.InteractionCreate, async interaction => {
 });
 
 async function refreshCommands() {
-    const commandsJson = [];
+    const commandsJson: RESTPostAPIChatInputApplicationCommandsJSONBody[] = [];
 
     for (const cname in commands)
         commandsJson.push(commands[cname].data.toJSON());
@@ -222,13 +248,13 @@ async function refreshCommands() {
     const data = await rest.put(
         Routes.applicationCommands(config["application-id"]),
         { body: commandsJson }
-    );
+    ) as RESTPutAPIApplicationCommandsResult;
 
     console.log(`Successfully reloaded ${data.length} global application (/) commands`);
 }
 
-for (var i in process.argv) {
-    var arg = process.argv[i];
+for (const i in process.argv) {
+    const arg = process.argv[i];
 
     if (arg == "--refresh-commands") {
         refreshCommands();

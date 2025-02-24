@@ -1,8 +1,8 @@
-const { EmbedBuilder, SlashCommandBuilder } = require("discord.js");
-const { getStats } = require("../index.js");
-const { getColor } = require("../utils.js");
+import { CacheType, ChatInputCommandInteraction, EmbedBuilder, SlashCommandBuilder } from "discord.js";
+import { getStats } from "../index.js";
+import { getColor } from "../utils.js";
 
-module.exports = {
+export default {
     modOnly: false,
     adminOnly: false,
 
@@ -10,7 +10,7 @@ module.exports = {
         .setName("status")
         .setDescription("Display status information for the Retro Rewind servers."),
 
-    exec: async function(interaction) {
+    exec: async function(interaction: ChatInputCommandInteraction<CacheType>) {
         const stats = getStats();
 
         if (!stats) {

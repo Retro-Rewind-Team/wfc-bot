@@ -1,8 +1,9 @@
-const { SlashCommandBuilder, PermissionFlagsBits } = require("discord.js");
-const { makeRequest } = require("../utils.js");
-const config = require("../config.json");
+import { CacheType, ChatInputCommandInteraction } from "discord.js";
+import { PermissionFlagsBits, SlashCommandBuilder } from "discord.js";
+import { makeRequest } from "../utils.js";
+import config from "../config.json" with { type: "json" };
 
-module.exports = {
+export default {
     modOnly: true,
     adminOnly: false,
 
@@ -14,8 +15,8 @@ module.exports = {
                 .setDescription("message of the day to set"))
         .setDefaultMemberPermissions(PermissionFlagsBits.BanMembers),
 
-    exec: async function(interaction) {
-        var motd = interaction.options.getString("message");
+    exec: async function(interaction: ChatInputCommandInteraction<CacheType>) {
+        let motd = interaction.options.getString("message");
 
         if (motd) {
             motd = motd.replace(/\\n/g, "\n");

@@ -1,8 +1,8 @@
-const { SlashCommandBuilder, PermissionFlagsBits } = require("discord.js");
-const { makeRequest, pidToFc, resolvePidFromString, sendEmbedLog, validateId } = require("../utils.js");
-const config = require("../config.json");
+import { CacheType, ChatInputCommandInteraction, PermissionFlagsBits, SlashCommandBuilder } from "discord.js";
+import { makeRequest, pidToFc, resolvePidFromString, sendEmbedLog, validateId } from "../utils.js";
+import config from "../config.json" with { type: "json" };
 
-module.exports = {
+export default {
     modOnly: true,
     adminOnly: false,
 
@@ -23,8 +23,8 @@ module.exports = {
                 .setDescription("hide mii name in logs"))
         .setDefaultMemberPermissions(PermissionFlagsBits.BanMembers),
 
-    exec: async function(interaction) {
-        var id = interaction.options.getString("id", true);
+    exec: async function(interaction: ChatInputCommandInteraction<CacheType>) {
+        let id = interaction.options.getString("id", true);
         id = id.trim();
 
         if (!validateId(id)) {

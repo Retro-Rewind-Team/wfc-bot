@@ -1,15 +1,15 @@
-const { SlashCommandBuilder, PermissionFlagsBits } = require("discord.js");
-const { makeRequest, pidToFc, resolvePidFromString, sendEmbedLog, validateId } = require("../utils.js");
-const config = require("../config.json");
+import { CacheType, ChatInputCommandInteraction, PermissionFlagsBits, SlashCommandBuilder } from "discord.js";
+import { makeRequest, pidToFc, resolvePidFromString, sendEmbedLog, validateId } from "../utils.js";
+import config from "../config.json" with { type: "json" };
 
-function p(count, str) {
+function p(count: number, str: string) {
     if (count == 1)
         return str;
 
     return str + "s";
 };
 
-module.exports = {
+export default {
     modOnly: true,
     adminOnly: false,
 
@@ -41,8 +41,8 @@ module.exports = {
                 .setDescription("hide public log message"))
         .setDefaultMemberPermissions(PermissionFlagsBits.BanMembers),
 
-    exec: async function(interaction) {
-        var id = interaction.options.getString("id", true);
+    exec: async function(interaction: ChatInputCommandInteraction<CacheType>) {
+        let id = interaction.options.getString("id", true);
         id = id.trim();
 
         if (!validateId(id)) {
@@ -53,14 +53,14 @@ module.exports = {
         const pid = resolvePidFromString(id);
         const reason = interaction.options.getString("reason", true);
         const reasonHidden = interaction.options.getString("hidden-reason");
-        var days = interaction.options.getNumber("days") ?? 0;
+        let days = interaction.options.getNumber("days") ?? 0;
         const hours = interaction.options.getNumber("hours") ?? 0;
         const minutes = interaction.options.getNumber("minutes") ?? 0;
         const tos = interaction.options.getBoolean("tos") ?? true;
         const hide = interaction.options.getBoolean("hide-name") ?? false;
         const hidePublic = interaction.options.getBoolean("hide-public") ?? false;
 
-        var perm = false;
+        let perm = false;
         if (hours + minutes + days == 0) {
             // Perm ban lol
             perm = true;
