@@ -191,16 +191,16 @@ interface Dictionary<T> { [key: string]: T }
 
 const commands: Dictionary<Command> = {};
 const commandsPath = path.join(import.meta.dirname, "commands");
-// const commandFiles = fs.readdirSync(commandsPath).filter(file => file.endsWith(".ts"));
 const commandFiles = fs.readdirSync(commandsPath).filter(file => file.endsWith(".js"));
 
 for (const file of commandFiles) {
-    const spec = await import(path.join(commandsPath, file));
-
-    if ("data" in spec && "exec" in spec)
-        commands[path.basename(file, ".ts")] = spec;
-    else
-        console.error(`The command at ${file} is missing a required data or exec property`);
+    import(path.join(commandsPath, file)).then((spec) => {
+        spec = spec.default;
+        if ("data" in spec && "exec" in spec)
+            commands[path.basename(file, ".js")] = spec;
+        else
+            console.error(`The command at ${file} is missing a required data or exec property`);
+    });
 }
 
 client.on(Events.InteractionCreate, async interaction => {
