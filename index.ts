@@ -189,21 +189,25 @@ interface Command {
 
 interface Dictionary<T> { [key: string]: T }
 
-const commands: Dictionary<Command> = {};
-const commandsPath = path.join(import.meta.dirname, "commands");
-const commandFiles = fs.readdirSync(commandsPath).filter(file => file.endsWith(".js"));
+async function resolveCommands(root: string, files: string[], callback: (_: Dictionary<Command>) => void) {
+    const ret: Dictionary<Command> = {};
 
-for (const file of commandFiles) {
-    import(path.join(commandsPath, file)).then((spec) => {
+    for (const file of files) {
+        let spec = await import(path.join(root, file));
         spec = spec.default;
-        if ("data" in spec && "exec" in spec)
-            commands[path.basename(file, ".js")] = spec;
+        if ("data" in spec && "exec" in spec) {
+            const name = path.basename(file, ".js");
+            console.log(`Registered command ${name}`);
+            ret[name] = spec;
+        }
         else
             console.error(`The command at ${file} is missing a required data or exec property`);
-    });
+    }
+
+    callback(ret);
 }
 
-client.on(Events.InteractionCreate, async interaction => {
+async function handleInteraction(interaction: ChatInputCommandInteraction<CacheType>, commands: Dictionary<Command>) {
     if (!interaction.isChatInputCommand())
         return;
 
@@ -233,9 +237,9 @@ client.on(Events.InteractionCreate, async interaction => {
         else
             await interaction.reply({ content: "There was an error while executing this command!", ephemeral: true });
     }
-});
+}
 
-async function refreshCommands() {
+async function refreshCommands(commands: Dictionary<Command>) {
     const commandsJson: RESTPostAPIChatInputApplicationCommandsJSONBody[] = [];
 
     for (const cname in commands)
@@ -253,10 +257,20 @@ async function refreshCommands() {
     console.log(`Successfully reloaded ${data.length} global application (/) commands`);
 }
 
-for (const i in process.argv) {
-    const arg = process.argv[i];
+const commandsRoot = path.join(import.meta.dirname, "commands");
+const commandFiles = fs.readdirSync(commandsRoot).filter(file => file.endsWith(".js"));
 
-    if (arg == "--refresh-commands") {
-        refreshCommands();
+// Because of really strange node behavior involving import and resolving
+// promises, commands cannot be awaited, so a callback is used instead.
+resolveCommands(commandsRoot, commandFiles, (commands) => {
+    client.on(Events.InteractionCreate, async interaction => {
+        handleInteraction(interaction as ChatInputCommandInteraction<CacheType>, commands);
+    });
+
+    for (const i in process.argv) {
+        const arg = process.argv[i];
+
+        if (arg == "--refresh-commands")
+            refreshCommands(commands);
     }
-}
+});
