@@ -32,7 +32,7 @@ export default {
             .setDescription("ban minutes length"))
         .addBooleanOption(option =>
             option.setName("tos")
-                .setDescription("tos violation (ban from entire service), default false"))
+                .setDescription("tos violation (ban from entire service), default true"))
         .addBooleanOption(option =>
             option.setName("hide-name")
                 .setDescription("hide mii name in logs"))
