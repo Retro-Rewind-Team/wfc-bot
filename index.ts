@@ -243,7 +243,8 @@ async function refreshCommands(commands: Dictionary<Command>) {
     const commandsJson: RESTPostAPIChatInputApplicationCommandsJSONBody[] = [];
 
     for (const cname in commands)
-        commandsJson.push(commands[cname].data.toJSON());
+        if (!commands[cname].adminOnly)
+            commandsJson.push(commands[cname].data.toJSON());
 
     console.log("Refreshing global slash commands");
 
@@ -255,6 +256,23 @@ async function refreshCommands(commands: Dictionary<Command>) {
     ) as RESTPutAPIApplicationCommandsResult;
 
     console.log(`Successfully reloaded ${data.length} global application (/) commands`);
+
+    for (const cname in commands)
+        if (commands[cname].adminOnly)
+            commandsJson.push(commands[cname].data.toJSON());
+
+    console.log("Refreshing admin slash commands");
+
+    for (const j in config["admin-servers"]) {
+        const guildId = config["admin-servers"][j];
+
+        const adminData = await rest.put(
+            Routes.applicationGuildCommands(config["application-id"], guildId.toString()),
+            { body: commandsJson }
+        ) as RESTPutAPIApplicationCommandsResult;
+
+        console.log(`Successfully reloaded ${adminData.length} application (/) commands for guild ${guildId}`);
+    }
 }
 
 const commandsRoot = path.join(import.meta.dirname, "commands");

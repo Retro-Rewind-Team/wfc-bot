@@ -4,23 +4,16 @@
   "wfc-server": "the wfc server to connect to, such as 'ppeb.me' or 'localhost'",
   "wfc-port": 8080,
   "wfc-secret": "your wfc secret key",
-  "moderation-roles": [
-    "The roles allowed to use moderation commands. (DEPRECATED)"
-  ],
-  "allowed-servers": [
+  "admin-servers": [
     "Allow guild ids here. Make this array empty or delete it entirely to allow all guilds. (DEPRECATED)"
   ],
-  "allowed-channels": [
-    "Allow channel ids here. Make this array empty or delete it entirely to allow all channels. (DEPRECATED)"
-  ],
-  "allowed-moderators": [
+  "allowed-admins": [
     "Allow user ids here."
   ],
-  "allowed-admins": [
+  "allowed-moderators": [
     "Allow user ids here."
   ],
   "logs-channel": "Channel id to send successful moderative actions to.",
   "public-logs-channel": "Channel id to send the public version of moderative actions to.",
   "friendbot": "FC used to link discord accounts to WFC profiles."
 }
-
