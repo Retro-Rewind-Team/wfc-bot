@@ -3,8 +3,8 @@ import { makeRequest, pidToFc, resolvePidFromString, sendEmbedLog, validateId } 
 import config from "../config.json" with { type: "json" };
 
 export default {
-    modOnly: true,
-    adminOnly: false,
+    modOnly: false,
+    adminOnly: true,
 
     data: new SlashCommandBuilder()
         .setName("clear")
