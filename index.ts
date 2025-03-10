@@ -219,7 +219,7 @@ async function handleInteraction(interaction: ChatInputCommandInteraction<CacheT
             const command = commands[cname];
             const [allowed, err] = isAllowedInteraction(interaction, command.modOnly, command.adminOnly);
             if (!allowed) {
-                interaction.reply({ content: `Command ${cname} is not allowed! Error: ${err}` });
+                await interaction.reply({ content: `Command ${cname} is not allowed! Error: ${err}` });
                 return;
             }
 

@@ -23,17 +23,17 @@ export default {
             const [success, res] = await makeRequest("/api/motd", "POST", { secret: config["wfc-secret"], motd: motd });
 
             if (success)
-                interaction.reply({ content: `Set message of the day to: "${motd}"` });
+                await interaction.reply({ content: `Set message of the day to: "${motd}"` });
             else
-                interaction.reply({ content: `Failed to set message of the day, error: ${res.Error ?? "no error message provided"}` });
+                await interaction.reply({ content: `Failed to set message of the day, error: ${res.Error ?? "no error message provided"}` });
         }
         else {
             const [success, res] = await makeRequest("/api/motd", "GET");
 
             if (success)
-                interaction.reply({ content: `Current message of the day is:\n${res.Motd}` });
+                await interaction.reply({ content: `Current message of the day is:\n${res.Motd}` });
             else
-                interaction.reply({ content: `Failed to fetch current message of the day, error: ${res.Error ?? "no error message provided"}` });
+                await interaction.reply({ content: `Failed to fetch current message of the day, error: ${res.Error ?? "no error message provided"}` });
         }
     }
 };

@@ -14,7 +14,7 @@ export default {
         const stats = getStats();
 
         if (!stats) {
-            interaction.reply("Room data is not populated yet! Please wait a moment. If this keeps happening contact the bot owner.");
+            await interaction.reply("Room data is not populated yet! Please wait a moment. If this keeps happening contact the bot owner.");
             return;
         }
 
@@ -37,6 +37,6 @@ export default {
                 }
             );
 
-        interaction.reply({ embeds: [embed], ephemeral: true });
+        await interaction.reply({ embeds: [embed], ephemeral: true });
     }
 };

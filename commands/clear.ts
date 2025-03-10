@@ -46,6 +46,6 @@ export default {
             ], hide, true);
         }
         else
-            interaction.reply({ content: `Failed to clear friend code "${fc}": error ${res.Error ?? "no error message provided"}` });
+            await interaction.reply({ content: `Failed to clear friend code "${fc}": error ${res.Error ?? "no error message provided"}` });
     }
 };

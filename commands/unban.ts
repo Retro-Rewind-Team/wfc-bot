@@ -50,6 +50,6 @@ export default {
             ], hide, hidePublic);
         }
         else
-            interaction.reply({ content: `Failed to unban friend code "${fc}": error ${res.Error ?? "no error message provided"}` });
+            await interaction.reply({ content: `Failed to unban friend code "${fc}": error ${res.Error ?? "no error message provided"}` });
     }
 };

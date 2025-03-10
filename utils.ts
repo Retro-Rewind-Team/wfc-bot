@@ -137,7 +137,7 @@ export async function sendEmbedLog(interaction: ChatInputCommandInteraction<Cach
         privEmbed.addFields(...opts);
 
     await (client.channels.cache.get(config["logs-channel"]) as TextChannel | null)?.send({ embeds: [privEmbed] });
-    interaction.reply({ content: `Successful ${action} performed on friend code "${fc}"` });
+    await interaction.reply({ content: `Successful ${action} performed on friend code "${fc}"` });
 
     if (noPublicEmbed)
         return;
