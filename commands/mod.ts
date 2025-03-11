@@ -65,7 +65,7 @@ export default {
                 fs.writeFileSync(configPath, JSON.stringify(config, null, 2));
                 await interaction.reply({ content: `User ${user.tag} has been added as a moderator.` });
 
-                sendEmbed(interaction, "Moderator Addition", user);
+                await sendEmbed(interaction, "Moderator Addition", user);
             } else
                 await interaction.reply({ content: `User ${user.tag} is already a moderator.` });
         } else if (subcommand === "remove") {
@@ -75,7 +75,7 @@ export default {
                 fs.writeFileSync(configPath, JSON.stringify(config, null, 2));
                 await interaction.reply({ content: `User ${user.tag} has been removed as a moderator.` });
 
-                sendEmbed(interaction, "Moderator Removal", user);
+                await sendEmbed(interaction, "Moderator Removal", user);
             } else
                 await interaction.reply({ content: `User ${user.tag} is not a moderator.` });
         }

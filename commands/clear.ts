@@ -40,7 +40,7 @@ export default {
         const fc = pidToFc(pid);
         const [success, res] = await makeRequest("/api/clear", "POST", { secret: config["wfc-secret"], pid: pid });
         if (success) {
-            sendEmbedLog(interaction, "clear", fc, res.User, [
+            await sendEmbedLog(interaction, "clear", fc, res.User, [
                 { name: "Reason", value: reason },
                 { name: "Hidden Reason", value: reason_hidden ?? "None", hidden: true },
             ], hide, true);

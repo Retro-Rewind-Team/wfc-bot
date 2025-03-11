@@ -170,7 +170,7 @@ export default {
         });
 
         if (success) {
-            await sendEmbed(packID, version, hashes);
+            await sendEmbed(interaction.member as GuildMember | null, packID, version, hashes);
             let content = `Updated hashes for ${packIDToName(packID)}, version ${version}`;
 
             for (let i = 0; i < 4; i++) {
