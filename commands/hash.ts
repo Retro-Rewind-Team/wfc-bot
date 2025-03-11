@@ -1,9 +1,10 @@
-import { CacheType, ChatInputCommandInteraction, EmbedBuilder, PermissionFlagsBits, SlashCommandBuilder, TextChannel } from "discord.js";
+import { CacheType, ChatInputCommandInteraction, EmbedBuilder, GuildMember, PermissionFlagsBits, SlashCommandBuilder, TextChannel } from "discord.js";
 import crypto from "crypto";
 import { client } from "../index.js";
 import config from "../config.json" with { type: "json" };
 import { getColor, makeRequest } from "../utils.js";
 
+export type PackIDStr = keyof typeof config;
 const RRID = 0x08;
 const CTGPCID = 0x29C;
 const IKWID = 0x49;
@@ -11,29 +12,39 @@ const LID = 0x29A;
 const OPID = 0x36B;
 const WTPID = 0x520;
 
-function packIDToName(packID: number) {
+export const PackOpts = [
+    { name: "Retro Rewind", value: RRID },
+    { name: "CTGP-C", value: CTGPCID },
+    { name: "Insane Kart Wii", value: IKWID },
+    { name: "Luminous", value: LID },
+    { name: "OptPack", value: OPID },
+    { name: "WTP", value: WTPID }
+];
+
+export function packIDToName(packID: number) {
     switch (packID) {
-        case RRID:
-            return "Retro Rewind";
-        case CTGPCID:
-            return "CTGP-C";
-        case IKWID:
-            return "Insane Kart Wii";
-        case LID:
-            return "Luminous";
-        case OPID:
-            return "OptPack";
-        case WTPID:
-            return "WTP";
-        default:
-            return "Unknown Pack";
+    case RRID:
+        return "Retro Rewind";
+    case CTGPCID:
+        return "CTGP-C";
+    case IKWID:
+        return "Insane Kart Wii";
+    case LID:
+        return "Luminous";
+    case OPID:
+        return "OptPack";
+    case WTPID:
+        return "WTP";
+    default:
+        return "Unknown Pack";
     }
 }
 
-async function sendEmbed(packID: number, version: number, hashResponses: HashResponse[]) {
+async function sendEmbed(owner: GuildMember | null, packID: number, version: number, hashResponses: HashResponse[]) {
     const embed = new EmbedBuilder()
         .setColor(getColor())
-        .setTitle(`Updated hashes for ${packIDToName(packID)}, version ${version}`);
+        .setTitle(`Updated hashes for ${packIDToName(packID)}, version ${version}`)
+        .addFields({ name: "Owner", value: `<@${owner?.id ?? "Unknown"}` });
 
     for (let i = 0; i < 4; i++) {
         const hashResponse = hashResponses[i];
@@ -62,35 +73,29 @@ interface HashResponse {
 
 function regionIdxToName(idx: number): string {
     switch (idx) {
-        case 0:
-            return "PAL";
-        case 1:
-            return "NTSC-U";
-        case 2:
-            return "NTSC-J";
-        case 3:
-            return "NTSC-K";
-        default:
-            return "Unknown Region";
+    case 0:
+        return "PAL";
+    case 1:
+        return "NTSC-U";
+    case 2:
+        return "NTSC-J";
+    case 3:
+        return "NTSC-K";
+    default:
+        return "Unknown Region";
     }
 }
 
 export default {
-    modOnly: false,
-    adminOnly: true,
+    modOnly: true,
+    adminOnly: false,
 
     data: new SlashCommandBuilder()
         .setName("hash")
         .setDescription("Update code.pul hash")
         .addIntegerOption(option => option.setName("packid")
             .setDescription("Pack to update")
-            .setChoices(
-                { name: "Retro Rewind", value: RRID },
-                { name: "CTGP-C", value: CTGPCID },
-                { name: "Insane Kart Wii", value: IKWID },
-                { name: "Luminous", value: LID },
-                { name: "OptPack", value: OPID },
-                { name: "WTP", value: WTPID })
+            .setChoices(PackOpts)
             .setRequired(true))
         .addIntegerOption(option => option.setName("version")
             .setDescription("Version of code.pul to update")
@@ -102,6 +107,15 @@ export default {
 
     exec: async function(interaction: ChatInputCommandInteraction<CacheType>) {
         const packID = interaction.options.getInteger("packid", true);
+        const packIDStr = packID.toString(16) as PackIDStr;
+
+        if (!config[packIDStr] || (config[packIDStr] as string[]).findIndex(id => id == interaction.member?.user.id) == -1) {
+            await interaction.reply({
+                content: `Insufficient permissions to update hash for pack: ${packIDToName(packID)}`
+            });
+            return;
+        }
+
         const version = interaction.options.getInteger("version", true);
         const binaryAttachment = interaction.options.getAttachment("binary", true);
         const binaryResponse = await fetch(binaryAttachment.url);
