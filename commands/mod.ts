@@ -8,17 +8,12 @@ import { getColor } from "../utils.js";
 async function sendEmbed(interaction: ChatInputCommandInteraction<CacheType>, action: string, updatedUser: User) {
     const member = interaction.member as GuildMember | null;
 
-    if (!member) {
-        console.error("Unable to send embed for mod command, member was null");
-        return;
-    }
-
     const embed = new EmbedBuilder()
         .setColor(getColor())
-        .setTitle(`${action.charAt(0).toUpperCase() + action.slice(1)} performed by ${member.displayName}`)
+        .setTitle(`${action.charAt(0).toUpperCase() + action.slice(1)} performed by ${member?.displayName ?? "Unknown"}`)
         .addFields(
             { name: "Server", value: interaction.guild!.name },
-            { name: "Moderator", value: `<@${member.id}>` },
+            { name: "Moderator", value: `<@${member?.id ?? "Unknown"}>` },
             { name: "Updated User", value: `<@${updatedUser.id}>` },
         )
         .setTimestamp();

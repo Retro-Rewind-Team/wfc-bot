@@ -116,17 +116,12 @@ export async function sendEmbedLog(interaction: ChatInputCommandInteraction<Cach
     const miiName = user.LastInGameSn != "" ? user.LastInGameSn : "Unknown";
     const member = interaction.member as GuildMember | null;
 
-    if (!member) {
-        console.error(`Unable to send embed for ${action}, member was null`);
-        return;
-    }
-
     const privEmbed = new EmbedBuilder()
         .setColor(getColor())
-        .setTitle(`${action.charAt(0).toUpperCase() + action.slice(1)} performed by ${member.displayName}`)
+        .setTitle(`${action.charAt(0).toUpperCase() + action.slice(1)} performed by ${member?.displayName ?? "Unknown"}`)
         .addFields(
             { name: "Server", value: interaction.guild!.name },
-            { name: "Moderator", value: `<@${member.id}>` },
+            { name: "Moderator", value: `<@${member?.id ?? "Unknown"}>` },
             { name: "Friend Code", value: fc },
             { name: "Mii Name", value: miiName },
             { name: "IP", value: user.LastIPAddress != "" ? user.LastIPAddress : "Unknown" }
