@@ -1,10 +1,10 @@
 import { CacheType, ChatInputCommandInteraction, EmbedBuilder, GuildMember, PermissionFlagsBits, SlashCommandBuilder, TextChannel, User } from "discord.js";
-import config from "../config.json" with { type: "json" };
-import { PackIDStr, packIDToName, PackOpts } from "./hash.js";
+import { getConfig, setConfig } from "../config.js";
+import { packIDToName, PackOpts } from "./hash.js";
 import { client } from "../index.js";
-import fs from "fs";
-import path from "path";
 import { getColor } from "../utils.js";
+
+const config = getConfig();
 
 async function sendEmbed(moderator: GuildMember | null, action: string, packID: number, user: User) {
     const embed = new EmbedBuilder()
@@ -15,7 +15,7 @@ async function sendEmbed(moderator: GuildMember | null, action: string, packID: 
             { name: "Updated User", value: `<@${user.id}>` },
         );
 
-    await (client.channels.cache.get(config["logs-channel"]) as TextChannel | null)?.send({ embeds: [embed] });
+    await (client.channels.cache.get(config.logsChannel) as TextChannel | null)?.send({ embeds: [embed] });
 }
 
 export default {
@@ -50,25 +50,25 @@ export default {
     exec: async function(interaction: ChatInputCommandInteraction<CacheType>) {
         const user = interaction.options.getUser("user")!; // User is required for Register and Deregister. Will not be null
         const packID = interaction.options.getInteger("packid")!; // Same as above
-        const packIDStr = packID?.toString(16) as PackIDStr;
+        const packIDStr = packID?.toString(16);
         const subcommand = interaction.options.getSubcommand();
-        const configPath = path.join(import.meta.dirname, "../config.json");
 
         if (subcommand == "register") {
-            if (!config[packIDStr])
-                config[packIDStr] = [] as never;
+            if (!config.packOwners[packIDStr])
+                config.packOwners[packIDStr] = [];
 
-            if (Array.isArray(config[packIDStr])) {
-                if (config[packIDStr].findIndex(id => id == user.id) > -1) {
+            if (Array.isArray(config.packOwners[packIDStr])) {
+                if (config.packOwners[packIDStr].findIndex(id => id == user.id) > -1) {
                     await interaction.reply({
                         content: `User ${user.username}, ${user.id} is already registered to pack ${packIDToName(packID)}`
                     });
                     return;
                 }
 
-                config[packIDStr].push(user.id as never);
+                config.packOwners[packIDStr].push(user.id);
 
-                fs.writeFileSync(configPath, JSON.stringify(config, null, 2));
+                setConfig(config);
+
                 await interaction.reply(
                     { content: `Registered user ${user.username}, ${user.id} to pack ${packIDToName(packID)}` }
                 );
@@ -81,14 +81,15 @@ export default {
             );
         }
         else if (subcommand == "deregister") {
-            if (config[packIDStr] && Array.isArray(config[packIDStr])) {
-                const idx = config[packIDStr].findIndex(id => id == user.id);
+            if (config.packOwners[packIDStr] && Array.isArray(config.packOwners[packIDStr])) {
+                const idx = config.packOwners[packIDStr].findIndex(id => id == user.id);
 
                 if (idx != -1)
-                    config[packIDStr].splice(idx, 1);
+                    config.packOwners[packIDStr].splice(idx, 1);
             }
 
-            fs.writeFileSync(configPath, JSON.stringify(config, null, 2));
+            setConfig(config);
+
             await interaction.reply({
                 content: `Deregistered user ${user.username}, ${user.id} from pack ${packIDToName(packID)}`
             });
@@ -99,8 +100,8 @@ export default {
             let some = false;
 
             for (const opt of PackOpts) {
-                const idStr = opt.value.toString(16) as PackIDStr;
-                const users = config[idStr];
+                const idStr = opt.value.toString(16);
+                const users = config.packOwners[idStr];
 
                 if (!users || !Array.isArray(users))
                     continue;

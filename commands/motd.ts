@@ -1,7 +1,8 @@
-import { CacheType, ChatInputCommandInteraction } from "discord.js";
-import { PermissionFlagsBits, SlashCommandBuilder } from "discord.js";
+import { CacheType, ChatInputCommandInteraction, PermissionFlagsBits, SlashCommandBuilder } from "discord.js";
+import { getConfig } from "../config.js";
 import { makeRequest } from "../utils.js";
-import config from "../config.json" with { type: "json" };
+
+const config = getConfig();
 
 export default {
     modOnly: true,
@@ -20,7 +21,7 @@ export default {
 
         if (motd) {
             motd = motd.replace(/\\n/g, "\n");
-            const [success, res] = await makeRequest("/api/motd", "POST", { secret: config["wfc-secret"], motd: motd });
+            const [success, res] = await makeRequest("/api/motd", "POST", { secret: config.wfcSecret, motd: motd });
 
             if (success)
                 await interaction.reply({ content: `Set message of the day to: "${motd}"` });

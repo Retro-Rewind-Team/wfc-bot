@@ -1,10 +1,11 @@
 import { CacheType, ChatInputCommandInteraction, EmbedBuilder, GuildMember, PermissionFlagsBits, SlashCommandBuilder, TextChannel } from "discord.js";
+import { getConfig } from "../config.js";
 import crypto from "crypto";
 import { client } from "../index.js";
-import config from "../config.json" with { type: "json" };
 import { getColor, makeRequest } from "../utils.js";
 
-export type PackIDStr = keyof typeof config;
+const config = getConfig();
+
 const RRID = 0x08;
 const CTGPCID = 0x29C;
 const IKWID = 0x49;
@@ -61,7 +62,7 @@ async function sendEmbed(owner: GuildMember | null, packID: number, version: num
             });
     }
 
-    await (client.channels.cache.get(config["logs-channel"]) as TextChannel | null)?.send({ embeds: [embed] });
+    await (client.channels.cache.get(config.logsChannel) as TextChannel | null)?.send({ embeds: [embed] });
 }
 
 interface HashResponse {
@@ -107,9 +108,9 @@ export default {
 
     exec: async function(interaction: ChatInputCommandInteraction<CacheType>) {
         const packID = interaction.options.getInteger("packid", true);
-        const packIDStr = packID.toString(16) as PackIDStr;
+        const packIDStr = packID.toString(16);
 
-        if (!config[packIDStr] || (config[packIDStr] as string[]).findIndex(id => id == interaction.member?.user.id) == -1) {
+        if (!config.packOwners[packIDStr] || (config.packOwners[packIDStr]).findIndex(id => id == interaction.member?.user.id) == -1) {
             await interaction.reply({
                 content: `Insufficient permissions to update hash for pack: ${packIDToName(packID)}`
             });
@@ -175,7 +176,7 @@ export default {
         }
 
         const [success, res] = await makeRequest("/api/hash", "POST", {
-            secret: config["wfc-secret"],
+            secret: config.wfcSecret,
             pack_id: packID,
             version: version,
             hash_ntscu: hashes[1].hash,

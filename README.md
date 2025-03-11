@@ -7,7 +7,13 @@ Simple discord bot with WiiLink WFC integration. See config.example.json, and pu
 2. `npm run build`
 3. `npm run start`
 
+### Command Line Arguments
+Command line arguments can be provided after a `--` in `npm run start`, such as `npm run start -- --refresh-commands`
+
+Available Arguments:  
+`--refresh-commands`: Refreshes the slash commands registered on discord  
+`--config [config file]`: Provide the config file used and saved to  
+
+
 ### Config options
-There are various methods of gating commands to certain users
-* Gate access to specific channels and guilds: Place guild and channel ids `allowed-servers` or `allowed-channels`. Make either an empty array and it will remove the associated restrictions.
-* Gate access to moderation actions: Moderation actions such as `ban`, `kick`, and `unban` are only visible to the role ID set in `moderation-role`.
+An example config will be automatically generated if none is provided. See `config.ts`.

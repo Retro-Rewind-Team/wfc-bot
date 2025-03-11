@@ -1,9 +1,9 @@
 import { CacheType, ChatInputCommandInteraction, EmbedBuilder, GuildMember, PermissionFlagsBits, SlashCommandBuilder, TextChannel, User } from "discord.js";
+import { getConfig, setConfig } from "../config.js";
 import { client } from "../index.js";
-import config from "../config.json" with { type: "json" };
-import fs from "fs";
-import path from "path";
 import { getColor } from "../utils.js";
+
+const config = getConfig();
 
 async function sendEmbed(interaction: ChatInputCommandInteraction<CacheType>, action: string, updatedUser: User) {
     const member = interaction.member as GuildMember | null;
@@ -18,7 +18,7 @@ async function sendEmbed(interaction: ChatInputCommandInteraction<CacheType>, ac
         )
         .setTimestamp();
 
-    await (client.channels.cache.get(config["logs-channel"]) as TextChannel | null)?.send({ embeds: [embed] });
+    await (client.channels.cache.get(config.logsChannel) as TextChannel | null)?.send({ embeds: [embed] });
 }
 
 export default {
@@ -49,29 +49,35 @@ export default {
     exec: async function(interaction: ChatInputCommandInteraction<CacheType>) {
         const subcommand = interaction.options.getSubcommand();
         const user = interaction.options.getUser("user")!;
-        const configPath = path.join(import.meta.dirname, "../config.json");
 
-        if (!config["allowed-moderators"])
-            config["allowed-moderators"] = [];
+        if (!config.allowedModerators)
+            config.allowedModerators = [];
 
         if (subcommand === "add") {
-            if (!config["allowed-moderators"].includes(user.id)) {
-                config["allowed-moderators"].push(user.id);
-                fs.writeFileSync(configPath, JSON.stringify(config, null, 2));
-                await interaction.reply({ content: `User ${user.tag} has been added as a moderator.` });
+            if (!config.allowedModerators.includes(user.id)) {
+                config.allowedModerators.push(user.id);
 
+                setConfig(config);
+
+                await interaction.reply({ content: `User ${user.tag} has been added as a moderator.` });
                 await sendEmbed(interaction, "Moderator Addition", user);
-            } else
+            }
+            else
                 await interaction.reply({ content: `User ${user.tag} is already a moderator.` });
-        } else if (subcommand === "remove") {
-            const index = config["allowed-moderators"].indexOf(user.id);
+        }
+        else if (subcommand === "remove") {
+            const index = config.allowedModerators.indexOf(user.id);
+
             if (index > -1) {
-                config["allowed-moderators"].splice(index, 1);
-                fs.writeFileSync(configPath, JSON.stringify(config, null, 2));
+                config.allowedModerators.splice(index, 1);
+
+                setConfig(config);
+
                 await interaction.reply({ content: `User ${user.tag} has been removed as a moderator.` });
 
                 await sendEmbed(interaction, "Moderator Removal", user);
-            } else
+            }
+            else
                 await interaction.reply({ content: `User ${user.tag} is not a moderator.` });
         }
     }

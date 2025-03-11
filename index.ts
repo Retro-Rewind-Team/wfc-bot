@@ -1,5 +1,5 @@
 import { CacheType, ChatInputCommandInteraction, Client, Events, IntentsBitField, REST, RESTPostAPIChatInputApplicationCommandsJSONBody, RESTPutAPIApplicationCommandsResult, Routes, SlashCommandOptionsOnlyBuilder, TextChannel } from "discord.js";
-import config from "./config.json" with { type: "json" };
+import { getConfig, initConfig } from "./config.js";
 import * as fs from "fs";
 import * as path from "path";
 import { exit } from "process";
@@ -61,27 +61,61 @@ export function getStats() {
     return stats;
 }
 
-if (!config["allowed-moderators"] || typeof config["allowed-moderators"] != "object" || config["allowed-moderators"].length === 0) {
-    console.log("No moderators set!");
+let refresh = false;
+let configPath = "";
+for (let i = 2; i < process.argv.length; i++) {
+    const arg = process.argv[i];
+
+    switch (arg) {
+    case "--refresh-commands":
+        refresh = true;
+        break;
+    case "--config":
+        if (process.argv.length > i + 1) {
+            configPath = process.argv[i + 1];
+
+            if (configPath.charAt(0) != "/")
+                configPath = path.join(process.cwd(), configPath);
+
+            console.log("Config retrieved from " + configPath);
+            i++;
+        }
+
+        break;
+    default:
+        console.error("Unknown argument: " + arg);
+    }
 }
 
-if (!config["allowed-admins"] || typeof config["allowed-admins"] != "object" || config["allowed-admins"].length === 0) {
-    console.error("No admins set! Please set one to continue.");
+initConfig(configPath.length > 0 ? configPath : path.join(process.cwd(), "config.json"));
+let config = getConfig();
+
+if (!config.allowedModerators
+    || !Array.isArray(config.allowedModerators)
+    || config.allowedModerators.length == 0) {
+    console.log("No moderators set! Please set one to continue.");
     exit(1);
 }
 
-if (!config["logs-channel"]) {
+if (!config.allowedAdmins
+    || !Array.isArray(config.allowedAdmins)
+    || config.allowedAdmins.length == 0) {
+    console.log("No admins set! Please set one to continue.");
+    exit(1);
+}
+
+if (!config.logsChannel) {
     console.error("No logs channel is set! Please set one to continue.");
     exit(1);
 }
 
-if (!config["public-logs-channel"]) {
+if (!config.publicLogsChannel) {
     console.error("No public logs channel is set! Please set one to continue.");
     exit(1);
 }
 
-const fetchGroupsUrl = `http://${config["wfc-server"]}:${config["wfc-port"]}/api/groups`;
-const fetchStatsUrl = `http://${config["wfc-server"]}:${config["wfc-port"]}/api/stats`;
+const fetchGroupsUrl = `http://${config.wfcServer}:${config.wfcPort}/api/groups`;
+const fetchStatsUrl = `http://${config.wfcServer}:${config.wfcPort}/api/stats`;
 async function fetchGroups() {
     function plural(count: number, text: string) {
         return count == 1 ? text : text + "s";
@@ -137,7 +171,7 @@ async function fetchGroups() {
 client.once(Events.ClientReady, async function(readyClient) {
     console.log(`Logged in as ${readyClient.user.tag}`);
 
-    const channel = await client.channels.fetch(config["logs-channel"]);
+    const channel = await client.channels.fetch(config.logsChannel);
 
     if (!channel) {
         console.error("Invalid channelid set for logs!");
@@ -146,7 +180,7 @@ client.once(Events.ClientReady, async function(readyClient) {
     else
         console.log(`Logs set to send to channel ${(channel as TextChannel).name}`);
 
-    const pubchannel = await client.channels.fetch(config["public-logs-channel"]);
+    const pubchannel = await client.channels.fetch(config.publicLogsChannel);
 
     if (!pubchannel) {
         console.error("Invalid channelid set for public logs!");
@@ -163,16 +197,18 @@ client.login(config["token"]);
 
 // TODO: Make this function not suck?
 function isAllowedInteraction(interaction: ChatInputCommandInteraction<CacheType>, modOnly: boolean, adminOnly: boolean) {
+    config = getConfig();
+
     const err: string[] = [];
 
     let user = true;
 
-    if (adminOnly && !config["allowed-admins"].includes(interaction.user.id)) {
+    if (adminOnly && !config.allowedAdmins.includes(interaction.user.id)) {
         err.push("not an admin");
         user = false;
     }
 
-    if (modOnly && !config["allowed-moderators"].includes(interaction.user.id)) {
+    if (modOnly && !config.allowedModerators.includes(interaction.user.id)) {
         err.push("not a moderator");
         user = false;
     }
@@ -251,7 +287,7 @@ async function refreshCommands(commands: Dictionary<Command>) {
     const rest = new REST().setToken(config["token"]);
 
     const data = await rest.put(
-        Routes.applicationCommands(config["application-id"]),
+        Routes.applicationCommands(config.applicationID),
         { body: commandsJson }
     ) as RESTPutAPIApplicationCommandsResult;
 
@@ -263,11 +299,11 @@ async function refreshCommands(commands: Dictionary<Command>) {
 
     console.log("Refreshing admin slash commands");
 
-    for (const j in config["admin-servers"]) {
-        const guildId = config["admin-servers"][j];
+    for (const j in config.adminServers) {
+        const guildId = config.adminServers[j];
 
         const adminData = await rest.put(
-            Routes.applicationGuildCommands(config["application-id"], guildId.toString()),
+            Routes.applicationGuildCommands(config.applicationID, guildId.toString()),
             { body: commandsJson }
         ) as RESTPutAPIApplicationCommandsResult;
 
@@ -285,10 +321,6 @@ resolveCommands(commandsRoot, commandFiles, (commands) => {
         handleInteraction(interaction as ChatInputCommandInteraction<CacheType>, commands);
     });
 
-    for (const i in process.argv) {
-        const arg = process.argv[i];
-
-        if (arg == "--refresh-commands")
-            refreshCommands(commands);
-    }
+    if (refresh)
+        refreshCommands(commands);
 });

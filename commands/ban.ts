@@ -1,6 +1,8 @@
 import { CacheType, ChatInputCommandInteraction, PermissionFlagsBits, SlashCommandBuilder } from "discord.js";
 import { makeRequest, pidToFc, resolvePidFromString, sendEmbedLog, validateId } from "../utils.js";
-import config from "../config.json" with { type: "json" };
+import { getConfig } from "../config.js";
+
+const config = getConfig();
 
 function p(count: number, str: string) {
     if (count == 1)
@@ -70,7 +72,7 @@ export default {
 
         const fc = pidToFc(pid);
         const [success, res] = await makeRequest("/api/ban", "POST", {
-            secret: config["wfc-secret"],
+            secret: config.wfcSecret,
             pid: pid,
             days: days,
             hours: hours,
