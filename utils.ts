@@ -155,3 +155,12 @@ export async function sendEmbedLog(interaction: ChatInputCommandInteraction<Cach
 
     await (client.channels.cache.get(config.publicLogsChannel) as TextChannel | null)?.send({ embeds: [pubEmbed] });
 }
+
+export function fmtHex(n: number): string {
+    let ret = n.toString(16).toUpperCase();
+
+    if (ret.length < 8)
+        ret = "0".repeat(8 - ret.length) + ret;
+
+    return "0x" + ret;
+}

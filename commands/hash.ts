@@ -2,7 +2,7 @@ import { CacheType, ChatInputCommandInteraction, EmbedBuilder, GuildMember, Perm
 import { getConfig } from "../config.js";
 import crypto from "crypto";
 import { client } from "../index.js";
-import { getColor, makeRequest } from "../utils.js";
+import { fmtHex, getColor, makeRequest } from "../utils.js";
 
 const config = getConfig();
 
@@ -44,8 +44,8 @@ export function packIDToName(packID: number) {
 async function sendEmbed(owner: GuildMember | null, packID: number, version: number, hashResponses: HashResponse[]) {
     const embed = new EmbedBuilder()
         .setColor(getColor())
-        .setTitle(`Updated hashes for ${packIDToName(packID)}, version ${version}`)
-        .addFields({ name: "Owner", value: `<@${owner?.id ?? "Unknown"}` });
+        .setTitle(`Updated hashes for ${packIDToName(packID)}, version ${version}/${fmtHex(version)}`)
+        .addFields({ name: "Owner", value: `<@${owner?.id ?? "Unknown"}>` });
 
     for (let i = 0; i < 4; i++) {
         const hashResponse = hashResponses[i];
