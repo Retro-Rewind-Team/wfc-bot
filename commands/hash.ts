@@ -104,7 +104,7 @@ export default {
         .addAttachmentOption(option => option.setName("binary")
             .setDescription("Code.pul binary to hash")
             .setRequired(true))
-        .setDefaultMemberPermissions(PermissionFlagsBits.Administrator),
+        .setDefaultMemberPermissions(PermissionFlagsBits.BanMembers),
 
     exec: async function(interaction: ChatInputCommandInteraction<CacheType>) {
         const packID = interaction.options.getInteger("packid", true);

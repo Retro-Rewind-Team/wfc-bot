@@ -45,7 +45,7 @@ export default {
             .addUserOption(option => option.setName("user")
                 .setDescription("The user to modify")
                 .setRequired(true)))
-        .setDefaultMemberPermissions(PermissionFlagsBits.BanMembers),
+        .setDefaultMemberPermissions(PermissionFlagsBits.Administrator),
 
     exec: async function(interaction: ChatInputCommandInteraction<CacheType>) {
         const user = interaction.options.getUser("user")!; // User is required for Register and Deregister. Will not be null

@@ -23,7 +23,7 @@ export default {
         .addBooleanOption(option =>
             option.setName("hide-name")
                 .setDescription("hide mii name in logs"))
-        .setDefaultMemberPermissions(PermissionFlagsBits.BanMembers),
+        .setDefaultMemberPermissions(PermissionFlagsBits.Administrator),
 
     exec: async function(interaction: ChatInputCommandInteraction<CacheType>) {
         let id = interaction.options.getString("id", true);
