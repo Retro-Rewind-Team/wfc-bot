@@ -311,7 +311,7 @@ async function refreshCommands(commands: Dictionary<Command>) {
     }
 }
 
-const commandsRoot = path.join(import.meta.dirname, "commands");
+const commandsRoot = path.join(import.meta.dirname ?? __dirname, "commands");
 const commandFiles = fs.readdirSync(commandsRoot).filter(file => file.endsWith(".js"));
 
 // Because of really strange node behavior involving import and resolving
