@@ -6,7 +6,7 @@ import { getColor, makeRequest } from "../utils.js";
 
 const config = getConfig();
 
-const RRID = 0x08;
+const RRID = 0x0A;
 const CTGPCID = 0x29C;
 const IKWID = 0x49;
 const LID = 0x29A;
