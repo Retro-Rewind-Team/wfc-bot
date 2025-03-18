@@ -61,6 +61,7 @@ export default {
         const tos = interaction.options.getBoolean("tos") ?? true;
         const hide = interaction.options.getBoolean("hide-name") ?? false;
         const hidePublic = interaction.options.getBoolean("hide-public") ?? false;
+        const moderator = interaction.user.username;
 
         let perm = false;
         if (hours + minutes + days == 0) {
@@ -79,7 +80,8 @@ export default {
             minutes: minutes,
             tos: tos,
             reason: reason,
-            reasonHidden: reasonHidden ?? ""
+            reasonHidden: reasonHidden ?? "",
+            moderator: moderator
         });
 
         if (success) {
