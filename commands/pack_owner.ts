@@ -2,7 +2,7 @@ import { CacheType, ChatInputCommandInteraction, EmbedBuilder, GuildMember, Perm
 import { getConfig, setConfig } from "../config.js";
 import { packIDToName, PackOpts } from "./hash.js";
 import { client } from "../index.js";
-import { getColor } from "../utils.js";
+import { fmtHex, getColor } from "../utils.js";
 
 const config = getConfig();
 
@@ -13,7 +13,8 @@ async function sendEmbed(moderator: GuildMember | null, action: string, packID: 
         .addFields(
             { name: "Moderator", value: `<@${moderator?.id ?? "Unknown"}>` },
             { name: "Updated User", value: `<@${user.id}>` },
-        );
+        )
+        .setTimestamp();
 
     await (client.channels.cache.get(config.logsChannel) as TextChannel | null)?.send({ embeds: [embed] });
 }
@@ -69,16 +70,16 @@ export default {
 
                 setConfig(config);
 
-                await interaction.reply(
-                    { content: `Registered user ${user.username}, ${user.id} to pack ${packIDToName(packID)}` }
-                );
+                await interaction.reply({
+                    content: `Registered user ${user.username}, ${user.id} to pack ${packIDToName(packID)}`
+                });
                 await sendEmbed(interaction.member as GuildMember | null, subcommand, packID, user);
                 return;
             }
 
-            await interaction.reply(
-                { content: `Failed to register user ${user.username}, ${user.id} to pack ${packIDToName(packID)}. config[packIDStr] is not an array!` }
-            );
+            await interaction.reply({
+                content: `Failed to register user ${user.username}, ${user.id} to pack ${packIDToName(packID)}. config[packIDStr] is not an array!`
+            });
         }
         else if (subcommand == "deregister") {
             if (config.packOwners[packIDStr] && Array.isArray(config.packOwners[packIDStr])) {
@@ -96,31 +97,32 @@ export default {
             await sendEmbed(interaction.member as GuildMember | null, subcommand, packID, user);
         }
         else if (subcommand == "list") {
-            let content = "Pack Owners:\n";
-            let some = false;
+            const embed = new EmbedBuilder()
+                .setColor(getColor())
+                .setTitle("Pack Owners");
 
             for (const opt of PackOpts) {
                 const idStr = opt.value.toString(16);
                 const users = config.packOwners[idStr];
+                // Scuffed ass formatting. I don't care
+                let value = "None  ";
 
-                if (!users || !Array.isArray(users))
-                    continue;
+                if (users && Array.isArray(users)) {
+                    value = "";
 
-                content += `${opt.name}: 0x0${idStr}\n`;
-
-                if (users.length > 0)
-                    some = true;
-
-                for (const uid of users) {
-                    const user = await interaction.guild?.members.fetch(uid);
-                    content += `${user?.user.username ?? "Unkown Username"}, ${uid}\n`;
+                    for (const uid of users)
+                        value += `<@${uid}>, `;
                 }
+
+                embed.addFields({
+                    name: `${opt.name}: ${fmtHex(opt.value)}`,
+                    value: value.slice(0, value.length - 2),
+                });
             }
 
-            if (!some)
-                content += "None";
-
-            await interaction.reply({ content: content });
+            await interaction.reply({
+                embeds: [embed]
+            });
         }
     }
 };

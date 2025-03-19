@@ -159,7 +159,9 @@ export async function sendEmbedLog(interaction: ChatInputCommandInteraction<Cach
 export function fmtHex(n: number): string {
     let ret = n.toString(16).toUpperCase();
 
-    if (ret.length < 8)
+    if (ret.length <= 4)
+        ret = "0".repeat(4 - ret.length) + ret;
+    else if (ret.length < 8)
         ret = "0".repeat(8 - ret.length) + ret;
 
     return "0x" + ret;

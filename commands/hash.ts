@@ -41,11 +41,18 @@ export function packIDToName(packID: number) {
     }
 }
 
-async function sendEmbed(owner: GuildMember | null, packID: number, version: number, hashResponses: HashResponse[]) {
+function isAllowed(packIDStr: string, userID: string) {
+    return config.packOwners[packIDStr] && (config.packOwners[packIDStr]).findIndex(id => id == userID) != -1;
+}
+
+async function sendHashResponseEmbed(owner: GuildMember | null, packID: number, version: number, hashResponses: HashResponse[]) {
     const embed = new EmbedBuilder()
         .setColor(getColor())
-        .setTitle(`Updated hashes for ${packIDToName(packID)}, version ${version}/${fmtHex(version)}`)
-        .addFields({ name: "Owner", value: `<@${owner?.id ?? "Unknown"}>` });
+        .setTitle(`Hash update performed by ${owner?.displayName ?? "Unknown"}`)
+        .addFields({ name: "Owner", value: `<@${owner?.id ?? "Unknown"}>` })
+        .addFields({ name: "Pack", value: `${packIDToName(packID)}/${fmtHex(packID)}` })
+        .addFields({ name: "Version", value: `${version}/${fmtHex(version)}` })
+        .setTimestamp();
 
     for (let i = 0; i < 4; i++) {
         const hashResponse = hashResponses[i];
@@ -77,13 +84,215 @@ function regionIdxToName(idx: number): string {
     case 0:
         return "PAL";
     case 1:
-        return "NTSC-U";
+        return "NTSCU";
     case 2:
-        return "NTSC-J";
+        return "NTSCJ";
     case 3:
-        return "NTSC-K";
+        return "NTSCK";
     default:
         return "Unknown Region";
+    }
+}
+
+function hash(buffer: Buffer): HashResponse[] {
+    const hashes: HashResponse[] = new Array(4);
+
+    // Credit rambo (https://github.com/EpicUsername12)
+    const regionSizes = [];
+    for (let i = 0; i < 4; i++) {
+        regionSizes.push(buffer.readUint32BE(i * 4));
+    }
+
+    for (let i = 0; i < 4; i++) {
+        if (regionSizes[i] === 0) {
+            console.log("Region", regionIdxToName(i), "is empty");
+            continue;
+        }
+
+        const offset = 0x10 + regionSizes.slice(0, i).reduce((a, b) => a + b, 0);
+        const header = buffer.subarray(offset, offset + 0x20);
+        const size = header.readUint32BE(0xc); // codeSize
+        const data = buffer.subarray(offset + 0x20, offset + 0x20 + size);
+
+        hashes[i] = {
+            hash: crypto
+                .createHash("sha1")
+                .update(data)
+                .digest("hex"),
+            regionName: regionIdxToName(i),
+            offset: offset,
+            magic: header.readBigUint64BE(0),
+        };
+    }
+
+    return hashes;
+}
+
+async function set(interaction: ChatInputCommandInteraction<CacheType>) {
+    const packID = interaction.options.getInteger("packid", true);
+    const packIDStr = packID.toString(16);
+
+    if (interaction.member && !isAllowed(packIDStr, interaction.member.user.id)) {
+        await interaction.reply({
+            content: `Insufficient permissions to update hash for pack: ${packIDToName(packID)}`
+        });
+        return;
+    }
+
+    const version = interaction.options.getInteger("version", true);
+    const binaryAttachment = interaction.options.getAttachment("binary", true);
+    const binaryResponse = await fetch(binaryAttachment.url);
+
+    if (!binaryResponse.ok) {
+        await interaction.reply({
+            content: `Error fetching payload attachment: ${binaryResponse.status}`
+        });
+        return;
+    }
+
+    const buffer = Buffer.from(await binaryResponse.arrayBuffer());
+    let hashes;
+    try {
+        hashes = hash(buffer);
+    }
+    catch (e) {
+        await interaction.reply({
+            content: `Failed to calculate hashes for pack: ${packIDToName(packID)}, version: ${version}, error: ${e}`
+        });
+        return;
+    }
+
+    console.log(`Calculated hashes for ${packIDToName(packID)}, version ${version}`);
+    for (let i = 0; i < 4; i++) {
+        const hashResponse = hashes[i];
+        if (hashResponse)
+            console.log(`Region: ${hashResponse.regionName}, Hash: ${hashResponse.hash}, Magic: ${hashResponse.magic}, Offset: ${hashResponse.offset}`);
+        else
+            console.log(`Region: ${regionIdxToName(i)}, None`);
+    }
+
+    const [success, res] = await makeRequest("/api/set_hash", "POST", {
+        secret: config.wfcSecret,
+        pack_id: packID,
+        version: version,
+        hash_ntscu: hashes[1]?.hash ?? "",
+        hash_ntscj: hashes[2]?.hash ?? "",
+        hash_ntsck: hashes[3]?.hash ?? "",
+        hash_pal: hashes[0]?.hash ?? "",
+    });
+
+    if (success) {
+        await sendHashResponseEmbed(interaction.member as GuildMember | null, packID, version, hashes);
+        let content = `Updated hashes for ${packIDToName(packID)}, version ${version}/${fmtHex(version)}`;
+
+        for (let i = 0; i < 4; i++) {
+            const hashResponse = hashes[i];
+            if (hashResponse)
+                content += `\nRegion: ${hashResponse.regionName}, Hash: ${hashResponse.hash}, Magic: ${hashResponse.magic}, Offset: ${hashResponse.offset}`;
+            else
+                content += `\nRegion: ${regionIdxToName(i)}, None`;
+        }
+
+        console.log(`Successfully updated hashes for ${packIDToName(packID)}`);
+        await interaction.reply({ content: content });
+    }
+    else {
+        const content = `Failed to update pack: ${packIDToName(packID)}, version: ${version}, error: ${res.Error ?? "no error message provided"}`;
+        console.error(content);
+        await interaction.reply({
+            content: content
+        });
+    }
+}
+
+async function list(interaction: ChatInputCommandInteraction<CacheType>) {
+    const [success, res] = await makeRequest("/api/get_hash", "POST", {
+        secret: config.wfcSecret
+    });
+
+    if (!success) {
+        const content = `Failed to query hashes, error: ${res.Error ?? "no error message provided"}`;
+        console.error(content);
+        await interaction.reply({
+            content: content,
+        });
+
+        return;
+    }
+
+    const embed = new EmbedBuilder()
+        .setColor(getColor())
+        .setTitle("Pack Hashes");
+
+    for (const packIDStr in res.Hashes) {
+        const packID = Number.parseInt(packIDStr);
+        const versions = res.Hashes[packIDStr];
+        let value = "";
+
+        for (const versionStr in versions) {
+            const version = Number.parseInt(versionStr);
+            const regions = versions[versionStr];
+            value += `Version ${version}/${fmtHex(version)}\n`;
+
+            for (const region in regions) {
+                const hash = regions[region];
+                value += `${region}: ${hash != "" ? hash : "None"}\n`;
+            }
+
+            value += "\n";
+        }
+
+        embed.addFields({ name: `${packIDToName(packID)}/${fmtHex(packID)}`, value: value });
+    }
+
+    await interaction.reply({
+        embeds: [embed]
+    });
+}
+
+async function sendDelEmbed(owner: GuildMember | null, packID: number, version: number) {
+    const embed = new EmbedBuilder()
+        .setColor(getColor())
+        .setTitle(`Hash deletion performed by ${owner?.displayName ?? "Unknown"}`)
+        .addFields({ name: "Owner", value: `<@${owner?.id ?? "Unknown"}>` })
+        .addFields({ name: "Pack", value: `${packIDToName(packID)}/${fmtHex(packID)}` })
+        .addFields({ name: "Version", value: `${version}/${fmtHex(version)}` })
+        .setTimestamp();
+
+    await (client.channels.cache.get(config.logsChannel) as TextChannel | null)?.send({ embeds: [embed] });
+}
+
+async function del(interaction: ChatInputCommandInteraction<CacheType>) {
+    const packID = interaction.options.getInteger("packid", true);
+    const packIDStr = packID.toString(16);
+
+    if (interaction.member && !isAllowed(packIDStr, interaction.member.user.id)) {
+        await interaction.reply({
+            content: `Insufficient permissions to delete hash for pack: ${packIDToName(packID)}`
+        });
+        return;
+    }
+
+    const version = interaction.options.getInteger("version", true);
+
+    const [success, res] = await makeRequest("/api/remove_hash", "POST", {
+        secret: config.wfcSecret,
+        pack_id: packID,
+        version: version,
+    });
+
+    if (success) {
+        await sendDelEmbed(interaction.member as GuildMember | null, packID, version);
+        await interaction.reply({
+            content: `Successful hash deletion performed on pack: ${packIDToName(packID)}, version: ${version}/${fmtHex(version)}`
+        });
+    }
+    else {
+        const content = `Failed to delete hash for pack: ${packIDToName(packID)}, version: ${version}/${fmtHex(version)}, error: ${res.Error ?? "no error message provided"}`;
+        console.error(content);
+        await interaction.reply({
+            content: content,
+        });
     }
 }
 
@@ -93,118 +302,45 @@ export default {
 
     data: new SlashCommandBuilder()
         .setName("hash")
-        .setDescription("Update code.pul hash")
-        .addIntegerOption(option => option.setName("packid")
-            .setDescription("Pack to update")
-            .setChoices(PackOpts)
-            .setRequired(true))
-        .addIntegerOption(option => option.setName("version")
-            .setDescription("Version of code.pul to update")
-            .setRequired(true))
-        .addAttachmentOption(option => option.setName("binary")
-            .setDescription("Code.pul binary to hash")
-            .setRequired(true))
+        .setDescription("Manage code.pul hashes")
+        .addSubcommand(subcommand => subcommand.setName("set")
+            .setDescription("set the hashes for a given pack and version")
+            .addIntegerOption(option => option.setName("packid")
+                .setDescription("Pack to update")
+                .setChoices(PackOpts)
+                .setRequired(true))
+            .addIntegerOption(option => option.setName("version")
+                .setDescription("Version of code.pul to update")
+                .setRequired(true))
+            .addAttachmentOption(option => option.setName("binary")
+                .setDescription("Code.pul binary to hash")
+                .setRequired(true)))
+        .addSubcommand(subcommand => subcommand.setName("delete")
+            .setDescription("remove hashes for a given pack and version")
+            .addIntegerOption(option => option.setName("packid")
+                .setDescription("Pack to update")
+                .setChoices(PackOpts)
+                .setRequired(true))
+            .addIntegerOption(option => option.setName("version")
+                .setDescription("Version of code.pul to update")
+                .setRequired(true)))
+        .addSubcommand(subcommand => subcommand.setName("list")
+            .setDescription("list hashes for every pack and version"))
         .setDefaultMemberPermissions(PermissionFlagsBits.BanMembers),
 
     exec: async function(interaction: ChatInputCommandInteraction<CacheType>) {
-        const packID = interaction.options.getInteger("packid", true);
-        const packIDStr = packID.toString(16);
+        const subcommand = interaction.options.getSubcommand();
 
-        if (!config.packOwners[packIDStr] || (config.packOwners[packIDStr]).findIndex(id => id == interaction.member?.user.id) == -1) {
-            await interaction.reply({
-                content: `Insufficient permissions to update hash for pack: ${packIDToName(packID)}`
-            });
-            return;
-        }
-
-        const version = interaction.options.getInteger("version", true);
-        const binaryAttachment = interaction.options.getAttachment("binary", true);
-        const binaryResponse = await fetch(binaryAttachment.url);
-
-        if (!binaryResponse.ok) {
-            await interaction.reply({
-                content: `Error fetching payload attachment: ${binaryResponse.status}`
-            });
-            return;
-        }
-
-        const hashes: HashResponse[] = new Array(4);
-        try {
-            // Credit rambo (https://github.com/EpicUsername12)
-            const buffer = Buffer.from(await binaryResponse.arrayBuffer());
-            const regionSizes = [];
-            for (let i = 0; i < 4; i++) {
-                regionSizes.push(buffer.readUint32BE(i * 4));
-            }
-
-            for (let i = 0; i < 4; i++) {
-                if (regionSizes[i] === 0) {
-                    console.log("Region", regionIdxToName(i), "is empty");
-                    continue;
-                }
-
-                const offset = 0x10 + regionSizes.slice(0, i).reduce((a, b) => a + b, 0);
-                const header = buffer.subarray(offset, offset + 0x20);
-                const size = header.readUint32BE(0xc); // codeSize
-                const data = buffer.subarray(offset + 0x20, offset + 0x20 + size);
-
-                hashes[i] = {
-                    hash: crypto
-                        .createHash("sha1")
-                        .update(data)
-                        .digest("hex"),
-                    regionName: regionIdxToName(i),
-                    offset: offset,
-                    magic: header.readBigUint64BE(0),
-                };
-            }
-        }
-        catch (e) {
-            await interaction.reply({
-                content: `Failed to calculate hashes for pack: ${packIDToName(packID)}, version: ${version}, error: ${e}`
-            });
-            return;
-        }
-
-        console.log(`Calculated hashes for ${packIDToName(packID)}, version ${version}`);
-        for (let i = 0; i < 4; i++) {
-            const hashResponse = hashes[i];
-            if (hashResponse)
-                console.log(`Region: ${hashResponse.regionName}, Hash: ${hashResponse.hash}, Magic: ${hashResponse.magic}, Offset: ${hashResponse.offset}`);
-            else
-                console.log(`Region: ${regionIdxToName(i)}, None`);
-        }
-
-        const [success, res] = await makeRequest("/api/hash", "POST", {
-            secret: config.wfcSecret,
-            pack_id: packID,
-            version: version,
-            hash_ntscu: hashes[1].hash,
-            hash_ntscj: hashes[2].hash,
-            hash_pal: hashes[0].hash,
-        });
-
-        if (success) {
-            await sendEmbed(interaction.member as GuildMember | null, packID, version, hashes);
-            let content = `Updated hashes for ${packIDToName(packID)}, version ${version}`;
-
-            for (let i = 0; i < 4; i++) {
-                const hashResponse = hashes[i];
-                if (hashResponse)
-                    content += `\nRegion: ${hashResponse.regionName}, Hash: ${hashResponse.hash}, Magic: ${hashResponse.magic}, Offset: ${hashResponse.offset}`;
-                else
-                    content += `\nRegion: ${regionIdxToName(i)}, None`;
-            }
-
-            console.log(`Successfully updated hashes for ${packIDToName(packID)}`);
-            await interaction.reply({ content: content });
-        }
-        else {
-            const content = `Failed to update pack: ${packIDToName(packID)}, version: ${version}, error: ${res.Error ?? "no error message provided"}`;
-            console.error(content);
-            await interaction.reply({
-                content: content
-            });
+        switch (subcommand) {
+        case "list":
+            await list(interaction);
+            break;
+        case "set":
+            await set(interaction);
+            break;
+        case "delete":
+            await del(interaction);
+            break;
         }
     }
 };
