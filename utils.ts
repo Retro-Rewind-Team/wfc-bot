@@ -108,9 +108,24 @@ interface SendEmbedOpt {
     hidden?: boolean,
 }
 
-interface WiiLinkUser {
+export interface WiiLinkUser {
+    ProfileId: number,
+    UserId: number,
+    GsbrCode: string,
+    NgDeviceId: number[],
+    Email: string,
+    UniqueNick: string,
+    FirstName: string,
+    LastName: string,
+    Restricted: boolean,
+    RestrictedDeviceId: number,
+    BanReason: string,
+    OpenHost: boolean,
     LastIPAddress: string,
     LastInGameSn: string,
+    Csnum: string[],
+    BanIssued: string,
+    BanExpires: string,
 }
 
 export async function sendEmbedLog(interaction: ChatInputCommandInteraction<CacheType>, action: string, fc: string, user: WiiLinkUser, opts: SendEmbedOpt[], hideMiiName = false, noPublicEmbed = false) {
