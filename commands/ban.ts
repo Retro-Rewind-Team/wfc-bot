@@ -32,15 +32,12 @@ export default {
             .setDescription("ban hours length"))
         .addNumberOption(option => option.setName("minutes")
             .setDescription("ban minutes length"))
-        .addBooleanOption(option =>
-            option.setName("tos")
-                .setDescription("tos violation (ban from entire service), default true"))
-        .addBooleanOption(option =>
-            option.setName("hide-name")
-                .setDescription("hide mii name in logs"))
-        .addBooleanOption(option =>
-            option.setName("hide-public")
-                .setDescription("hide public log message"))
+        .addBooleanOption(option => option.setName("tos")
+            .setDescription("tos violation (ban from entire service), default true"))
+        .addBooleanOption(option => option.setName("hide-name")
+            .setDescription("hide mii name in logs"))
+        .addBooleanOption(option => option.setName("hide-public")
+            .setDescription("hide public log message"))
         .setDefaultMemberPermissions(PermissionFlagsBits.BanMembers),
 
     exec: async function(interaction: ChatInputCommandInteraction<CacheType>) {

@@ -11,9 +11,8 @@ export default {
     data: new SlashCommandBuilder()
         .setName("motd")
         .setDescription("Get or set the current message of the day.")
-        .addStringOption(option =>
-            option.setName("message")
-                .setDescription("message of the day to set"))
+        .addStringOption(option => option.setName("message")
+            .setDescription("message of the day to set"))
         .setDefaultMemberPermissions(PermissionFlagsBits.BanMembers),
 
     exec: async function(interaction: ChatInputCommandInteraction<CacheType>) {

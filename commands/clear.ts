@@ -11,18 +11,16 @@ export default {
     data: new SlashCommandBuilder()
         .setName("clear")
         .setDescription("Clear a user from the database")
-        .addStringOption(option =>
-            option.setName("id")
-                .setDescription("friend code or pid to clear")
-                .setRequired(true))
+        .addStringOption(option => option.setName("id")
+            .setDescription("friend code or pid to clear")
+            .setRequired(true))
         .addStringOption(option => option.setName("reason")
             .setDescription("clear reason")
             .setRequired(true))
         .addStringOption(option => option.setName("hidden-reason")
             .setDescription("clear reason only visible to moderators"))
-        .addBooleanOption(option =>
-            option.setName("hide-name")
-                .setDescription("hide mii name in logs"))
+        .addBooleanOption(option => option.setName("hide-name")
+            .setDescription("hide mii name in logs"))
         .setDefaultMemberPermissions(PermissionFlagsBits.Administrator),
 
     exec: async function(interaction: ChatInputCommandInteraction<CacheType>) {

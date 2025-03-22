@@ -11,21 +11,18 @@ export default {
     data: new SlashCommandBuilder()
         .setName("unban")
         .setDescription("Unban a user")
-        .addStringOption(option =>
-            option.setName("id")
-                .setDescription("friend code or pid to unban")
-                .setRequired(true))
+        .addStringOption(option => option.setName("id")
+            .setDescription("friend code or pid to unban")
+            .setRequired(true))
         .addStringOption(option => option.setName("reason")
             .setDescription("unban reason")
             .setRequired(true))
         .addStringOption(option => option.setName("hidden-reason")
             .setDescription("unban reason only visible to moderators"))
-        .addBooleanOption(option =>
-            option.setName("hide-name")
-                .setDescription("hide mii name in logs"))
-        .addBooleanOption(option =>
-            option.setName("hide-public")
-                .setDescription("hide public log message"))
+        .addBooleanOption(option => option.setName("hide-name")
+            .setDescription("hide mii name in logs"))
+        .addBooleanOption(option => option.setName("hide-public")
+            .setDescription("hide public log message"))
         .setDefaultMemberPermissions(PermissionFlagsBits.BanMembers),
 
     exec: async function(interaction: ChatInputCommandInteraction<CacheType>) {

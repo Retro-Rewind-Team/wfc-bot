@@ -31,16 +31,14 @@ export default {
         .setDefaultMemberPermissions(PermissionFlagsBits.Administrator)
         .addSubcommand(subcommand => subcommand.setName("add")
             .setDescription("Add a moderator")
-            .addUserOption(option =>
-                option.setName("user")
-                    .setDescription("The user to add as a moderator")
-                    .setRequired(true)))
+            .addUserOption(option => option.setName("user")
+                .setDescription("The user to add as a moderator")
+                .setRequired(true)))
         .addSubcommand(subcommand => subcommand.setName("remove")
             .setDescription("Remove a moderator")
-            .addUserOption(option =>
-                option.setName("user")
-                    .setDescription("The user to remove as a moderator")
-                    .setRequired(true))),
+            .addUserOption(option => option.setName("user")
+                .setDescription("The user to remove as a moderator")
+                .setRequired(true))),
 
     exec: async function(interaction: ChatInputCommandInteraction<CacheType>) {
         const subcommand = interaction.options.getSubcommand();
