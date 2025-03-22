@@ -181,3 +181,18 @@ export function fmtHex(n: number): string {
 
     return "0x" + ret;
 }
+
+export function fmtTimeSpan(diff: number): string {
+    const days = Math.floor(diff / (60 * 60 * 24));
+    diff -= days * (60 * 60 * 24);
+
+    const hours = Math.floor(diff / (60 * 60));
+    diff -= hours * (60 * 60);
+
+    const mins = Math.floor(diff / (60));
+    diff -= mins * (60);
+
+    const seconds = Math.floor(diff);
+
+    return `${days} Days, ${hours} Hours, ${seconds} Seconds`;
+}

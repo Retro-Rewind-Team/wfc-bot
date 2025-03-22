@@ -1,18 +1,19 @@
-import { CacheType, ChatInputCommandInteraction, SlashCommandBuilder } from "discord.js";
+import { CacheType, ChatInputCommandInteraction, PermissionFlagsBits, SlashCommandBuilder } from "discord.js";
 import { pinfo } from "./pinfo_shared.js";
 
 export default {
-    modOnly: false,
+    modOnly: true,
     adminOnly: false,
 
     data: new SlashCommandBuilder()
-        .setName("pinfo")
+        .setName("pinfo_private")
         .setDescription("Query information for a given player id")
         .addStringOption(option => option.setName("id")
             .setDescription("friend code to retrieve")
-            .setRequired(true)),
+            .setRequired(true))
+        .setDefaultMemberPermissions(PermissionFlagsBits.BanMembers),
 
     exec: async function(interaction: ChatInputCommandInteraction<CacheType>) {
-        await pinfo(interaction, false);
+        await pinfo(interaction, true);
     }
 };

@@ -231,6 +231,10 @@ async function resolveCommands(root: string, files: string[], callback: (_: Dict
     for (const file of files) {
         let spec = await import(path.join(root, file));
         spec = spec.default;
+
+        if (spec == undefined || spec == null)
+            continue;
+
         if ("data" in spec && "exec" in spec) {
             const name = path.basename(file, ".js");
             console.log(`Registered command ${name}`);
