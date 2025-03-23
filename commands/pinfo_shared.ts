@@ -3,6 +3,7 @@ import { fmtTimeSpan, getColor, makeRequest, pidToFc, resolvePidFromString, vali
 import { getConfig } from "../config.js";
 
 const config = getConfig();
+const idRegex = new RegExp(/^\d+$/);
 
 async function reply(interaction: ChatInputCommandInteraction<CacheType>, priv: boolean, options: InteractionReplyOptions) {
     if (priv) {
@@ -77,6 +78,19 @@ export async function pinfo(interaction: ChatInputCommandInteraction<CacheType>,
     );
 
     if (user.Restricted || expiredBan) {
+        if (priv) {
+            let banModerator;
+
+            if (!user.BanModerator || user.BanModerator == "" || user.BanModerator == "admin")
+                banModerator = "Unknown";
+            else if (user.BanModerator.match(idRegex))
+                banModerator = `<@${user.BanModerator}>`;
+            else
+                banModerator = user.BanModerator;
+
+            embed.addFields({ name: "Ban Moderator", value: `${banModerator}` });
+        }
+
         embed.addFields(
             { name: "Ban Reason", value: `${user.BanReason}` },
             { name: "Ban Issued", value: `<t:${issuedDate}:F>` },
@@ -94,7 +108,6 @@ export async function pinfo(interaction: ChatInputCommandInteraction<CacheType>,
             { name: "Unique Nick", value: `${user.UniqueNick}` },
             { name: "First Name", value: `${user.FirstName}` },
             { name: "Last Name", value: `${user.LastName}` },
-            { name: "Restricted Device ID", value: `${user.RestrictedDeviceId}` },
             { name: "Last IP Address", value: `${user.LastIPAddress}` },
             { name: "Console Serial Numbers", value: `${user.Csnum}` },
         );
