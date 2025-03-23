@@ -1,4 +1,4 @@
-import { CacheType, ChatInputCommandInteraction, EmbedBuilder, GuildMember, PermissionFlagsBits, SlashCommandBuilder, TextChannel } from "discord.js";
+import { CacheType, ChatInputCommandInteraction, EmbedBuilder, GuildMember, MessageFlags, PermissionFlagsBits, SlashCommandBuilder, TextChannel } from "discord.js";
 import { getConfig } from "../config.js";
 import crypto from "crypto";
 import { client } from "../index.js";
@@ -69,7 +69,7 @@ async function sendHashResponseEmbed(owner: GuildMember | null, packID: number, 
             });
     }
 
-    await (client.channels.cache.get(config.logsChannel) as TextChannel | null)?.send({ embeds: [embed] });
+    await (client.channels.cache.get(config.packOwnersLogsChannel) as TextChannel | null)?.send({ embeds: [embed] });
 }
 
 interface HashResponse {
@@ -134,7 +134,8 @@ async function set(interaction: ChatInputCommandInteraction<CacheType>) {
 
     if (interaction.member && !isAllowed(packIDStr, interaction.member.user.id)) {
         await interaction.reply({
-            content: `Insufficient permissions to update hash for pack: ${packIDToName(packID)}`
+            content: `Insufficient permissions to update hash for pack: ${packIDToName(packID)}`,
+            flags: MessageFlags.Ephemeral,
         });
         return;
     }
@@ -145,7 +146,8 @@ async function set(interaction: ChatInputCommandInteraction<CacheType>) {
 
     if (!binaryResponse.ok) {
         await interaction.reply({
-            content: `Error fetching payload attachment: ${binaryResponse.status}`
+            content: `Error fetching payload attachment: ${binaryResponse.status}`,
+            flags: MessageFlags.Ephemeral,
         });
         return;
     }
@@ -157,7 +159,8 @@ async function set(interaction: ChatInputCommandInteraction<CacheType>) {
     }
     catch (e) {
         await interaction.reply({
-            content: `Failed to calculate hashes for pack: ${packIDToName(packID)}, version: ${version}, error: ${e}`
+            content: `Failed to calculate hashes for pack: ${packIDToName(packID)}, version: ${version}, error: ${e}`,
+            flags: MessageFlags.Ephemeral,
         });
         return;
     }
@@ -194,13 +197,17 @@ async function set(interaction: ChatInputCommandInteraction<CacheType>) {
         }
 
         console.log(`Successfully updated hashes for ${packIDToName(packID)}`);
-        await interaction.reply({ content: content });
+        await interaction.reply({
+            content: content,
+            flags: MessageFlags.Ephemeral,
+        });
     }
     else {
         const content = `Failed to update pack: ${packIDToName(packID)}, version: ${version}, error: ${res.Error ?? "no error message provided"}`;
         console.error(content);
         await interaction.reply({
-            content: content
+            content: content,
+            flags: MessageFlags.Ephemeral,
         });
     }
 }
@@ -215,6 +222,7 @@ async function list(interaction: ChatInputCommandInteraction<CacheType>) {
         console.error(content);
         await interaction.reply({
             content: content,
+            flags: MessageFlags.Ephemeral,
         });
 
         return;
@@ -246,7 +254,8 @@ async function list(interaction: ChatInputCommandInteraction<CacheType>) {
     }
 
     await interaction.reply({
-        embeds: [embed]
+        embeds: [embed],
+        flags: MessageFlags.Ephemeral,
     });
 }
 
@@ -259,7 +268,7 @@ async function sendDelEmbed(owner: GuildMember | null, packID: number, version: 
         .addFields({ name: "Version", value: `${version}/${fmtHex(version)}` })
         .setTimestamp();
 
-    await (client.channels.cache.get(config.logsChannel) as TextChannel | null)?.send({ embeds: [embed] });
+    await (client.channels.cache.get(config.packOwnersLogsChannel) as TextChannel | null)?.send({ embeds: [embed] });
 }
 
 async function del(interaction: ChatInputCommandInteraction<CacheType>) {
@@ -268,7 +277,8 @@ async function del(interaction: ChatInputCommandInteraction<CacheType>) {
 
     if (interaction.member && !isAllowed(packIDStr, interaction.member.user.id)) {
         await interaction.reply({
-            content: `Insufficient permissions to delete hash for pack: ${packIDToName(packID)}`
+            content: `Insufficient permissions to delete hash for pack: ${packIDToName(packID)}`,
+            flags: MessageFlags.Ephemeral,
         });
         return;
     }
@@ -284,7 +294,8 @@ async function del(interaction: ChatInputCommandInteraction<CacheType>) {
     if (success) {
         await sendDelEmbed(interaction.member as GuildMember | null, packID, version);
         await interaction.reply({
-            content: `Successful hash deletion performed on pack: ${packIDToName(packID)}, version: ${version}/${fmtHex(version)}`
+            content: `Successful hash deletion performed on pack: ${packIDToName(packID)}, version: ${version}/${fmtHex(version)}`,
+            flags: MessageFlags.Ephemeral,
         });
     }
     else {
@@ -292,6 +303,7 @@ async function del(interaction: ChatInputCommandInteraction<CacheType>) {
         console.error(content);
         await interaction.reply({
             content: content,
+            flags: MessageFlags.Ephemeral,
         });
     }
 }

@@ -14,12 +14,33 @@ interface Config {
     allowedModerators: string[]
     logsChannel: string
     publicLogsChannel: string
+    packOwnersLogsChannel: string
     friendbot: string
     packOwners: Dictionary<string[]>
 }
 
 let _config: Config;
 let _path: string;
+
+function verifyConfig(config: Config) {
+    if (!config.allowedAdmins
+        || !Array.isArray(config.allowedAdmins)
+        || config.allowedAdmins.length == 0) {
+        throw "No admins set! Please set one to continue.";
+    }
+
+    if (!config.logsChannel || config.logsChannel.length == 0) {
+        throw "No logs channel is set! Please set one to continue.";
+    }
+
+    if (!config.publicLogsChannel || config.publicLogsChannel.length == 0) {
+        throw "No public logs channel is set! Please set one to continue.";
+    }
+
+    if (!config.packOwnersLogsChannel || config.packOwnersLogsChannel.length == 0) {
+        throw "No pack owners logs channel is set! Please set one to continue.";
+    }
+}
 
 export function initConfig(path: string) {
     _path = path;
@@ -44,12 +65,15 @@ export function initConfig(path: string) {
                 ],
                 logsChannel: "Channel id to send successful moderative actions to.",
                 publicLogsChannel: "Channel id to send the public version of moderative actions to.",
+                packOwnersLogsChannel: "Channel id to send the hash logs to.",
                 friendbot: "FC used to link discord accounts to WFC profiles.",
                 packOwners: {},
             });
 
         const buf = readFileSync(path, { encoding: "utf8" });
         _config = JSON.parse(buf);
+
+        verifyConfig(_config);
     }
     catch (e) {
         console.error(e);

@@ -1,4 +1,4 @@
-import { CacheType, ChatInputCommandInteraction, Client, Events, IntentsBitField, REST, RESTPostAPIChatInputApplicationCommandsJSONBody, RESTPutAPIApplicationCommandsResult, Routes, SlashCommandOptionsOnlyBuilder, TextChannel } from "discord.js";
+import { CacheType, ChatInputCommandInteraction, Client, Events, IntentsBitField, MessageFlags, REST, RESTPostAPIChatInputApplicationCommandsJSONBody, RESTPutAPIApplicationCommandsResult, Routes, SlashCommandOptionsOnlyBuilder, TextChannel } from "discord.js";
 import { getConfig, initConfig } from "./config.js";
 import { Dictionary } from "./dictionary.js";
 import * as fs from "fs";
@@ -90,30 +90,6 @@ for (let i = 2; i < process.argv.length; i++) {
 
 initConfig(configPath.length > 0 ? configPath : path.join(process.cwd(), "config.json"));
 let config = getConfig();
-
-if (!config.allowedModerators
-    || !Array.isArray(config.allowedModerators)
-    || config.allowedModerators.length == 0) {
-    console.log("No moderators set! Please set one to continue.");
-    exit(1);
-}
-
-if (!config.allowedAdmins
-    || !Array.isArray(config.allowedAdmins)
-    || config.allowedAdmins.length == 0) {
-    console.log("No admins set! Please set one to continue.");
-    exit(1);
-}
-
-if (!config.logsChannel) {
-    console.error("No logs channel is set! Please set one to continue.");
-    exit(1);
-}
-
-if (!config.publicLogsChannel) {
-    console.error("No public logs channel is set! Please set one to continue.");
-    exit(1);
-}
 
 const fetchGroupsUrl = `http://${config.wfcServer}:${config.wfcPort}/api/groups`;
 const fetchStatsUrl = `http://${config.wfcServer}:${config.wfcPort}/api/stats`;
@@ -272,9 +248,15 @@ async function handleInteraction(interaction: ChatInputCommandInteraction<CacheT
     catch (error) {
         console.error(error);
         if (interaction.replied || interaction.deferred)
-            await interaction.followUp({ content: "There was an error while executing this command!", ephemeral: true });
+            await interaction.followUp({
+                content: "There was an error while executing this command!",
+                flags: MessageFlags.Ephemeral,
+            });
         else
-            await interaction.reply({ content: "There was an error while executing this command!", ephemeral: true });
+            await interaction.reply({
+                content: "There was an error while executing this command!",
+                flags: MessageFlags.Ephemeral,
+            });
     }
 }
 
