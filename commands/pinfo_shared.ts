@@ -61,7 +61,7 @@ export async function pinfo(interaction: ChatInputCommandInteraction<CacheType>,
         issuedDate = Math.round(issuedDate / 1000);
         expiresDate = Math.round(expiresDate / 1000);
 
-        if (expiresDate > Date.now() / 1000) {
+        if (expiresDate < Date.now() / 1000) {
             expiredBan = true;
             user.Restricted = false;
         }
