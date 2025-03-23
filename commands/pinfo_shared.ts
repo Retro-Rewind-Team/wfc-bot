@@ -49,6 +49,7 @@ export async function pinfo(interaction: ChatInputCommandInteraction<CacheType>,
     const embed = new EmbedBuilder()
         .setColor(getColor())
         .setTitle(`Player info for friend code ${fc}`)
+        .setThumbnail(`https://${config.statusServer}/miiimg?fc=${fc}`)
         .setTimestamp();
 
     const user: WiiLinkUser = res.User;
