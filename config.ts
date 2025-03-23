@@ -5,6 +5,7 @@ import { exit } from "process";
 interface Config {
     token: string
     applicationID: string
+    statusServer: string
     wfcServer: string
     wfcPort: number
     wfcSecret: string
@@ -28,6 +29,7 @@ export function initConfig(path: string) {
             setConfig({
                 token: "your bot's token",
                 applicationID: "your application id",
+                statusServer: "The status server to query miis from (RetroRewindRooms)",
                 wfcServer: "the wfc server to connect to, such as 'ppeb.me' or 'localhost'",
                 wfcPort: 8080,
                 wfcSecret: "your wfc secret key",

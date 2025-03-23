@@ -132,6 +132,7 @@ export interface WiiLinkUser {
 export async function sendEmbedLog(interaction: ChatInputCommandInteraction<CacheType>, action: string, fc: string, user: WiiLinkUser, opts: SendEmbedOpt[], hideMiiName = false, noPublicEmbed = false) {
     const miiName = user.LastInGameSn != "" ? user.LastInGameSn : "Unknown";
     const member = interaction.member as GuildMember | null;
+    const thumbnail = `https://${config.statusServer}/miiimg?fc=${fc}`;
 
     const privEmbed = new EmbedBuilder()
         .setColor(getColor())
@@ -144,6 +145,9 @@ export async function sendEmbedLog(interaction: ChatInputCommandInteraction<Cach
             { name: "IP", value: user.LastIPAddress != "" ? user.LastIPAddress : "Unknown" }
         )
         .setTimestamp();
+
+    privEmbed.setThumbnail(thumbnail);
+    console.log(thumbnail);
 
     if (opts)
         privEmbed.addFields(...opts);
@@ -162,6 +166,10 @@ export async function sendEmbedLog(interaction: ChatInputCommandInteraction<Cach
             { name: "Mii Name", value: hideMiiName ? "\\*\\*\\*\\*\\*" : miiName }
         )
         .setTimestamp();
+
+
+    if (!hideMiiName)
+        pubEmbed.setThumbnail(thumbnail);
 
     if (opts) {
         const filtered = opts.filter((opt) => !opt["hidden"]);
