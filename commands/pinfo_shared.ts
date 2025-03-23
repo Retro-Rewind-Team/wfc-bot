@@ -55,26 +55,28 @@ export async function pinfo(interaction: ChatInputCommandInteraction<CacheType>,
     let issuedDate = Date.parse(user.BanIssued);
     let expiresDate = Date.parse(user.BanExpires);
     let banLengthStr = null;
+    let expiredBan = false;
 
     if (!isNaN(expiresDate) && !isNaN(expiresDate)) {
         issuedDate = Math.round(issuedDate / 1000);
         expiresDate = Math.round(expiresDate / 1000);
 
-        if (expiresDate > Date.now())
+        if (expiresDate > Date.now() / 1000) {
+            expiredBan = true;
             user.Restricted = false;
-        else
-            banLengthStr = fmtTimeSpan(expiresDate - issuedDate);
+        }
 
+        banLengthStr = fmtTimeSpan(expiresDate - issuedDate);
     }
 
     embed.addFields(
         { name: "Profile ID", value: `${user.ProfileId}` },
         { name: "Mii Name", value: `${user.LastInGameSn}` },
         { name: "Open Host", value: `${user.OpenHost}` },
-        { name: "Banned", value: `${user.Restricted}` }
+        { name: "Banned", value: `${user.Restricted}${expiredBan ? " (Expired)" : ""}` }
     );
 
-    if (user.Restricted) {
+    if (user.Restricted || expiredBan) {
         embed.addFields(
             { name: "Ban Reason", value: `${user.BanReason}` },
             { name: "Ban Issued", value: `<t:${issuedDate}:F>` },

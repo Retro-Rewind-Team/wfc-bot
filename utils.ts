@@ -194,5 +194,5 @@ export function fmtTimeSpan(diff: number): string {
 
     const seconds = Math.floor(diff);
 
-    return `${days} Days, ${hours} Hours, ${seconds} Seconds`;
+    return `${days} Days, ${hours} Hours, ${mins} Minutes, ${seconds} Seconds`;
 }
