@@ -1,7 +1,6 @@
+import { Dictionary } from "./dictionary.js";
 import { existsSync, readFileSync, writeFileSync } from "fs";
 import { exit } from "process";
-
-interface Dictionary<T> { [key: string]: T }
 
 interface Config {
     token: string

@@ -1,5 +1,6 @@
 import { CacheType, ChatInputCommandInteraction, Client, Events, IntentsBitField, REST, RESTPostAPIChatInputApplicationCommandsJSONBody, RESTPutAPIApplicationCommandsResult, Routes, SlashCommandOptionsOnlyBuilder, TextChannel } from "discord.js";
 import { getConfig, initConfig } from "./config.js";
+import { Dictionary } from "./dictionary.js";
 import * as fs from "fs";
 import * as path from "path";
 import { exit } from "process";
@@ -222,8 +223,6 @@ interface Command {
     data: SlashCommandOptionsOnlyBuilder;
     exec: (_: ChatInputCommandInteraction<CacheType>) => Promise<void>,
 }
-
-interface Dictionary<T> { [key: string]: T }
 
 async function resolveCommands(root: string, files: string[], callback: (_: Dictionary<Command>) => void) {
     const ret: Dictionary<Command> = {};
