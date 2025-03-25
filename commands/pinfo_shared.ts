@@ -5,6 +5,36 @@ import { getConfig } from "../config.js";
 const config = getConfig();
 const idRegex = new RegExp(/^\d+$/);
 
+function fmtDeviceID(deviceIDs: number[]) {
+    if (!deviceIDs)
+        return "null";
+
+    let ret = "";
+
+    for (let i = 0; i < deviceIDs.length; i++) {
+        const deviceID = deviceIDs[i];
+        switch (deviceID) {
+        case 33869561:
+        case 59541067:
+        case 68042647:
+        case 107866953:
+        case 170939432:
+        case 172260247:
+            ret += deviceID + " (leaked)";
+            break;
+        case 67349608:
+            ret += deviceID + " (dolphin)";
+            break;
+        default:
+            ret += deviceID;
+        }
+
+        ret += (i + 1 == deviceIDs.length ? "" : ", ");
+    }
+
+    return ret;
+}
+
 async function reply(interaction: ChatInputCommandInteraction<CacheType>, priv: boolean, options: InteractionReplyOptions) {
     if (priv) {
         if (typeof options.flags == "number")
@@ -104,7 +134,7 @@ export async function pinfo(interaction: ChatInputCommandInteraction<CacheType>,
         embed.addFields(
             { name: "User ID", value: `${user.UserId}` },
             { name: "Gsbr Code", value: `${user.GsbrCode}` },
-            { name: "NG Device IDs", value: `${user.NgDeviceId}` },
+            { name: "NG Device IDs", value: `${fmtDeviceID(user.NgDeviceId)}` },
             { name: "Email", value: `${user.Email}` },
             { name: "Unique Nick", value: `${user.UniqueNick}` },
             { name: "First Name", value: `${user.FirstName}` },
