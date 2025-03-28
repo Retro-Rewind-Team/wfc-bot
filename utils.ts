@@ -1,7 +1,8 @@
 import crypto from "crypto";
-import { CacheType, ChatInputCommandInteraction, EmbedBuilder, GuildMember, TextChannel } from "discord.js";
+import { CacheType, ChatInputCommandInteraction, EmbedBuilder, GuildMember, PermissionFlagsBits, TextChannel } from "discord.js";
 import { client } from "./index.js";
 import { getConfig } from "./config.js";
+import { Dictionary } from "./dictionary.js";
 
 const fcRegex = new RegExp(/[0-9]{4}-[0-9]{4}-[0-9]{4}/);
 const pidRegex = new RegExp(/^\d+$/);
@@ -204,4 +205,8 @@ export function fmtTimeSpan(diff: number): string {
     const seconds = Math.floor(diff);
 
     return `${days} Days, ${hours} Hours, ${mins} Minutes, ${seconds} Seconds`;
+}
+
+export function resolveModRestrictPermission() {
+    return (PermissionFlagsBits as Dictionary<bigint>)[config.modRestrictPerm] as bigint;
 }

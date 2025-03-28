@@ -1,5 +1,6 @@
-import { CacheType, ChatInputCommandInteraction, PermissionFlagsBits, SlashCommandBuilder } from "discord.js";
+import { CacheType, ChatInputCommandInteraction, SlashCommandBuilder } from "discord.js";
 import { pinfo } from "./pinfo_shared.js";
+import { resolveModRestrictPermission } from "../utils.js";
 
 export default {
     modOnly: true,
@@ -11,7 +12,7 @@ export default {
         .addStringOption(option => option.setName("id")
             .setDescription("friend code to retrieve")
             .setRequired(true))
-        .setDefaultMemberPermissions(PermissionFlagsBits.BanMembers),
+        .setDefaultMemberPermissions(resolveModRestrictPermission()),
 
     exec: async function(interaction: ChatInputCommandInteraction<CacheType>) {
         await pinfo(interaction, true);

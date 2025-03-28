@@ -28,7 +28,6 @@ export default {
     data: new SlashCommandBuilder()
         .setName("mod")
         .setDescription("Manage moderators")
-        .setDefaultMemberPermissions(PermissionFlagsBits.Administrator)
         .addSubcommand(subcommand => subcommand.setName("add")
             .setDescription("Add a moderator")
             .addUserOption(option => option.setName("user")
@@ -38,7 +37,8 @@ export default {
             .setDescription("Remove a moderator")
             .addUserOption(option => option.setName("user")
                 .setDescription("The user to remove as a moderator")
-                .setRequired(true))),
+                .setRequired(true)))
+        .setDefaultMemberPermissions(PermissionFlagsBits.Administrator),
 
     exec: async function(interaction: ChatInputCommandInteraction<CacheType>) {
         const subcommand = interaction.options.getSubcommand();

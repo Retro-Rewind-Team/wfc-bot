@@ -1,3 +1,4 @@
+import { PermissionFlagsBits } from "discord.js";
 import { Dictionary } from "./dictionary.js";
 import { existsSync, readFileSync, writeFileSync } from "fs";
 import { exit } from "process";
@@ -15,6 +16,7 @@ interface Config {
     logsChannel: string
     publicLogsChannel: string
     packOwnersLogsChannel: string
+    modRestrictPerm: string
     friendbot: string
     packOwners: Dictionary<string[]>
 }
@@ -25,21 +27,21 @@ let _path: string;
 function verifyConfig(config: Config) {
     if (!config.allowedAdmins
         || !Array.isArray(config.allowedAdmins)
-        || config.allowedAdmins.length == 0) {
+        || config.allowedAdmins.length == 0)
         throw "No admins set! Please set one to continue.";
-    }
 
-    if (!config.logsChannel || config.logsChannel.length == 0) {
+    if (!config.logsChannel || config.logsChannel.length == 0)
         throw "No logs channel is set! Please set one to continue.";
-    }
 
-    if (!config.publicLogsChannel || config.publicLogsChannel.length == 0) {
+    if (!config.publicLogsChannel || config.publicLogsChannel.length == 0)
         throw "No public logs channel is set! Please set one to continue.";
-    }
 
-    if (!config.packOwnersLogsChannel || config.packOwnersLogsChannel.length == 0) {
+    if (!config.packOwnersLogsChannel || config.packOwnersLogsChannel.length == 0)
         throw "No pack owners logs channel is set! Please set one to continue.";
-    }
+
+    if (!config.modRestrictPerm
+        || !(PermissionFlagsBits as Dictionary<bigint>)[config.modRestrictPerm])
+        throw "No or an incorrect modRestrictPerm is set! Please set one to continue.";
 }
 
 export function initConfig(path: string) {
@@ -66,6 +68,7 @@ export function initConfig(path: string) {
                 logsChannel: "Channel id to send successful moderative actions to.",
                 publicLogsChannel: "Channel id to send the public version of moderative actions to.",
                 packOwnersLogsChannel: "Channel id to send the hash logs to.",
+                modRestrictPerm: "Permission used to restrict mod commands. See PermissionFlagsBits",
                 friendbot: "FC used to link discord accounts to WFC profiles.",
                 packOwners: {},
             });

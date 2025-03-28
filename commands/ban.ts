@@ -1,5 +1,5 @@
-import { CacheType, ChatInputCommandInteraction, PermissionFlagsBits, SlashCommandBuilder } from "discord.js";
-import { makeRequest, pidToFc, resolvePidFromString, sendEmbedLog, validateId } from "../utils.js";
+import { CacheType, ChatInputCommandInteraction, SlashCommandBuilder } from "discord.js";
+import { makeRequest, pidToFc, resolveModRestrictPermission, resolvePidFromString, sendEmbedLog, validateId } from "../utils.js";
 import { getConfig } from "../config.js";
 
 const config = getConfig();
@@ -38,7 +38,7 @@ export default {
             .setDescription("hide mii name in logs"))
         .addBooleanOption(option => option.setName("hide-public")
             .setDescription("hide public log message"))
-        .setDefaultMemberPermissions(PermissionFlagsBits.BanMembers),
+        .setDefaultMemberPermissions(resolveModRestrictPermission()),
 
     exec: async function(interaction: ChatInputCommandInteraction<CacheType>) {
         let id = interaction.options.getString("id", true);

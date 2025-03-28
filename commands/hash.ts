@@ -1,8 +1,8 @@
-import { CacheType, ChatInputCommandInteraction, EmbedBuilder, GuildMember, MessageFlags, PermissionFlagsBits, SlashCommandBuilder, TextChannel } from "discord.js";
+import { CacheType, ChatInputCommandInteraction, EmbedBuilder, GuildMember, MessageFlags, SlashCommandBuilder, TextChannel } from "discord.js";
 import { getConfig } from "../config.js";
 import crypto from "crypto";
 import { client } from "../index.js";
-import { fmtHex, getColor, makeRequest } from "../utils.js";
+import { fmtHex, getColor, makeRequest, resolveModRestrictPermission } from "../utils.js";
 
 const config = getConfig();
 
@@ -338,7 +338,7 @@ export default {
                 .setRequired(true)))
         .addSubcommand(subcommand => subcommand.setName("list")
             .setDescription("list hashes for every pack and version"))
-        .setDefaultMemberPermissions(PermissionFlagsBits.BanMembers),
+        .setDefaultMemberPermissions(resolveModRestrictPermission()),
 
     exec: async function(interaction: ChatInputCommandInteraction<CacheType>) {
         const subcommand = interaction.options.getSubcommand();
