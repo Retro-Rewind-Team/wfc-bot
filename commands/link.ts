@@ -1,5 +1,5 @@
-import { ActionRowBuilder, ButtonBuilder, ButtonStyle, CacheType, ChatInputCommandInteraction, SlashCommandBuilder } from "discord.js";
-import { makeRequest, pidToFc, resolveModRestrictPermission, resolvePidFromString, sendEmbedLog, validateId } from "../utils.js";
+import { CacheType, ChatInputCommandInteraction, SlashCommandBuilder } from "discord.js";
+import { makeRequest, pidToFc, resolvePidFromString, validateId } from "../utils.js";
 import { getConfig } from "../config.js";
 
 const config = getConfig();
@@ -28,7 +28,7 @@ export default {
         const fc = pidToFc(pid);
         const discordId = interaction.user.id;
 
-        interaction.deferReply({ ephemeral: true });
+        await interaction.deferReply({ ephemeral: true });
         if (currentlyVerifying.has(pid)) {
             await interaction.editReply({ content: `Error linking friend code "${fc}": Already verifying this profile!` });
             return;
@@ -41,24 +41,22 @@ export default {
             return;
         }
 
-        const completed = new ButtonBuilder()
-            .setCustomId("verify")
-            .setLabel("Completed")
-            .setStyle(ButtonStyle.Success)
         
-        const row = new ActionRowBuilder<ButtonBuilder>().addComponents(completed);
-        /* const verifDM = await interaction.user.send({
-            content: `Verification started for "${fc}"! Please add "${config.friendbot}" on RWFC and press the button below withig 10 minutes!`,
-            components: [row],
-        }); */
         interaction.editReply({
             content: `Verification started for "${fc}"! Please add "${config.friendbot}" on RWFC and press the button below within 10 minutes!`,
-            components: [row]
         });
         const timeOut = (Date.now() + 600_000); // 10 minutes
         while (Date.now() < timeOut) {
-            try {
-                const confirmation = await interaction.user.awaitMessageComponent({
-
+            await new Promise(resolve => setTimeout(resolve, 30_000)); // Try every 30 seconds
+            const [checkSuccess, checkRes] = await makeRequest("/api/link", "POST", { secret: config.wfcSecret, pid: pid, discordId: discordId, action: "check" });
+            if (checkSuccess) {
+                currentlyVerifying.delete(pid);
+                await interaction.editReply({ content: `Successfully linked friend code "${fc}" to your Discord account!: error ${checkRes.Error ?? "no error message provided"}` });
+                return;
+            }
+        }
+        await interaction.editReply({ content: `Profile linking for "${fc}" timed out!`});
+        currentlyVerifying.delete(pid);
+        return;
     }
-}
+};
