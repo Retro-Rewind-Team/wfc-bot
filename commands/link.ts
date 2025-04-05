@@ -56,7 +56,12 @@ export default {
             }
         }
         await interaction.editReply({ content: `Profile linking for "${fc}" timed out!`});
+        const [deleteSuccess, deleteRes] = await makeRequest("/api/link", "POST", { secret: config.wfcSecret, pid: pid, discordId: discordId, action: "unlink" });
+        if (deleteSuccess) {
+            await interaction.followUp({ content: `Profile linking for "${fc}" cancelled!` });
+        } else {
+            await interaction.followUp({ content: `Failed to cancel linking for "${fc}": error ${deleteRes.Error ?? "no error message provided"}` });
         currentlyVerifying.delete(pid);
-        return;
+        }
     }
 };
