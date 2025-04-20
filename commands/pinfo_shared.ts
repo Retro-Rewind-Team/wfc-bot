@@ -127,7 +127,7 @@ export async function pinfo(interaction: ChatInputCommandInteraction<CacheType>,
         if (priv) {
             embed.addFields({
                 name: "Hidden Reason",
-                value: `${user.BanReasonHidden.length != 0 ? user.BanReasonHidden : "None"}`
+                value: `${user.BanReasonHidden && user.BanReasonHidden.length != 0 ? user.BanReasonHidden : "None"}`
             });
         }
 
