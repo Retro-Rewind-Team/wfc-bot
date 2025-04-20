@@ -126,6 +126,7 @@ export interface WiiLinkUser {
     LastInGameSn: string,
     Csnum: string[],
     BanModerator: string,
+    BanReasonHidden: string,
     BanIssued: string,
     BanExpires: string,
 }

@@ -77,7 +77,7 @@ export default {
             minutes: minutes,
             tos: tos,
             reason: reason,
-            reasonHidden: reasonHidden ?? "",
+            reason_hidden: reasonHidden ?? "",
             moderator: moderator
         });
 

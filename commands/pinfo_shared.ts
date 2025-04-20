@@ -122,11 +122,19 @@ export async function pinfo(interaction: ChatInputCommandInteraction<CacheType>,
             embed.addFields({ name: "Ban Moderator", value: `${banModerator}` });
         }
 
+        embed.addFields({ name: "Ban Reason", value: `${user.BanReason}` });
+
+        if (priv) {
+            embed.addFields({
+                name: "Hidden Reason",
+                value: `${user.BanReasonHidden.length != 0 ? user.BanReasonHidden : "None"}`
+            });
+        }
+
         embed.addFields(
-            { name: "Ban Reason", value: `${user.BanReason}` },
             { name: "Ban Issued", value: `<t:${issuedDate}:F>` },
             { name: "Ban Expires", value: `<t:${expiresDate}:F>` },
-            { name: "Ban Length", value: `${banLengthStr ?? "Unknown"}` }
+            { name: "Ban Length", value: `${banLengthStr ?? "Unknown"}` },
         );
     }
 
