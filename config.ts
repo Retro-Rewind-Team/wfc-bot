@@ -3,7 +3,7 @@ import { Dictionary } from "./dictionary.js";
 import { existsSync, readFileSync, writeFileSync } from "fs";
 import { exit } from "process";
 
-interface Config {
+export interface Config {
     token: string
     applicationID: string
     statusServer: string
@@ -19,6 +19,7 @@ interface Config {
     modRestrictPerm: string
     friendbot: string
     packOwners: Dictionary<string[]>
+    pulsarToolsTag: string
 }
 
 let _config: Config;
@@ -71,6 +72,7 @@ export function initConfig(path: string) {
                 modRestrictPerm: "Permission used to restrict mod commands. See PermissionFlagsBits",
                 friendbot: "FC used to link discord accounts to WFC profiles.",
                 packOwners: {},
+                pulsarToolsTag: "Stored release of pulsar tools. Will be overwritten with the latest version"
             });
 
         const buf = readFileSync(path, { encoding: "utf8" });

@@ -196,7 +196,8 @@ function isAllowedInteraction(interaction: ChatInputCommandInteraction<CacheType
 interface Command {
     modOnly: boolean,
     adminOnly: boolean,
-    data: SlashCommandOptionsOnlyBuilder;
+    data: SlashCommandOptionsOnlyBuilder,
+    init: () => Promise<void>,
     exec: (_: ChatInputCommandInteraction<CacheType>) => Promise<void>,
 }
 
@@ -209,6 +210,9 @@ async function resolveCommands(root: string, files: string[], callback: (_: Dict
 
         if (spec == undefined || spec == null)
             continue;
+
+        if ("init" in spec)
+            spec.init();
 
         if ("data" in spec && "exec" in spec) {
             const name = path.basename(file, ".js");
