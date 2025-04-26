@@ -1,4 +1,4 @@
-import { CacheType, ChatInputCommandInteraction, Client, Events, IntentsBitField, MessageFlags, REST, RESTPostAPIChatInputApplicationCommandsJSONBody, RESTPutAPIApplicationCommandsResult, Routes, SlashCommandOptionsOnlyBuilder, TextChannel } from "discord.js";
+import { AutocompleteInteraction, CacheType, ChatInputCommandInteraction, Client, Events, IntentsBitField, MessageFlags, REST, RESTPostAPIChatInputApplicationCommandsJSONBody, RESTPutAPIApplicationCommandsResult, Routes, SlashCommandOptionsOnlyBuilder, TextChannel } from "discord.js";
 import { getConfig, initConfig } from "./config.js";
 import { Dictionary } from "./dictionary.js";
 import * as fs from "fs";
@@ -197,7 +197,8 @@ interface Command {
     modOnly: boolean,
     adminOnly: boolean,
     data: SlashCommandOptionsOnlyBuilder,
-    init: () => Promise<void>,
+    init?: () => Promise<void>,
+    autocomplete?: (_: AutocompleteInteraction<CacheType>) => Promise<void>,
     exec: (_: ChatInputCommandInteraction<CacheType>) => Promise<void>,
 }
 
@@ -212,11 +213,11 @@ async function resolveCommands(root: string, files: string[], callback: (_: Dict
             continue;
 
         if ("init" in spec)
-            spec.init();
+            await spec.init();
 
         if ("data" in spec && "exec" in spec) {
             const name = path.basename(file, ".js");
-            console.log(`Registered command ${name}`);
+            console.log(`Registered command ${name} from file ${file}`);
             ret[name] = spec;
         }
         else
@@ -264,6 +265,36 @@ async function handleInteraction(interaction: ChatInputCommandInteraction<CacheT
     }
 }
 
+async function handleAutocomplete(interaction: AutocompleteInteraction<CacheType>, commands: Dictionary<Command>) {
+    if (!interaction.isAutocomplete())
+        return;
+
+    try {
+        for (const cname in commands) {
+            if (cname != interaction.commandName)
+                continue;
+
+            const command = commands[cname];
+
+            if (command.autocomplete)
+                await command.autocomplete(interaction);
+            else
+                break;
+
+            return;
+        }
+
+        interaction.respond([]);
+    }
+    catch (error) {
+        console.error(error);
+
+        if (!interaction.responded) {
+            interaction.respond([]);
+        }
+    }
+}
+
 async function refreshCommands(commands: Dictionary<Command>) {
     const globalCommands: RESTPostAPIChatInputApplicationCommandsJSONBody[] = [];
     const adminCommands: RESTPostAPIChatInputApplicationCommandsJSONBody[] = [];
@@ -307,7 +338,10 @@ const commandFiles = fs.readdirSync(commandsRoot).filter(file => file.endsWith("
 // promises, commands cannot be awaited, so a callback is used instead.
 resolveCommands(commandsRoot, commandFiles, (commands) => {
     client.on(Events.InteractionCreate, async interaction => {
-        handleInteraction(interaction as ChatInputCommandInteraction<CacheType>, commands);
+        if (interaction.isAutocomplete())
+            handleAutocomplete(interaction, commands);
+        else if (interaction.isChatInputCommand())
+            handleInteraction(interaction as ChatInputCommandInteraction<CacheType>, commands);
     });
 
     if (refresh)
