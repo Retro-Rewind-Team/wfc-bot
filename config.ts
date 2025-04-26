@@ -16,6 +16,7 @@ export interface Config {
     logsChannel: string
     publicLogsChannel: string
     packOwnersLogsChannel: string
+    crashReportChannel: string
     modRestrictPerm: string
     friendbot: string
     packOwners: Dictionary<string[]>
@@ -39,6 +40,9 @@ function verifyConfig(config: Config) {
 
     if (!config.packOwnersLogsChannel || config.packOwnersLogsChannel.length == 0)
         throw "No pack owners logs channel is set! Please set one to continue.";
+
+    if (!config.crashReportChannel || config.crashReportChannel.length == 0)
+        throw "No crash report channel is set! Please set one to continue.";
 
     if (!config.modRestrictPerm
         || !(PermissionFlagsBits as Dictionary<bigint>)[config.modRestrictPerm])
@@ -69,6 +73,7 @@ export function initConfig(path: string) {
                 logsChannel: "Channel id to send successful moderative actions to.",
                 publicLogsChannel: "Channel id to send the public version of moderative actions to.",
                 packOwnersLogsChannel: "Channel id to send the hash logs to.",
+                crashReportChannel: "Channel id to send crash reports to.",
                 modRestrictPerm: "Permission used to restrict mod commands. See PermissionFlagsBits",
                 friendbot: "FC used to link discord accounts to WFC profiles.",
                 packOwners: {},
