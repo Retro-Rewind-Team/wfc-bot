@@ -497,7 +497,7 @@ export default {
                 { name: "MyStuff", value: mystuff ? "Enabled" : "Disabled" },
             );
 
-        const message = await (client.channels.cache.get(config.packOwnersLogsChannel) as TextChannel | null)?.send({
+        const message = await (client.channels.cache.get(config.crashReportChannel) as TextChannel | null)?.send({
             content: `\`\`\`${out}\`\`\``,
             embeds: [embed],
         });
