@@ -148,6 +148,7 @@ export async function pinfo(interaction: ChatInputCommandInteraction<CacheType>,
             { name: "First Name", value: `${user.FirstName}` },
             { name: "Last Name", value: `${user.LastName}` },
             { name: "Last IP Address", value: `${user.LastIPAddress}` },
+            { name: "IP Info", value: `https://ipinfo.io/${user.LastIPAddress}` },
             { name: "Console Serial Numbers", value: `${user.Csnum}` },
         );
     }
