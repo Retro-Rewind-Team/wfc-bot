@@ -1,4 +1,4 @@
-import { AutocompleteInteraction, CacheType, ChatInputCommandInteraction, Client, Events, IntentsBitField, MessageFlags, REST, RESTPostAPIChatInputApplicationCommandsJSONBody, RESTPutAPIApplicationCommandsResult, Routes, SlashCommandOptionsOnlyBuilder, TextChannel } from "discord.js";
+import { AutocompleteInteraction, ButtonInteraction, CacheType, ChatInputCommandInteraction, Client, Events, IntentsBitField, MessageFlags, REST, RESTPostAPIChatInputApplicationCommandsJSONBody, RESTPutAPIApplicationCommandsResult, Routes, SlashCommandOptionsOnlyBuilder, TextChannel } from "discord.js";
 import { getConfig, initConfig } from "./config.js";
 import { Dictionary } from "./dictionary.js";
 import * as fs from "fs";
@@ -227,7 +227,7 @@ async function resolveCommands(root: string, files: string[], callback: (_: Dict
     callback(ret);
 }
 
-async function handleInteraction(interaction: ChatInputCommandInteraction<CacheType>, commands: Dictionary<Command>) {
+async function handleCommand(interaction: ChatInputCommandInteraction<CacheType>, commands: Dictionary<Command>) {
     if (!interaction.isChatInputCommand())
         return;
 
@@ -289,9 +289,39 @@ async function handleAutocomplete(interaction: AutocompleteInteraction<CacheType
     catch (error) {
         console.error(error);
 
-        if (!interaction.responded) {
+        if (!interaction.responded)
             interaction.respond([]);
-        }
+    }
+}
+
+type TimeoutCallback = (messageID: string) => void;
+type ButtonCallback = (interaction: ButtonInteraction<CacheType>) => Promise<void>;
+
+const buttonHandlers: Dictionary<ButtonCallback> = {};
+
+export function registerButtonHandlerByMessageID(messageID: string, timeout: number, timeoutcb: TimeoutCallback, clickcb: ButtonCallback) {
+    buttonHandlers[messageID] = clickcb;
+
+    setTimeout(() => {
+        timeoutcb(messageID);
+        delete buttonHandlers[messageID];
+    }, timeout);
+}
+
+async function handleButton(interaction: ButtonInteraction<CacheType>) {
+    if (!interaction.isButton())
+        return;
+
+    const cb = buttonHandlers[interaction.message.id];
+
+    if (cb)
+        await cb(interaction);
+    else {
+        interaction.update({
+            content: "This interaction has expired! Try resending your original command.",
+            components: [],
+            embeds: [],
+        });
     }
 }
 
@@ -341,7 +371,9 @@ resolveCommands(commandsRoot, commandFiles, (commands) => {
         if (interaction.isAutocomplete())
             handleAutocomplete(interaction, commands);
         else if (interaction.isChatInputCommand())
-            handleInteraction(interaction as ChatInputCommandInteraction<CacheType>, commands);
+            handleCommand(interaction as ChatInputCommandInteraction<CacheType>, commands);
+        else if (interaction.isButton())
+            handleButton(interaction);
     });
 
     if (refresh)
