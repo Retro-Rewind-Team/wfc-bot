@@ -211,3 +211,116 @@ export function fmtTimeSpan(diff: number): string {
 export function resolveModRestrictPermission() {
     return (PermissionFlagsBits as Dictionary<bigint>)[config.modRestrictPerm] as bigint;
 }
+
+const idRegex = new RegExp(/^\d+$/);
+
+function fmtDeviceID(deviceIDs: number[]) {
+    if (!deviceIDs)
+        return "null";
+
+    let ret = "";
+
+    for (let i = 0; i < deviceIDs.length; i++) {
+        const deviceID = deviceIDs[i];
+        switch (deviceID) {
+        case 33869561:
+        case 59541067:
+        case 68042647:
+        case 107866953:
+        case 170939432:
+        case 172260247:
+            ret += deviceID + " (leaked)";
+            break;
+        case 67349608:
+            ret += deviceID + " (dolphin)";
+            break;
+        default:
+            ret += deviceID;
+        }
+
+        ret += (i + 1 == deviceIDs.length ? "" : ", ");
+    }
+
+    return ret;
+}
+
+
+export function createUserEmbed(user: WiiLinkUser, priv: boolean): EmbedBuilder {
+    const fc = pidToFc(user.ProfileId);
+    const embed = new EmbedBuilder()
+        .setColor(getColor())
+        .setTitle(`Player info for friend code ${fc}`)
+        .setThumbnail(`https://${config.statusServer}/miiimg?fc=${fc}`)
+        .setTimestamp();
+
+    let issuedDate = Date.parse(user.BanIssued);
+    let expiresDate = Date.parse(user.BanExpires);
+    let banLengthStr = null;
+    let expiredBan = false;
+
+    if (!isNaN(expiresDate) && !isNaN(expiresDate)) {
+        issuedDate = Math.round(issuedDate / 1000);
+        expiresDate = Math.round(expiresDate / 1000);
+
+        if (expiresDate < Date.now() / 1000) {
+            expiredBan = true;
+            user.Restricted = false;
+        }
+
+        banLengthStr = fmtTimeSpan(expiresDate - issuedDate);
+    }
+
+    embed.addFields(
+        { name: "Profile ID", value: `${user.ProfileId}` },
+        { name: "Mii Name", value: `${user.LastInGameSn}` },
+        { name: "Open Host", value: `${user.OpenHost}` },
+        { name: "Banned", value: `${user.Restricted}${expiredBan ? " (Expired)" : ""}` }
+    );
+
+    if (user.Restricted || expiredBan) {
+        if (priv) {
+            let banModerator;
+
+            if (!user.BanModerator || user.BanModerator == "" || user.BanModerator == "admin")
+                banModerator = "Unknown";
+            else if (user.BanModerator.match(idRegex))
+                banModerator = `<@${user.BanModerator}>`;
+            else
+                banModerator = user.BanModerator;
+
+            embed.addFields({ name: "Ban Moderator", value: `${banModerator}` });
+        }
+
+        embed.addFields({ name: "Ban Reason", value: `${user.BanReason}` });
+
+        if (priv) {
+            embed.addFields({
+                name: "Hidden Reason",
+                value: `${user.BanReasonHidden && user.BanReasonHidden.length != 0 ? user.BanReasonHidden : "None"}`
+            });
+        }
+
+        embed.addFields(
+            { name: "Ban Issued", value: `<t:${issuedDate}:F>` },
+            { name: "Ban Expires", value: `<t:${expiresDate}:F>` },
+            { name: "Ban Length", value: `${banLengthStr ?? "Unknown"}` },
+        );
+    }
+
+    if (priv) {
+        embed.addFields(
+            { name: "User ID", value: `${user.UserId}` },
+            { name: "Gsbr Code", value: `${user.GsbrCode}` },
+            { name: "NG Device IDs", value: `${fmtDeviceID(user.NgDeviceId)}` },
+            { name: "Email", value: `${user.Email}` },
+            { name: "Unique Nick", value: `${user.UniqueNick}` },
+            { name: "First Name", value: `${user.FirstName}` },
+            { name: "Last Name", value: `${user.LastName}` },
+            { name: "Last IP Address", value: `${user.LastIPAddress}` },
+            { name: "IP Info", value: `https://ipinfo.io/${user.LastIPAddress}` },
+            { name: "Console Serial Numbers", value: `${user.Csnum}` },
+        );
+    }
+
+    return embed;
+}
