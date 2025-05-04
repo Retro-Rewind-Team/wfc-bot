@@ -229,6 +229,7 @@ function fmtDeviceID(deviceIDs: number[]) {
         case 107866953:
         case 170939432:
         case 172260247:
+        case 169777103: // Thanks gab
             ret += deviceID + " (leaked)";
             break;
         case 67349608:
