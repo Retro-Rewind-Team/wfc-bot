@@ -18,7 +18,7 @@ export default {
 
         if (!binaryResponse.ok) {
             await interaction.reply({
-                content: `Error fetching payload attachment: ${binaryResponse.status}`,
+                content: `Error fetching crash attachment: ${binaryResponse.status}`,
                 flags: MessageFlags.Ephemeral,
             });
             return;
