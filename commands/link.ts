@@ -15,7 +15,7 @@ export default {
         .addStringOption(option => option.setName("id")
             .setDescription("friend code or pid to link")
             .setRequired(true)),
-    exec: async function(interaction: ChatInputCommandInteraction<CacheType>) {
+    exec: async function (interaction: ChatInputCommandInteraction<CacheType>) {
         let id = interaction.options.getString("id", true);
         id = id.trim();
 
@@ -28,7 +28,7 @@ export default {
         const fc = pidToFc(pid);
         const discordId = interaction.user.id;
 
-        await interaction.deferReply({ ephemeral: true });
+        await interaction.deferReply();
         if (currentlyVerifying.has(pid)) {
             await interaction.editReply({ content: `Error linking friend code "${fc}": Already verifying this profile!` });
             return;
@@ -41,9 +41,9 @@ export default {
             return;
         }
 
-        
+
         interaction.editReply({
-            content: `Verification started for "${fc}"! Please add "${config.friendbot}" on RWFC and press the button below within 10 minutes!`,
+            content: `Verification started for "${fc}"! Please add "${config.friendbot}" within 10 minutes!`,
         });
         const timeOut = (Date.now() + 600_000); // 10 minutes
         while (Date.now() < timeOut) {
@@ -51,17 +51,19 @@ export default {
             const [checkSuccess, checkRes] = await makeRequest("/api/link", "POST", { secret: config.wfcSecret, pid: pid, discordId: discordId, action: "check" });
             if (checkSuccess) {
                 currentlyVerifying.delete(pid);
-                await interaction.editReply({ content: `Successfully linked friend code "${fc}" to your Discord account!: error ${checkRes.Error ?? "no error message provided"}` });
+                await interaction.editReply({ content: `Successfully linked friend code "${fc}" to your Discord account!` });
                 return;
+            } else if (checkRes.Error = "Profile is not in the correct step to link Discord ID") {
+                console.log("Profile is not in the correct step to link Discord ID");
             }
         }
-        await interaction.editReply({ content: `Profile linking for "${fc}" timed out!`});
+        currentlyVerifying.delete(pid);
+        await interaction.editReply({ content: `Profile linking for "${fc}" timed out!` });
         const [deleteSuccess, deleteRes] = await makeRequest("/api/link", "POST", { secret: config.wfcSecret, pid: pid, discordId: discordId, action: "unlink" });
         if (deleteSuccess) {
             await interaction.followUp({ content: `Profile linking for "${fc}" cancelled!` });
         } else {
             await interaction.followUp({ content: `Failed to cancel linking for "${fc}": error ${deleteRes.Error ?? "no error message provided"}` });
-        currentlyVerifying.delete(pid);
         }
     }
 };
