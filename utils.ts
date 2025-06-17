@@ -309,6 +309,8 @@ export function createUserEmbed(user: WiiLinkUser, priv: boolean): EmbedBuilder 
     }
 
     if (priv) {
+        const csnums = user.Csnum?.join(", ") ?? "null";
+
         embed.addFields(
             { name: "User ID", value: `${user.UserId}` },
             { name: "Gsbr Code", value: `${user.GsbrCode}` },
@@ -319,7 +321,7 @@ export function createUserEmbed(user: WiiLinkUser, priv: boolean): EmbedBuilder 
             { name: "Last Name", value: `${user.LastName}` },
             { name: "Last IP Address", value: `${user.LastIPAddress}` },
             { name: "IP Info", value: `https://ipinfo.io/${user.LastIPAddress}` },
-            { name: "Console Serial Numbers", value: `${user.Csnum}` },
+            { name: "Console Serial Numbers", value: `${csnums.length <= 1024 ? csnums : "Too many Serial Numbers!"}` },
         );
     }
 
