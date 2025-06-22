@@ -46,6 +46,8 @@ export default {
             .setDescription("the device id to search for"))
         .addStringOption(option => option.setName("csnum")
             .setDescription("the serial number to search for"))
+        .addStringOption(option => option.setName("discordid")
+            .setDescription("the discord id to search for"))
         .addBooleanOption(option => option.setName("banned")
             .setDescription("whether the user is banned, defaults to either if unset"))
         .setDefaultMemberPermissions(resolveModRestrictPermission()),
@@ -54,6 +56,7 @@ export default {
         const ip = interaction.options.getString("ip");
         const deviceID = interaction.options.getInteger("deviceid") ?? 0;
         const csnum = interaction.options.getString("csnum");
+        const discordID = interaction.options.getString("discordid");
         const banned = interaction.options.getBoolean("banned");
 
         let hasban;
@@ -69,6 +72,7 @@ export default {
             ip: ip,
             deviceID: deviceID,
             csnum: csnum,
+            discordID: discordID,
             hasban: hasban,
         });
 
