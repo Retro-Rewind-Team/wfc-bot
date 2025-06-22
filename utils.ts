@@ -125,6 +125,7 @@ export interface WiiLinkUser {
     LastIPAddress: string,
     LastInGameSn: string,
     Csnum: string[],
+    DiscordID: string;
     BanModerator: string,
     BanReasonHidden: string,
     BanIssued: string,
@@ -275,7 +276,8 @@ export function createUserEmbed(user: WiiLinkUser, priv: boolean): EmbedBuilder 
         { name: "Profile ID", value: `${user.ProfileId}` },
         { name: "Mii Name", value: `${user.LastInGameSn}` },
         { name: "Open Host", value: `${user.OpenHost}` },
-        { name: "Banned", value: `${user.Restricted}${expiredBan ? " (Expired)" : ""}` }
+        { name: "Banned", value: `${user.Restricted}${expiredBan ? " (Expired)" : ""}` },
+        { name: "Discord ID", value: user.DiscordID.length != 0 ? `<@${user.DiscordID}>` : "None Linked" }
     );
 
     if (user.Restricted || expiredBan) {
