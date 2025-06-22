@@ -38,7 +38,15 @@ export function resolvePidFromString(fcOrPid: string) {
 
 // Checks if friendCode or Pid is correct
 export function validateId(fcOrPid: string) {
-    return fcOrPid.match(pidRegex) || fcOrPid.match(fcRegex);
+    if (fcOrPid.match(pidRegex))
+        return true;
+
+    if (!fcOrPid.match(fcRegex))
+        return false;
+
+    // For FCs, check if they can convert to a pid and then back to the FC.
+    // Sometimes the conversion mangles the FC, in which case it's invalid.
+    return fcOrPid == pidToFc(resolvePidFromString(fcOrPid));
 }
 
 export function pidToFc(pid: number) {
