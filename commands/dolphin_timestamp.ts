@@ -1,4 +1,4 @@
-import { CacheType, ChatInputCommandInteraction, SlashCommandBuilder } from "discord.js";
+import { CacheType, ChatInputCommandInteraction, MessageFlags, SlashCommandBuilder } from "discord.js";
 
 const serialRegexp = /([0-9]*)/;
 
@@ -40,6 +40,7 @@ export default {
 
         await interaction.reply({
             content: response,
+            flags: MessageFlags.Ephemeral,
         });
     }
 };
