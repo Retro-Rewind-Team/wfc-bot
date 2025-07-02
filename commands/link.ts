@@ -53,7 +53,7 @@ async function beginLink(interaction: ChatInputCommandInteraction<CacheType>, pi
     const [success, res] = await makeRequest("/api/link", "POST", {
         secret: config.wfcSecret,
         pid: pid,
-        discordId: discordID,
+        discordID: discordID,
         action: "link"
     });
 
