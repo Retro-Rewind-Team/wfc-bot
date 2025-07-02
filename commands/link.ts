@@ -3,7 +3,7 @@ import { makeRequest, pidToFc, resolvePidFromString, validateId } from "../utils
 import { getConfig } from "../config.js";
 
 const config = getConfig();
-const currentlyVerifying: Set<number> = new Set();
+export const currentlyVerifying: Set<number> = new Set();
 
 export default {
     modOnly: false,
