@@ -232,17 +232,28 @@ function fmtDeviceID(deviceIDs: number[]) {
     for (let i = 0; i < deviceIDs.length; i++) {
         const deviceID = deviceIDs[i];
         switch (deviceID) {
-        case 33869561:
-        case 59541067:
-        case 68042647:
-        case 107866953:
-        case 170939432:
-        case 172260247:
-        case 169777103: // Thanks gab
-            ret += deviceID + " (leaked)";
+        case 0x02000001:
+            ret += deviceID + " (internal)";
             break;
-        case 67349608:
+        case 0x403ac68:
             ret += deviceID + " (dolphin)";
+            break;
+        case 0x0204cef9:
+        case 0x038c864b:
+        case 0x040e3f97:
+        case 0x04cb7515:
+        case 0x066deb49:
+        case 0x06bcc32d:
+        case 0x06d0437a:
+        case 0x089120c8:
+        case 0x0a305428:
+        case 0x0a447b97:
+        case 0x0a1e97cf: // Thanks gab
+        case 0x0e19d5ed:
+        case 0x0e31482b:
+        case 0x2428a8cb:
+        case 0x247dd10b:
+            ret += deviceID + " (leaked)";
             break;
         default:
             ret += deviceID;
