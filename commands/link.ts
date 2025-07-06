@@ -32,7 +32,9 @@ export default {
         const fc = pidToFc(pid);
         const discordID = interaction.user.id;
 
-        await interaction.deferReply();
+        await interaction.deferReply({
+            flags: MessageFlags.Ephemeral,
+        });
         if (currentlyVerifying.has(pid)) {
             await interaction.editReply({
                 content: `Error linking friend code "${fc}": Already verifying this profile!`
