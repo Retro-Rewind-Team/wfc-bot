@@ -1,4 +1,4 @@
-import { CacheType, ChatInputCommandInteraction, SlashCommandBuilder } from "discord.js";
+import { CacheType, ChatInputCommandInteraction, MessageFlags, SlashCommandBuilder } from "discord.js";
 import { pidToFc, resolvePidFromString, validateId } from "../utils.js";
 
 export default {
@@ -17,13 +17,19 @@ export default {
         id = id.trim();
 
         if (!validateId(id)) {
-            await interaction.reply({ content: `Error converting friend code or pid "${id}": Incorrect format` });
+            await interaction.reply({
+                content: `Error converting friend code or pid "${id}": Incorrect format`,
+                flags: MessageFlags.Ephemeral,
+            });
             return;
         }
 
         const pid = resolvePidFromString(id);
         const fc = pidToFc(pid);
 
-        await interaction.reply({ content: `PID: ${pid}\nFC: ${fc}`, ephemeral: true });
+        await interaction.reply({
+            content: `PID: ${pid}\nFC: ${fc}`,
+            flags: MessageFlags.Ephemeral,
+        });
     }
 };
