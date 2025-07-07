@@ -1,5 +1,5 @@
 import { CacheType, ChatInputCommandInteraction, SlashCommandBuilder } from "discord.js";
-import { makeRequest, pidToFc, resolveModRestrictPermission, resolvePidFromString, sendEmbedLog, validateId } from "../utils.js";
+import { makeRequest, pidToFc, resolveModRestrictPermission, resolvePidFromString, sendEmbedLog, validateID } from "../utils.js";
 import { getConfig } from "../config.js";
 
 const config = getConfig();
@@ -44,8 +44,9 @@ export default {
         let id = interaction.options.getString("id", true);
         id = id.trim();
 
-        if (!validateId(id)) {
-            await interaction.reply({ content: `Error banning friend code or pid "${id}": Incorrect format` });
+        const [valid, err] = validateID(id);
+        if (!valid) {
+            await interaction.reply({ content: `Error banning friend code or pid "${id}": ${err}` });
             return;
         }
 

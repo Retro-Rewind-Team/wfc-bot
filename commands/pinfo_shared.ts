@@ -1,5 +1,5 @@
 import { CacheType, ChatInputCommandInteraction, InteractionReplyOptions, MessageFlags, } from "discord.js";
-import { createUserEmbed, makeRequest, pidToFc, resolvePidFromString, validateId } from "../utils.js";
+import { createUserEmbed, makeRequest, pidToFc, resolvePidFromString, validateID } from "../utils.js";
 import { getConfig } from "../config.js";
 
 const config = getConfig();
@@ -19,11 +19,12 @@ export async function pinfo(interaction: ChatInputCommandInteraction<CacheType>,
     let id = interaction.options.getString("id", true);
     id = id.trim();
 
-    if (!validateId(id)) {
+    const [valid, err] = validateID(id);
+    if (!valid) {
         await reply(
             interaction,
             priv,
-            { content: `Error retrieving friend code or pid "${id}": Incorrect format` }
+            { content: `Error retrieving friend code or pid "${id}": ${err}` }
         );
         return;
     }

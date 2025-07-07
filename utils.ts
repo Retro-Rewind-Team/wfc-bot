@@ -37,16 +37,19 @@ export function resolvePidFromString(fcOrPid: string) {
 }
 
 // Checks if friendCode or Pid is correct
-export function validateId(fcOrPid: string) {
+export function validateID(fcOrPid: string): [boolean, string | null] {
     if (fcOrPid.match(pidRegex))
-        return true;
+        return [true, null];
 
     if (!fcOrPid.match(fcRegex))
-        return false;
+        return [false, "Invalid Format"];
 
     // For FCs, check if they can convert to a pid and then back to the FC.
     // Sometimes the conversion mangles the FC, in which case it's invalid.
-    return fcOrPid == pidToFc(resolvePidFromString(fcOrPid));
+    const mangled = pidToFc(resolvePidFromString(fcOrPid));
+    const ret = fcOrPid == mangled;
+
+    return [ret, ret ? null : `Valid Format, but the FC would have been mangled to ${mangled}`];
 }
 
 export function pidToFc(pid: number) {
