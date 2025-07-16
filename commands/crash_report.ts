@@ -383,7 +383,9 @@ export default {
             else
                 choices = SheetLangToLocaleInfo["Common/English"].Tracks;
 
-            const nodeLocale = SheetLangToLocaleInfo[DiscordLocaleToSheetLang[interaction.locale]].NodeJSLocale
+            const sheetLang = DiscordLocaleToSheetLang[interaction.locale]
+                    ?? DiscordLocaleToSheetLang[Locale.EnglishUS];
+            const nodeLocale = SheetLangToLocaleInfo[sheetLang].NodeJSLocale
                     ?? SheetLangToLocaleInfo["Common/English"].NodeJSLocale;
 
             const englishLocale = SheetLangToLocaleInfo["Common/English"];
