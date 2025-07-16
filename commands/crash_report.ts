@@ -376,10 +376,8 @@ export default {
             const match = Object.values(SheetLangToLocaleInfo)
                 .filter(linfo => linfo.PercComplete == "100.0%" && linfo.DiscordLocale == interaction.locale);
 
-            if (match.length != 0) {
+            if (match.length != 0)
                 choices = match[0].Tracks;
-                console.log("Match found!");
-            }
             else
                 choices = SheetLangToLocaleInfo["Common/English"].Tracks;
 
