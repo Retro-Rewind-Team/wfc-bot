@@ -498,7 +498,7 @@ export default {
             );
 
         const message = await (client.channels.cache.get(config.crashReportChannel) as TextChannel | null)?.send({
-            content: `\`\`\`${out}\`\`\``,
+            content: out,
             embeds: [embed],
         });
 

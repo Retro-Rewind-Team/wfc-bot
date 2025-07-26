@@ -30,7 +30,7 @@ export default {
 
         if (code == 0) {
             await interaction.reply({
-                content: `\`\`\`${out}\`\`\``,
+                content: out,
             });
         }
         else {

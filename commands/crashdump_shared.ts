@@ -3,11 +3,28 @@ import child_process from "child_process";
 import os from "os";
 import { exit } from "process";
 import { existsSync, writeFileSync } from "fs";
+import { haste } from "../utils.js";
 
 let config: Config = null!;
 export let pulsarToolsBin: string = null!;
 
 export async function processCrashdump(buf: Buffer): Promise<[code: number | null, stdout: string, stderr: string]> {
+    const [code, out, err] = await processCrashdumpInner(buf);
+
+    if (code != 0)
+        return [code, out, err];
+
+    // 10 margin of error just in case
+    if (out.length + 10 > 2000) {
+        const [hcode, hout, herr] = await haste(out);
+
+        return [hcode == 200 ? 0 : hcode, hout, herr];
+    }
+
+    return [code, `\`\`\`${out}\`\`\``, err];
+}
+
+async function processCrashdumpInner(buf: Buffer): Promise<[code: number | null, stdout: string, stderr: string]> {
     const proc = child_process.spawn(`${process.cwd()}/${pulsarToolsBin}`, ["crash", "--file", "stdin"], {
         cwd: process.cwd(),
         stdio: "pipe"

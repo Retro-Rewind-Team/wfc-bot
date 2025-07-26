@@ -351,3 +351,17 @@ export function createUserEmbed(user: WiiLinkUser, priv: boolean): EmbedBuilder 
 
     return embed;
 }
+
+export async function haste(body: string): Promise<[number, string, string]> {
+    const res = await fetch("https://paste.ppeb.me/documents", {
+        method: "POST",
+        body: body,
+    });
+
+    if (!res.ok)
+        return [res.status, "", res.statusText];
+
+    const key = (await res.json()).key;
+
+    return [200, `https://paste.ppeb.me/${key}`, ""];
+}
