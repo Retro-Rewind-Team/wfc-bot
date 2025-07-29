@@ -79,7 +79,7 @@ export default {
             if (res.Replaced && res.Replaced != "")
                 embed.addFields({ name: "Replaced", value: `<@${res.Replaced}>` });
 
-            await (client.channels.cache.get(config.publicLogsChannel) as TextChannel | null)?.send({ embeds: [embed] });
+            await (client.channels.cache.get(config.logsChannel) as TextChannel | null)?.send({ embeds: [embed] });
         }
     }
 };
