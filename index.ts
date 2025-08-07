@@ -5,62 +5,9 @@ import * as fs from "fs";
 import * as path from "path";
 import { exit } from "process";
 
-interface Mii {
-    data: string,
-    name: string,
-}
-
-interface Player {
-    count: string,
-    pid: string,
-    name: string,
-    conn_map: string,
-    conn_fail: string,
-    suspend: string,
-    fc: string,
-    ev: string,
-    eb: string,
-    mii: Mii[],
-}
-
-interface Group {
-    id: string,
-    game: string,
-    created: string,
-    type: string,
-    suspend: boolean,
-    host: string,
-    rk: string,
-    players: Player[],
-}
-
-interface Groups {
-    timestamp: number,
-    rooms: Group[],
-}
-
-interface Stat {
-    online: number,
-    active: number,
-    groups: number,
-}
-
-interface Stats {
-    global: Stat,
-    mariokartwii: Stat,
-}
-
-export const client = new Client({ intents: [IntentsBitField.Flags.Guilds, IntentsBitField.Flags.GuildMessages] });
-let groups: Groups | null = null;
-let stats: Stats | null = null;
-
-export function getGroups() {
-    return groups;
-}
-
-export function getStats() {
-    return stats;
-}
+export const client = new Client({
+    intents: [IntentsBitField.Flags.Guilds, IntentsBitField.Flags.GuildMessages]
+});
 
 let refresh = false;
 let configPath = "";
@@ -91,60 +38,6 @@ for (let i = 2; i < process.argv.length; i++) {
 initConfig(configPath.length > 0 ? configPath : path.join(process.cwd(), "config.json"));
 let config = getConfig();
 
-const fetchGroupsUrl = `http://${config.wfcServer}:${config.wfcPort}/api/groups`;
-const fetchStatsUrl = `http://${config.wfcServer}:${config.wfcPort}/api/stats`;
-async function fetchGroups() {
-    function plural(count: number, text: string) {
-        return count == 1 ? text : text + "s";
-    }
-
-    function throwInline(err: string) {
-        throw new Error(err);
-    }
-
-    async function queryJson(url: string) {
-        const response = await fetch(url);
-
-        if (!response.ok) {
-            console.error(`Unable to fetch groups, status code: ${response.status}`);
-            return null;
-        }
-
-        const json = await response.json();
-
-        if (!json) {
-            console.error(`Invalid response from ${url}, unable to populate groups!`);
-            return null;
-        }
-
-        return json;
-    }
-
-    try {
-        const groupsJson = (await queryJson(fetchGroupsUrl)) ?? throwInline("Empty or no json response from groups api.");
-        groups = { timestamp: Date.now(), rooms: groupsJson };
-        stats = await queryJson(fetchStatsUrl) ?? throwInline("Empty or no json response from stats api.");
-        const players = stats!.mariokartwii.active;
-        const rooms = stats!.mariokartwii.groups;
-
-        const presenceText = `${players} ${plural(players, "player")} in ${rooms} ${plural(rooms, "room")}!`;
-
-        client.user?.setPresence({
-            status: "online",
-            activities: [{
-                name: "Stats",
-                type: 4,
-                state: presenceText,
-            }]
-        });
-
-        console.log(`Successfully fetched groups and stats! Time is ${new Date(Date.now())}. ${presenceText}`);
-    }
-    catch (e) {
-        console.error(`Failed to fetch groups and stats, error: ${e}`);
-    }
-}
-
 client.once(Events.ClientReady, async function(readyClient) {
     console.log(`Logged in as ${readyClient.user.tag}`);
 
@@ -166,8 +59,6 @@ client.once(Events.ClientReady, async function(readyClient) {
     else
         console.log(`Public logs set to send to channel ${(pubchannel as TextChannel).name}`);
     // Runs once a minute
-    setInterval(fetchGroups, 60000);
-    fetchGroups();
 });
 
 client.login(config["token"]);
@@ -225,6 +116,27 @@ async function resolveCommands(root: string, files: string[], callback: (_: Dict
     }
 
     callback(ret);
+}
+
+async function startServices(root: string, files: string[]) {
+    for (const file of files) {
+        let spec = await import(path.join(root, file));
+        spec = spec.default;
+
+        if (spec == undefined || spec == null)
+            continue;
+
+        if ("register" in spec) {
+            try {
+                spec.register();
+            }
+            catch (e) {
+                console.error(`Error starting service ${file}: ${e}.`);
+            }
+
+            console.log(`Started service ${file}`);
+        }
+    }
 }
 
 async function handleCommand(interaction: ChatInputCommandInteraction<CacheType>, commands: Dictionary<Command>) {
@@ -378,4 +290,8 @@ resolveCommands(commandsRoot, commandFiles, (commands) => {
 
     if (refresh)
         refreshCommands(commands);
+
+    const servicesRoot = path.join(import.meta.dirname ?? __dirname, "services");
+    const serviceFiles = fs.readdirSync(servicesRoot).filter(file => file.endsWith(".js"));
+    startServices(servicesRoot, serviceFiles);
 });

@@ -365,3 +365,25 @@ export async function haste(body: string): Promise<[number, string, string]> {
 
     return [200, `https://paste.ppeb.me/${key}`, ""];
 }
+
+export function throwInline(err: string) {
+    throw new Error(err);
+}
+
+export async function queryJson(url: string) {
+    const response = await fetch(url);
+
+    if (!response.ok) {
+        console.error(`Unable to fetch groups, status code: ${response.status}`);
+        return null;
+    }
+
+    const json = await response.json();
+
+    if (!json) {
+        console.error(`Invalid response from ${url}, unable to populate groups!`);
+        return null;
+    }
+
+    return json;
+}

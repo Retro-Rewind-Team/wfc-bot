@@ -1,5 +1,5 @@
 import { CacheType, ChatInputCommandInteraction, EmbedBuilder, MessageFlags, SlashCommandBuilder } from "discord.js";
-import { getStats } from "../index.js";
+import { getStats } from "../services/stats.js";
 import { getColor } from "../utils.js";
 
 export default {
