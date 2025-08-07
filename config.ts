@@ -17,6 +17,7 @@ export interface Config {
     publicLogsChannel: string
     packOwnersLogsChannel: string
     crashReportChannel: string
+    newPlayerLogsChannel: string,
     modRestrictPerm: string
     friendbot: string
     packOwners: Dictionary<string[]>
@@ -74,6 +75,7 @@ export function initConfig(path: string) {
                 publicLogsChannel: "Channel id to send the public version of moderative actions to.",
                 packOwnersLogsChannel: "Channel id to send the hash logs to.",
                 crashReportChannel: "Channel id to send crash reports to.",
+                newPlayerLogsChannel: "Channel id to send new players to.",
                 modRestrictPerm: "Permission used to restrict mod commands. See PermissionFlagsBits",
                 friendbot: "FC used to link discord accounts to WFC profiles.",
                 packOwners: {},
