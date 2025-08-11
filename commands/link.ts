@@ -60,6 +60,10 @@ async function beginLink(interaction: ChatInputCommandInteraction<CacheType>, pi
 
     if (!success) {
         currentlyVerifying.delete(pid);
+
+        if (res.Error && res.Error == "Session not found for given profileID")
+            res.Error = "You must be online to link your friend code.";
+
         await interaction.editReply({
             content: `Failed to link friend code "${fc}": error ${res.Error ?? "no error message provided"}`
         });
