@@ -22,6 +22,8 @@ export interface Config {
     friendbot: string
     packOwners: Dictionary<string[]>
     pulsarToolsTag: string
+    leaderboardServer: string
+    leaderboardPort: number
 }
 
 let _config: Config;

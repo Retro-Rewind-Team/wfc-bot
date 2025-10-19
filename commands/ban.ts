@@ -83,6 +83,35 @@ export default {
         });
 
         if (success) {
+            const leaderboardUrl = `http://${config.leaderboardServer}:${config.leaderboardPort}`;
+            try {
+                const leaderboardResponse = await fetch(`${leaderboardUrl}/api/moderation/ban`, {
+                    method: "POST",
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${config.wfcSecret}`
+                    },
+                    body: JSON.stringify({
+                        pid: pid,
+                        days: days,
+                        hours: hours,
+                        minutes: minutes,
+                        tos: tos,
+                        reason: reason,
+                        reason_hidden: reasonHidden ?? "",
+                        moderator: moderator
+                    })
+                });
+
+                if (leaderboardResponse.ok) {
+                    console.log(`Successfully removed player ${pid} from leaderboard database`);
+                } else {
+                    console.error(`Failed to remove player ${pid} from leaderboard: ${leaderboardResponse.status}`);
+                }
+            } catch (error) {
+                console.error(`Error calling leaderboard API for player ${pid}:`, error);
+            }
+
             await sendEmbedLog(interaction, "ban", fc, res.User, [
                 { name: "Ban Length", value: perm ? "Permanent" : `${days} ${p(days, "day")}, ${hours} ${p(hours, "hour")}, ${minutes} ${p(minutes, "minute")}` },
                 { name: "Reason", value: reason },
