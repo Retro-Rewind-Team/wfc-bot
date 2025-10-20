@@ -92,7 +92,7 @@ export default {
                         'Authorization': `Bearer ${config.wfcSecret}`
                     },
                     body: JSON.stringify({
-                        pid: pid,
+                        pid: pid.toString(),
                         days: days,
                         hours: hours,
                         minutes: minutes,
@@ -103,11 +103,13 @@ export default {
                     })
                 });
 
-                if (leaderboardResponse.ok) {
-                    console.log(`Successfully removed player ${pid} from leaderboard database`);
-                } else {
-                    console.error(`Failed to remove player ${pid} from leaderboard: ${leaderboardResponse.status}`);
-                }
+            if (leaderboardResponse.ok) {
+                console.log(`Successfully removed player ${pid} from leaderboard database`);
+            } else {
+                const errorText = await leaderboardResponse.text();
+                console.error(`Failed to remove player ${pid} from leaderboard: ${leaderboardResponse.status}`);
+                console.error(`Error details: ${errorText}`);
+            }
             } catch (error) {
                 console.error(`Error calling leaderboard API for player ${pid}:`, error);
             }
