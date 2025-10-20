@@ -81,7 +81,9 @@ export function initConfig(path: string) {
                 modRestrictPerm: "Permission used to restrict mod commands. See PermissionFlagsBits",
                 friendbot: "FC used to link discord accounts to WFC profiles.",
                 packOwners: {},
-                pulsarToolsTag: "Stored release of pulsar tools. Will be overwritten with the latest version"
+                pulsarToolsTag: "Stored release of pulsar tools. Will be overwritten with the latest version",
+                leaderboardPort: 5000,
+                leaderboardServer: "localhost"
             });
 
         const buf = readFileSync(path, { encoding: "utf8" });
