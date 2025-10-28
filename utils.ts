@@ -94,6 +94,10 @@ export async function makeRequest(route: string, method: string, data?: object) 
     try {
         const response = await fetch(url, {
             method: method,
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${config.wfcSecret}`
+            },
             body: data ? JSON.stringify(data) : null
         });
 
