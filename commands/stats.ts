@@ -31,8 +31,7 @@ export default {
         .setDescription("Show detailed statistics for a player")
         .addStringOption(option => option.setName("id")
             .setDescription("friend code or pid to check")
-            .setRequired(true))
-        .setDefaultMemberPermissions(resolveModRestrictPermission()),
+            .setRequired(true)),
 
     exec: async function(interaction: ChatInputCommandInteraction<CacheType>) {
         let id = interaction.options.getString("id", true);
