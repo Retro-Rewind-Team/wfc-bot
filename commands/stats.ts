@@ -1,24 +1,32 @@
-import { CacheType, ChatInputCommandInteraction, SlashCommandBuilder, EmbedBuilder } from "discord.js";
-import { getColor, pidToFc, resolveModRestrictPermission, resolvePidFromString, validateID } from "../utils.js";
+import { CacheType, ChatInputCommandInteraction, EmbedBuilder, SlashCommandBuilder } from "discord.js";
+import { getColor, pidToFc, resolvePidFromString, validateID } from "../utils.js";
 import { getConfig } from "../config.js";
 
 const config = getConfig();
 
 function formatVRChange(change: number): string {
-    if (change > 0) return `+${change}`;
-    if (change < 0) return `${change}`;
+    if (change > 0)
+        return `+${change}`;
+    if (change < 0)
+        return `${change}`;
+
     return `${change}`;
 }
 
 function getActivityStatus(isActive: boolean, lastSeen: string): string {
-    if (!isActive) return "Inactive";
-    
+    if (!isActive)
+        return "Inactive";
+
     const lastSeenDate = new Date(lastSeen);
     const now = new Date();
     const hoursSince = (now.getTime() - lastSeenDate.getTime()) / (1000 * 60 * 60);
-    
-    if (hoursSince < 1) return "Online Recently";
-    if (hoursSince < 24) return "Active (Last 24h)";
+
+    if (hoursSince < 1)
+        return "Online Recently";
+
+    if (hoursSince < 24)
+        return "Active (Last 24h)";
+
     return "Active";
 }
 
@@ -52,9 +60,7 @@ export default {
         try {
             const leaderboardResponse = await fetch(`${leaderboardUrl}/api/moderation/player-stats/${pid}`, {
                 method: "GET",
-                headers: {
-                    'Authorization': `Bearer ${config.wfcSecret}`
-                }
+                headers: { "Authorization": `Bearer ${config.wfcSecret}` },
             });
 
             if (leaderboardResponse.ok) {
@@ -65,29 +71,29 @@ export default {
                 const activityStatus = getActivityStatus(player.isActive, player.lastSeen);
 
                 const activityEmoji = player.isActive ? "🟢" : "🔴";
-                
+
                 const embed = new EmbedBuilder()
                     .setColor(player.isSuspicious ? 0xff0000 : getColor())
                     .setTitle(`📊 Player Stats: ${player.name || "Unknown"}`)
                     .setDescription(`**Friend Code:** \`${fc}\`\n**Player ID:** \`${player.pid}\`\n\u200B`)
                     .setThumbnail(`https://${config.statusServer}/miiimg?fc=${fc}`)
                     .addFields(
-                        { 
-                            name: "🏆 VR Rating", 
-                            value: `**${player.vr.toLocaleString()}** VR`, 
-                            inline: true 
+                        {
+                            name: "🏆 VR Rating",
+                            value: `**${player.vr.toLocaleString()}** VR`,
+                            inline: true
                         },
-                        { 
-                            name: "📈 Rank", 
-                            value: `#${player.rank.toLocaleString()}`, 
-                            inline: true 
+                        {
+                            name: "📈 Rank",
+                            value: `#${player.rank.toLocaleString()}`,
+                            inline: true
                         },
-                        { 
-                            name: "⚡ Active Rank", 
-                            value: player.activeRank ? `#${player.activeRank.toLocaleString()}` : "N/A", 
-                            inline: true 
+                        {
+                            name: "⚡ Active Rank",
+                            value: player.activeRank ? `#${player.activeRank.toLocaleString()}` : "N/A",
+                            inline: true
                         },
-                        { name: '\u200B', value: '' },
+                        { name: "\u200B", value: "" },
                         {
                             name: "📅 Last Seen",
                             value: `<t:${Math.floor(lastSeenDate.getTime() / 1000)}:R>`,
@@ -103,7 +109,7 @@ export default {
                             value: player.isSuspicious ? "Yes" : "No",
                             inline: true
                         },
-                        { name: '\u200B', value: '' },
+                        { name: "\u200B", value: "" },
                         {
                             name: "VR Gain (24h)",
                             value: formatVRChange(player.vrStats.last24Hours),
@@ -121,23 +127,25 @@ export default {
                         }
                     )
                     .setTimestamp()
-                    .setFooter({ 
-                        text: player.isSuspicious ? "⚠ This player has been flagged as suspicious" : "Retro Rewind Leaderboard" 
+                    .setFooter({
+                        text: player.isSuspicious ? "⚠ This player has been flagged as suspicious" : "Retro Rewind Leaderboard"
                     });
 
                 await interaction.editReply({ embeds: [embed] });
-            } else {
+            }
+            else {
                 const errorText = await leaderboardResponse.text();
                 console.error(`Failed to get stats for ${pid}: ${leaderboardResponse.status}`);
                 console.error(`Error details: ${errorText}`);
-                await interaction.editReply({ 
-                    content: `Failed to retrieve stats for friend code "${fc}": error ${leaderboardResponse.status}` 
+                await interaction.editReply({
+                    content: `Failed to retrieve stats for friend code "${fc}": error ${leaderboardResponse.status}`
                 });
             }
-        } catch (error) {
+        }
+        catch (error) {
             console.error(`Error calling leaderboard API for player ${pid}:`, error);
-            await interaction.editReply({ 
-                content: `Failed to retrieve stats for friend code "${fc}": network error` 
+            await interaction.editReply({
+                content: `Failed to retrieve stats for friend code "${fc}": network error`
             });
         }
     }

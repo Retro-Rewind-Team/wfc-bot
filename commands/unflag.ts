@@ -36,8 +36,8 @@ export default {
             const leaderboardResponse = await fetch(`${leaderboardUrl}/api/moderation/unflag`, {
                 method: "POST",
                 headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${config.wfcSecret}`
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${config.wfcSecret}`
                 },
                 body: JSON.stringify({
                     pid: pid.toString(),
@@ -46,19 +46,26 @@ export default {
             });
 
             if (leaderboardResponse.ok) {
-                await interaction.reply({ 
-                    content: `Successfully removed suspicious flag from player with friend code "${fc}"` 
+                await interaction.reply({
+                    content: `Successfully removed suspicious flag from player with friend code "${fc}"`
                 });
                 console.log(`Successfully unflagged player ${pid}`);
-            } else {
+            }
+            else {
                 const errorText = await leaderboardResponse.text();
                 console.error(`Failed to unflag player ${pid}: ${leaderboardResponse.status}`);
                 console.error(`Error details: ${errorText}`);
-                await interaction.reply({ content: `Failed to unflag friend code "${fc}": error ${leaderboardResponse.status}` });
+
+                await interaction.reply({
+                    content: `Failed to unflag friend code "${fc}": error ${leaderboardResponse.status}`
+                });
             }
-        } catch (error) {
+        }
+        catch (error) {
             console.error(`Error calling leaderboard API for player ${pid}:`, error);
-            await interaction.reply({ content: `Failed to unflag friend code "${fc}": network error` });
+            await interaction.reply({
+                content: `Failed to unflag friend code "${fc}": network error`
+            });
         }
     }
 };

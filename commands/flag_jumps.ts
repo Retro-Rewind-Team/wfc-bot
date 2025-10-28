@@ -1,4 +1,4 @@
-import { CacheType, ChatInputCommandInteraction, SlashCommandBuilder, EmbedBuilder } from "discord.js";
+import { CacheType, ChatInputCommandInteraction, EmbedBuilder, SlashCommandBuilder } from "discord.js";
 import { getColor, pidToFc, resolveModRestrictPermission, resolvePidFromString, validateID } from "../utils.js";
 import { getConfig } from "../config.js";
 
@@ -36,7 +36,7 @@ export default {
             const leaderboardResponse = await fetch(`${leaderboardUrl}/api/moderation/suspicious-jumps/${pid}`, {
                 method: "GET",
                 headers: {
-                    'Authorization': `Bearer ${config.wfcSecret}`
+                    "Authorization": `Bearer ${config.wfcSecret}`
                 }
             });
 
@@ -44,8 +44,8 @@ export default {
                 const res = await leaderboardResponse.json();
 
                 if (res.count === 0) {
-                    await interaction.editReply({ 
-                        content: `No suspicious VR jumps found for player ${res.player.name} (${fc})` 
+                    await interaction.editReply({
+                        content: `No suspicious VR jumps found for player ${res.player.name} (${fc})`
                     });
                     return;
                 }
@@ -59,16 +59,16 @@ export default {
                 const jumpsToShow = res.suspiciousJumps.slice(0, 25);
                 for (const jump of jumpsToShow) {
                     const date = new Date(jump.date);
-                    const dateStr = date.toLocaleString('en-US', { 
-                        month: 'short', 
-                        day: 'numeric', 
-                        hour: '2-digit', 
-                        minute: '2-digit' 
+                    const dateStr = date.toLocaleString("en-US", {
+                        month: "short",
+                        day: "numeric",
+                        hour: "2-digit",
+                        minute: "2-digit"
                     });
-                    
+
                     embed.addFields({
                         name: dateStr,
-                        value: `Change: ${jump.vrChange > 0 ? '+' : ''}${jump.vrChange} VR → Total: ${jump.totalVR} VR`,
+                        value: `Change: ${jump.vrChange > 0 ? "+" : ""}${jump.vrChange} VR → Total: ${jump.totalVR} VR`,
                         inline: true
                     });
                 }
@@ -82,14 +82,14 @@ export default {
                 const errorText = await leaderboardResponse.text();
                 console.error(`Failed to get suspicious jumps for ${pid}: ${leaderboardResponse.status}`);
                 console.error(`Error details: ${errorText}`);
-                await interaction.editReply({ 
-                    content: `Failed to retrieve suspicious jumps for friend code "${fc}": error ${leaderboardResponse.status}` 
+                await interaction.editReply({
+                    content: `Failed to retrieve suspicious jumps for friend code "${fc}": error ${leaderboardResponse.status}`
                 });
             }
         } catch (error) {
             console.error(`Error calling leaderboard API for player ${pid}:`, error);
-            await interaction.editReply({ 
-                content: `Failed to retrieve suspicious jumps for friend code "${fc}": network error` 
+            await interaction.editReply({
+                content: `Failed to retrieve suspicious jumps for friend code "${fc}": network error`
             });
         }
     }

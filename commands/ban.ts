@@ -88,8 +88,8 @@ export default {
                 const leaderboardResponse = await fetch(`${leaderboardUrl}/api/moderation/ban`, {
                     method: "POST",
                     headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${config.wfcSecret}`
+                        "Content-Type": "application/json",
+                        "Authorization": `Bearer ${config.wfcSecret}`
                     },
                     body: JSON.stringify({
                         pid: pid.toString(),
@@ -103,13 +103,13 @@ export default {
                     })
                 });
 
-            if (leaderboardResponse.ok) {
-                console.log(`Successfully removed player ${pid} from leaderboard database`);
-            } else {
-                const errorText = await leaderboardResponse.text();
-                console.error(`Failed to remove player ${pid} from leaderboard: ${leaderboardResponse.status}`);
-                console.error(`Error details: ${errorText}`);
-            }
+                if (leaderboardResponse.ok) {
+                    console.log(`Successfully removed player ${pid} from leaderboard database`);
+                } else {
+                    const errorText = await leaderboardResponse.text();
+                    console.error(`Failed to remove player ${pid} from leaderboard: ${leaderboardResponse.status}`);
+                    console.error(`Error details: ${errorText}`);
+                }
             } catch (error) {
                 console.error(`Error calling leaderboard API for player ${pid}:`, error);
             }
