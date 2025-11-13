@@ -1,4 +1,4 @@
-import { CacheType, ChatInputCommandInteraction, EmbedBuilder, SlashCommandBuilder } from "discord.js";
+import { CacheType, ChatInputCommandInteraction, EmbedBuilder, MessageFlags, SlashCommandBuilder } from "discord.js";
 import { getColor, pidToFc, resolveModRestrictPermission, resolvePidFromString, validateID } from "../utils.js";
 import { getConfig } from "../config.js";
 
@@ -22,14 +22,17 @@ export default {
 
         const [valid, err] = validateID(id);
         if (!valid) {
-            await interaction.reply({ content: `Error checking friend code or pid "${id}": ${err}` });
+            await interaction.reply({ 
+                content: `Error checking friend code or pid "${id}": ${err}`,
+                flags: MessageFlags.Ephemeral
+            });
             return;
         }
 
         const pid = resolvePidFromString(id);
         const fc = pidToFc(pid);
 
-        await interaction.deferReply();
+        await interaction.deferReply({ flags: MessageFlags.Ephemeral });
 
         const leaderboardUrl = `http://${config.leaderboardServer}:${config.leaderboardPort}`;
         try {
