@@ -6,7 +6,7 @@ import { createUserEmbed, makeRequest, WiiLinkUser } from "../utils.js";
 const config = getConfig();
 
 async function fetchNewPlayers() {
-    const [res, success] = await makeRequest("/api/new_players", "POST", {
+    const [success, res] = await makeRequest("/api/new_players", "POST", {
         secret: config.wfcSecret,
     });
 
