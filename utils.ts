@@ -88,7 +88,8 @@ export function plural(count: number, text: string) {
     return count == 1 ? text : text + "s";
 }
 
-export async function makeRequest(route: string, method: string, data?: object) {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export async function makeRequest(route: string, method: string, data?: object): Promise<[boolean, any]> {
     const url = urlBase + route;
 
     try {
