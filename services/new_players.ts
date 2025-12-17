@@ -16,7 +16,9 @@ async function fetchNewPlayers() {
     }
 
     if (!res.Users || res.Users.length == 0) {
-        console.log("Fetched users, but no new users have been created.");
+        if (config.logServices)
+            console.log("Fetched users, but no new users have been created.");
+
         return;
     }
 

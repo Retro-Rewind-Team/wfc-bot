@@ -24,6 +24,7 @@ export interface Config {
     pulsarToolsTag: string
     leaderboardServer: string
     leaderboardPort: number
+    logServices: boolean
 }
 
 let _config: Config;
@@ -83,7 +84,8 @@ export function initConfig(path: string) {
                 packOwners: {},
                 pulsarToolsTag: "Stored release of pulsar tools. Will be overwritten with the latest version",
                 leaderboardPort: 5000,
-                leaderboardServer: "localhost"
+                leaderboardServer: "localhost",
+                logServices: false,
             });
 
         const buf = readFileSync(path, { encoding: "utf8" });

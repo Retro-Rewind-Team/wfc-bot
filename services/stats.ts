@@ -42,7 +42,8 @@ async function fetchStats() {
             }]
         });
 
-        console.log(`Successfully fetched stats! Time is ${new Date(Date.now())}. ${presenceText}`);
+        if (config.logServices)
+            console.log(`Successfully fetched stats! Time is ${new Date(Date.now())}. ${presenceText}`);
     }
     catch (e) {
         console.error(`Failed to fetch stats, error: ${e}`);
