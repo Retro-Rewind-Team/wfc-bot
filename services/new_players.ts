@@ -27,7 +27,7 @@ async function fetchNewPlayers() {
         embeds.push(createUserEmbed(user, true));
 
 
-    const message = await (client.channels.cache.get(config.crashReportChannel) as TextChannel | null)?.send({
+    const message = await (client.channels.cache.get(config.newPlayerLogsChannel) as TextChannel | null)?.send({
         embeds: embeds,
     });
 
