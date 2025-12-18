@@ -2,7 +2,7 @@ import { ActionRowBuilder, APIActionRowComponent, APIMessageActionRowComponent, 
 import { getConfig } from "../config.js";
 import { Dictionary } from "../dictionary.js";
 import { registerButtonHandlerByMessageID } from "../index.js";
-import { createUserEmbed, makeRequest, resolveModRestrictPermission } from "../utils.js";
+import { createUserEmbed, makeRequest, resolveModRestrictPermission, resolvePidFromString, validateID } from "../utils.js";
 
 const config = getConfig();
 
@@ -46,18 +46,40 @@ export default {
             .setDescription("the device id to search for"))
         .addStringOption(option => option.setName("csnum")
             .setDescription("the serial number to search for"))
+        .addIntegerOption(option => option.setName("userid")
+            .setDescription("the user id to search for"))
         .addStringOption(option => option.setName("discordid")
             .setDescription("the discord id to search for"))
         .addBooleanOption(option => option.setName("banned")
             .setDescription("whether the user is banned, defaults to either if unset"))
+        .addStringOption(option => option.setName("id")
+            .setDescription("friend code to retrieve"))
         .setDefaultMemberPermissions(resolveModRestrictPermission()),
 
     exec: async function(interaction: ChatInputCommandInteraction<CacheType>) {
         const ip = interaction.options.getString("ip");
         const deviceID = interaction.options.getInteger("deviceid") ?? 0;
         const csnum = interaction.options.getString("csnum");
+        const userID = interaction.options.getInteger("userid") ?? 0;
         const discordID = interaction.options.getString("discordid");
         const banned = interaction.options.getBoolean("banned");
+        let id = interaction.options.getString("id") ?? "";
+        id = id.trim();
+
+        let pid = 0;
+        if (id != "") {
+            const [valid, err] = validateID(id);
+            if (!valid) {
+                await interaction.reply({
+                    content: `Error querying friend code or pid "${id}": ${err}`,
+                    flags: MessageFlags.Ephemeral,
+                });
+                return;
+            }
+
+            pid = resolvePidFromString(id);
+        }
+
 
         let hasban;
         if (banned == undefined || banned == null)
@@ -72,8 +94,10 @@ export default {
             ip: ip,
             deviceID: deviceID,
             csnum: csnum,
+            userID: userID,
             discordID: discordID,
             hasban: hasban,
+            pid: pid,
         });
 
         if (!success) {

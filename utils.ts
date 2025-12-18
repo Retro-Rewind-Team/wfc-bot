@@ -38,6 +38,9 @@ export function resolvePidFromString(fcOrPid: string) {
 
 // Checks if friendCode or Pid is correct
 export function validateID(fcOrPid: string): [boolean, string | null] {
+    if (fcOrPid == "")
+        return [false, "Empty fc or pid"];
+
     if (fcOrPid.match(pidRegex))
         return [true, null];
 
