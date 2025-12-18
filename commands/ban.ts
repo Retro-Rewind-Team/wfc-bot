@@ -82,46 +82,48 @@ export default {
             moderator: moderator
         });
 
-        if (success) {
-            const leaderboardUrl = `http://${config.leaderboardServer}:${config.leaderboardPort}`;
-            try {
-                const leaderboardResponse = await fetch(`${leaderboardUrl}/api/moderation/ban`, {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                        "Authorization": `Bearer ${config.wfcSecret}`
-                    },
-                    body: JSON.stringify({
-                        pid: pid.toString(),
-                        days: days,
-                        hours: hours,
-                        minutes: minutes,
-                        tos: tos,
-                        reason: reason,
-                        reason_hidden: reasonHidden ?? "",
-                        moderator: moderator
-                    })
-                });
-
-                if (leaderboardResponse.ok) {
-                    console.log(`Successfully removed player ${pid} from leaderboard database`);
-                } else {
-                    const errorText = await leaderboardResponse.text();
-                    console.error(`Failed to remove player ${pid} from leaderboard: ${leaderboardResponse.status}`);
-                    console.error(`Error details: ${errorText}`);
-                }
-            } catch (error) {
-                console.error(`Error calling leaderboard API for player ${pid}:`, error);
-            }
-
-            await sendEmbedLog(interaction, "ban", fc, res.User, [
-                { name: "Ban Length", value: perm ? "Permanent" : `${days} ${p(days, "day")}, ${hours} ${p(hours, "hour")}, ${minutes} ${p(minutes, "minute")}` },
-                { name: "Reason", value: reason },
-                { name: "Hidden Reason", value: reasonHidden ?? "None", hidden: true },
-                { name: "TOS", value: tos.toString() },
-            ], hide, hidePublic);
-        }
-        else
+        if (!success) {
             await interaction.reply({ content: `Failed to ban friend code "${fc}": error ${res.Error ?? "no error message provided"}` });
+
+            return;
+        }
+
+        const leaderboardUrl = `http://${config.leaderboardServer}:${config.leaderboardPort}`;
+        try {
+            const leaderboardResponse = await fetch(`${leaderboardUrl}/api/moderation/ban`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${config.wfcSecret}`
+                },
+                body: JSON.stringify({
+                    pid: pid.toString(),
+                    days: days,
+                    hours: hours,
+                    minutes: minutes,
+                    tos: tos,
+                    reason: reason,
+                    reason_hidden: reasonHidden ?? "",
+                    moderator: moderator
+                })
+            });
+
+            if (leaderboardResponse.ok) {
+                console.log(`Successfully removed player ${pid} from leaderboard database`);
+            } else {
+                const errorText = await leaderboardResponse.text();
+                console.error(`Failed to remove player ${pid} from leaderboard: ${leaderboardResponse.status}`);
+                console.error(`Error details: ${errorText}`);
+            }
+        } catch (error) {
+            console.error(`Error calling leaderboard API for player ${pid}:`, error);
+        }
+
+        await sendEmbedLog(interaction, "ban", fc, res.User, [
+            { name: "Ban Length", value: perm ? "Permanent" : `${days} ${p(days, "day")}, ${hours} ${p(hours, "hour")}, ${minutes} ${p(minutes, "minute")}` },
+            { name: "Reason", value: reason },
+            { name: "Hidden Reason", value: reasonHidden ?? "None", hidden: true },
+            { name: "TOS", value: tos.toString() },
+        ], hide, hidePublic);
     }
 };
