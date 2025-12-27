@@ -18,6 +18,9 @@ export interface Config {
     packOwnersLogsChannel: string
     crashReportChannel: string
     newPlayerLogsChannel: string,
+    roomPingChannel: string,
+    roomTypeNameMap: Dictionary<string>,
+    roomPingRoles: Dictionary<string>,
     modRestrictPerm: string
     friendbot: string
     packOwners: Dictionary<string[]>
@@ -50,7 +53,10 @@ function verifyConfig(config: Config) {
 
     if (!config.modRestrictPerm
         || !(PermissionFlagsBits as Dictionary<bigint>)[config.modRestrictPerm])
-        throw "No or an incorrect modRestrictPerm is set! Please set one to continue.";
+        throw "No modRestrictPerm is set or it is incorrect! Please set one to continue.";
+
+    if (!config.roomPingChannel)
+        throw "No roomPingChannel is set! Please set one to continue";
 }
 
 export function initConfig(path: string) {
@@ -79,6 +85,9 @@ export function initConfig(path: string) {
                 packOwnersLogsChannel: "Channel id to send the hash logs to.",
                 crashReportChannel: "Channel id to send crash reports to.",
                 newPlayerLogsChannel: "Channel id to send new players to.",
+                roomPingChannel: "Channel id to send room openings to.",
+                roomTypeNameMap: {},
+                roomPingRoles: {},
                 modRestrictPerm: "Permission used to restrict mod commands. See PermissionFlagsBits",
                 friendbot: "FC used to link discord accounts to WFC profiles.",
                 packOwners: {},
