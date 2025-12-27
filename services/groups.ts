@@ -79,14 +79,17 @@ async function sendPings() {
     // Send out alerts for subscribed users
     for (const group of groups!.rooms) {
         if (group.type == "private") {
-            console.log(`Skipping private room ${group.id}`);
+            if (config.logServices)
+                console.log(`Skipping private room ${group.id}`);
+
             continue;
         }
 
         currentRooms.push(group.id);
 
         if (pingedRooms.includes(group.id)) {
-            console.log(`Room ${group.id} has already been pinged!`);
+            if (config.logServices)
+                console.log(`Room ${group.id} has already been pinged!`);
             continue;
         }
 
@@ -94,12 +97,16 @@ async function sendPings() {
         const groupPing = config.roomPingRoles[group.rk];
 
         if (!groupPing) {
-            console.error(`No role has been configured to alert for rooms of type ${group.rk}`);
+            if (config.logServices)
+                console.error(`No role has been configured to alert for rooms of type ${group.rk}`);
+
             continue;
         }
 
         const content = `<@&${groupPing}>, a ${groupName} room (${group.id}) has opened!`;
-        console.log(`Sending message ${content}`);
+
+        if (config.logServices)
+            console.log(`Sending message ${content}`);
 
         const message = await (client.channels.cache.get(config.roomPingChannel) as TextChannel | null)?.send({
             content: content,
@@ -115,7 +122,9 @@ async function sendPings() {
     // up over time
     for (const id of pingedRooms) {
         if (!currentRooms.includes(id)) {
-            console.log(`Room ${id} has closed`);
+            if (config.logServices)
+                console.log(`Room ${id} has closed`);
+
             pingedRooms.splice(pingedRooms.indexOf(id), 1);
         }
     }
