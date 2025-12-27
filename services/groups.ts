@@ -93,7 +93,7 @@ async function sendPings() {
 
         if (!groupPing) {
             console.error(`No role has been configured to alert for rooms of type ${group.rk}`);
-            content = `A ${groupName} room (${group.id}) has opened!`;
+            continue;
         }
         else
             content = `<@&${groupPing}>, a ${groupName} room (${group.id}) has opened!`;
