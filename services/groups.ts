@@ -132,8 +132,7 @@ async function sendPings() {
 
 export default {
     register: function() {
-        // TODO: Groups unused for now
-        // setInterval(fetchGroups, 60000);
+        setInterval(fetchGroups, 60000);
 
         // Call to shut up the compiler.
         fetchGroups();
