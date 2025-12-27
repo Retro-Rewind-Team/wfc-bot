@@ -1,7 +1,8 @@
-import { TextChannel } from "discord.js";
+import { Message, TextChannel } from "discord.js";
 import { getConfig } from "../config.js";
 import { client } from "../index.js";
 import * as utils from "../utils.js";
+import { Dictionary } from "../dictionary.js";
 
 const config = getConfig();
 
@@ -61,29 +62,62 @@ async function fetchGroups() {
         if (config.logServices)
             console.log(`Successfully fetched groups! Time is ${new Date(Date.now())}`);
 
-        if (!shouldPing)
-            pingedRooms = groups.rooms.map((group) => group.id);
-
+        // Push only rooms which are validly configured, so invalid rooms do
+        // not show as being already pinged in logs
+        if (!shouldPing) {
+            for (const group of groups.rooms) {
+                if (config.roomPingRoles[group.rk])
+                    pingedRooms.push(group);
+            }
+        }
     }
     catch (e) {
         console.error(`Failed to fetch groups, error: ${e}`);
         return;
     }
 
-    if (!shouldPing)
-        return;
+    // if (!shouldPing)
+    //     return;
 
     await sendPings();
 }
 
-let pingedRooms: string[] = [];
+const pingedRooms: Group[] = [];
+const roomMessages: Dictionary<Message> = {};
 async function sendPings() {
-    const currentRooms: string[] = [];
+    // Update existing logged rooms
+    for (const group of pingedRooms) {
+        const roomMessage = roomMessages[group.id];
+        const groupName = config.roomTypeNameMap[group.rk] ?? group.rk;
+        // Guaranteed to exist, otherwise the message would not exist
+        const groupPing = config.roomPingRoles[group.rk];
+
+        // Delete the room
+        if (!groupsContains(groups!.rooms, group)) {
+            if (config.logServices)
+                console.log(`Room ${group.id} has closed`);
+
+            pingedRooms.splice(groupsIndexOf(pingedRooms, group), 1);
+
+            await roomMessage.edit(`<@&${groupPing}>, room ${group.id} has closed.`);
+            delete roomMessages[group.id];
+
+            return;
+        }
+
+        // Otherwise, update the room.
+        const playerCount = Object.keys(group.players).length;
+        await roomMessage.edit(
+            `<@&${groupPing}>, ${aOrAn(groupName)} ${groupName} room (${group.id}) is open with ${playerCount} ${utils.plural(playerCount, "player")}!`
+        );
+
+        if (config.logServices)
+            console.log(`Updated room ${group.id} with playercount ${playerCount}`);
+    }
 
     // Send out alerts for subscribed users
+    // This handles new rooms
     for (const group of groups!.rooms) {
-        currentRooms.push(group.id);
-
         if (group.type == "private") {
             if (config.logServices)
                 console.log(`Skipping private room ${group.id}`);
@@ -91,9 +125,10 @@ async function sendPings() {
             continue;
         }
 
-        if (pingedRooms.includes(group.id)) {
+        if (groupsContains(pingedRooms, group)) {
             if (config.logServices)
                 console.log(`Room ${group.id} has already been pinged!`);
+
             continue;
         }
 
@@ -102,12 +137,12 @@ async function sendPings() {
 
         if (!groupPing) {
             if (config.logServices)
-                console.error(`No role has been configured to alert for rooms of type ${group.rk}`);
+                console.error(`No role has been configured to alert for rooms of type ${group.rk}, for room ${group.id}`);
 
             continue;
         }
 
-        const content = `<@&${groupPing}>, a ${groupName} room (${group.id}) has opened!`;
+        const content = `<@&${groupPing}>, ${aOrAn(groupName)} ${groupName} room (${group.id}) has opened!`;
 
         if (config.logServices)
             console.log(`Sending message ${content}`);
@@ -121,19 +156,34 @@ async function sendPings() {
             continue;
         }
 
-        pingedRooms.push(group.id);
+        roomMessages[group.id] = message;
+        pingedRooms.push(group);
+    }
+}
+
+function groupsContains(groups: Group[], group: Group): boolean {
+    for (const _group of groups) {
+        if (_group.id == group.id)
+            return true;
     }
 
-    // Clear rooms which no longer exist from pingedRooms, to avoid it filling
-    // up over time
-    for (const id of pingedRooms) {
-        if (!currentRooms.includes(id)) {
-            if (config.logServices)
-                console.log(`Room ${id} has closed`);
+    return false;
+}
 
-            pingedRooms.splice(pingedRooms.indexOf(id), 1);
-        }
+function groupsIndexOf(groups: Group[], group: Group) {
+    for (let i = 0; i < groups.length; i++) {
+        if (groups[i].id == group.id)
+            return i;
     }
+
+    return -1;
+}
+
+function aOrAn(following: string) {
+    const start = following.charAt(0).toLowerCase();
+    const isVowel = start == "a" || start == "e" || start == "i" || start == "o" || start == "u";
+
+    return isVowel ? "an" : "a";
 }
 
 export default {
