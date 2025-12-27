@@ -78,6 +78,9 @@ async function sendPings() {
 
     // Send out alerts for subscribed users
     for (const group of groups!.rooms) {
+        if (group.type == "private")
+            continue;
+
         currentRooms.push(group.id);
 
         if (pingedRooms.includes(group.id))
