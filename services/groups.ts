@@ -60,6 +60,10 @@ async function fetchGroups() {
 
         if (config.logServices)
             console.log(`Successfully fetched groups! Time is ${new Date(Date.now())}`);
+
+        if (!shouldPing)
+            pingedRooms = groups.rooms.map((group) => group.id);
+
     }
     catch (e) {
         console.error(`Failed to fetch groups, error: ${e}`);
@@ -72,20 +76,20 @@ async function fetchGroups() {
     await sendPings();
 }
 
-const pingedRooms: string[] = [];
+let pingedRooms: string[] = [];
 async function sendPings() {
     const currentRooms: string[] = [];
 
     // Send out alerts for subscribed users
     for (const group of groups!.rooms) {
+        currentRooms.push(group.id);
+
         if (group.type == "private") {
             if (config.logServices)
                 console.log(`Skipping private room ${group.id}`);
 
             continue;
         }
-
-        currentRooms.push(group.id);
 
         if (pingedRooms.includes(group.id)) {
             if (config.logServices)
