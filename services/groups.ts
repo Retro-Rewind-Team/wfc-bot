@@ -116,6 +116,8 @@ async function sendPings() {
             console.error(`Failed to send message for group ${group.rk}!`);
             continue;
         }
+
+        pingedRooms.push(group.id);
     }
 
     // Clear rooms which no longer exist from pingedRooms, to avoid it filling
