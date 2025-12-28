@@ -13,23 +13,6 @@ function formatVRChange(change: number): string {
     return `${change}`;
 }
 
-function getActivityStatus(isActive: boolean, lastSeen: string): string {
-    if (!isActive)
-        return "Inactive";
-
-    const lastSeenDate = new Date(lastSeen);
-    const now = new Date();
-    const hoursSince = (now.getTime() - lastSeenDate.getTime()) / (1000 * 60 * 60);
-
-    if (hoursSince < 1)
-        return "Online Recently";
-
-    if (hoursSince < 24)
-        return "Active (Last 24h)";
-
-    return "Active";
-}
-
 export default {
     modOnly: false,
     adminOnly: false,
@@ -68,9 +51,6 @@ export default {
                 const player = res.player;
 
                 const lastSeenDate = new Date(player.lastSeen);
-                const activityStatus = getActivityStatus(player.isActive, player.lastSeen);
-
-                const activityEmoji = player.isActive ? "🟢" : "🔴";
 
                 const embed = new EmbedBuilder()
                     .setColor(player.isSuspicious ? 0xff0000 : getColor())
@@ -89,8 +69,8 @@ export default {
                             inline: true
                         },
                         {
-                            name: "⚡ Active Rank",
-                            value: player.activeRank ? `#${player.activeRank.toLocaleString()}` : "N/A",
+                            name: "⚠️ Flagged",
+                            value: player.isSuspicious ? "Yes" : "No",
                             inline: true
                         },
                         { name: "\u200B", value: "" },
@@ -99,16 +79,8 @@ export default {
                             value: `<t:${Math.floor(lastSeenDate.getTime() / 1000)}:R>`,
                             inline: true
                         },
-                        {
-                            name: `${activityEmoji} Activity Status`,
-                            value: activityStatus,
-                            inline: true
-                        },
-                        {
-                            name: "⚠️ Flagged",
-                            value: player.isSuspicious ? "Yes" : "No",
-                            inline: true
-                        },
+                        { name: "\u200B", value: "\u200B", inline: true },
+                        { name: "\u200B", value: "\u200B", inline: true },
                         { name: "\u200B", value: "" },
                         {
                             name: "VR Gain (24h)",
