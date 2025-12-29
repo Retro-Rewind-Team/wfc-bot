@@ -88,6 +88,9 @@ async function sendPings() {
     // Update existing logged rooms
     for (const group of pingedRooms) {
         const roomMessage = roomMessages[group.id];
+        if (!roomMessage)
+            continue;
+
         const groupName = config.roomTypeNameMap[group.rk] ?? group.rk;
         // Guaranteed to exist, otherwise the message would not exist
         const groupPing = config.roomPingRoles[group.rk];
