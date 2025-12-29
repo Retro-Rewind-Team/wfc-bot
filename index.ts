@@ -103,8 +103,14 @@ async function resolveCommands(root: string, files: string[], callback: (_: Dict
         if (spec == undefined || spec == null)
             continue;
 
-        if ("init" in spec)
-            await spec.init();
+        if ("init" in spec) {
+            try {
+                await spec.init();
+            }
+            catch (e) {
+                console.error(`Failed to run init for spec ${file}, ${e}`);
+            }
+        }
 
         if ("data" in spec && "exec" in spec) {
             const name = path.basename(file, ".js");
