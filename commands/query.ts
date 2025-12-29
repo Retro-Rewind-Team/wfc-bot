@@ -1,4 +1,4 @@
-import { ActionRowBuilder, APIActionRowComponent, APIMessageActionRowComponent, ButtonBuilder, ButtonInteraction, ButtonStyle, CacheType, ChatInputCommandInteraction, EmbedBuilder, MessageFlags, SlashCommandBuilder } from "discord.js";
+import { ActionRowBuilder, APIMessageTopLevelComponent, ButtonBuilder, ButtonInteraction, ButtonStyle, CacheType, ChatInputCommandInteraction, EmbedBuilder, MessageFlags, SlashCommandBuilder } from "discord.js";
 import { getConfig } from "../config.js";
 import { Dictionary } from "../dictionary.js";
 import { registerButtonHandlerByMessageID } from "../index.js";
@@ -145,7 +145,7 @@ export default {
                 // I have to do this dumbass cast because apparently the docs
                 // lie or the typings are incorrect...
                 // https://discordjs.guide/message-components/buttons.html#sending-buttons
-                components: [row as unknown as APIActionRowComponent<APIMessageActionRowComponent>],
+                components: [row as unknown as APIMessageTopLevelComponent],
             });
 
             // Wrong ID is associated with the interaction's reply for some
@@ -214,6 +214,6 @@ async function handleButton(buttonInteraction: ButtonInteraction<CacheType>) {
 
     buttonInteraction.update({
         embeds: [state.Embeds[newidx]],
-        components: [row as unknown as APIActionRowComponent<APIMessageActionRowComponent>],
+        components: [row as unknown as APIMessageTopLevelComponent],
     });
 }
