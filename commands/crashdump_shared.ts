@@ -69,10 +69,8 @@ export default {
 
         const res = await fetch("https://api.github.com/repos/ppebb/pulsar-tools/releases/latest");
 
-        if (!res.ok) {
-            console.error(`Failed to fetch latest version of pulsar-tools! ${res.status}, ${res.statusText}`);
-            exit(1);
-        }
+        if (!res.ok)
+            throw `Failed to fetch latest version of pulsar-tools! ${res.status}, ${res.statusText}`;
 
         const json = await res.json();
 
