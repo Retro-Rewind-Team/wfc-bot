@@ -1,5 +1,6 @@
 node_modules/
 config.json
+state.json
 build/
 pulsar-tools
 pulsar-tools.exe

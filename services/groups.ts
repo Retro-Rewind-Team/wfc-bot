@@ -1,5 +1,6 @@
-import { Message, TextChannel } from "discord.js";
+import { TextChannel } from "discord.js";
 import { getConfig } from "../config.js";
+import { loadState, State } from "../state.js";
 import { client } from "../index.js";
 import * as utils from "../utils.js";
 import { Dictionary } from "../dictionary.js";
@@ -41,6 +42,7 @@ interface Groups {
 }
 
 let groups: Groups | null = null;
+const state: State = await loadState();
 
 export function getGroups() {
     return groups;
@@ -49,54 +51,28 @@ export function getGroups() {
 const fetchGroupsUrl = `http://${config.wfcServer}:${config.wfcPort}/api/groups`;
 
 async function fetchGroups() {
-    let shouldPing = true;
     try {
-        // Don't ping if this is the first groups response. This avoids pinging
-        // when the bot is restarted.
-        if (groups == null)
-            shouldPing = false;
-
         const groupsJson = (await utils.queryJson(fetchGroupsUrl)) ?? utils.throwInline("Empty or no json response from groups api.");
         groups = { timestamp: Date.now(), rooms: groupsJson };
 
         if (config.logServices)
             console.log(`Successfully fetched groups! Time is ${new Date(Date.now())}`);
-
-        // Push only rooms which are validly configured, so invalid rooms do
-        // not show as being already pinged in logs
-        if (!shouldPing) {
-            for (const group of groups.rooms) {
-                if (config.roomPingRoles[group.rk])
-                    pingedRooms.push(group);
-            }
-        }
     }
     catch (e) {
         console.error(`Failed to fetch groups, error: ${e}`);
         return;
     }
 
-    // if (!shouldPing)
-    //     return;
-
     await sendPings();
 }
 
-let pingedRooms: Group[] = [];
-const roomMessages: Dictionary<Message> = {};
 async function sendPings() {
-    // Replace old groups in pingedRooms with the refreshed groups
-    const newPingedRooms: Group[] = [];
-    for (const group of pingedRooms) {
-        for (const newGroup of groups!.rooms)
-            if (group.id == newGroup.id)
-                newPingedRooms.push(newGroup);
-    }
-    pingedRooms = newPingedRooms;
+    // Replace old groups in state.pingedRooms with the refreshed groups
+    state.pingedRooms = updatePingedRooms(state.pingedRooms);
 
     // Update existing logged rooms
-    for (const group of pingedRooms) {
-        const roomMessage = roomMessages[group.id];
+    for (const group of state.pingedRooms) {
+        const roomMessage = state.messages[group.id];
         if (!roomMessage) {
             if (config.logServices)
                 console.log(`Missing message for group ${group.id}`);
@@ -121,8 +97,8 @@ async function sendPings() {
             if (config.logServices)
                 console.log(`Room ${group.id} has closed`);
 
-            pingedRooms.splice(groupsIndexOf(pingedRooms, group), 1);
-            delete roomMessages[group.id];
+            state.pingedRooms.splice(groupsIndexOf(state.pingedRooms, group), 1);
+            delete state.messages[group.id];
 
             continue;
         }
@@ -149,7 +125,7 @@ async function sendPings() {
             continue;
         }
 
-        if (groupsContains(pingedRooms, group)) {
+        if (groupsContains(state.pingedRooms, group)) {
             if (config.logServices)
                 console.log(`Room ${group.id} has already been pinged!`);
 
@@ -180,9 +156,29 @@ async function sendPings() {
             continue;
         }
 
-        roomMessages[group.id] = message;
-        pingedRooms.push(group);
+        state.messages[group.id] = message;
+        state.pingedRooms.push(group);
     }
+
+    state.save();
+}
+
+function updatePingedRooms(oldPingedRooms: Group[]): Group[] {
+    const newPingedRooms: Group[] = [];
+
+    for (const group of oldPingedRooms)
+        newPingedRooms.push(getUpdatedRoom(group));
+
+    return newPingedRooms;
+}
+
+function getUpdatedRoom(oldRoom: Group): Group {
+    for (const newGroup of groups!.rooms) {
+        if (oldRoom.id == newGroup.id)
+            return newGroup;
+    }
+
+    return oldRoom;
 }
 
 function groupsContains(groups: Group[], group: Group): boolean {
