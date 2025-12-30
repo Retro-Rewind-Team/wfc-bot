@@ -32,7 +32,7 @@ export interface Group {
     suspend: boolean,
     host: string,
     rk: string,
-    players: Player[],
+    players: Dictionary<Player>,
 }
 
 interface Groups {
