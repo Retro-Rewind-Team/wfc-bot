@@ -24,7 +24,7 @@ interface Player {
     mii: Mii[],
 }
 
-interface Group {
+export interface Group {
     id: string,
     game: string,
     created: string,
