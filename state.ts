@@ -1,12 +1,11 @@
-import { Message, TextChannel } from "discord.js";
+import { Message } from "discord.js";
 import { Dictionary } from "./dictionary.js";
 import { existsSync, readFileSync, writeFileSync } from "fs";
 import { exit } from "process";
-import { client } from "./index.js";
-import { getConfig } from "./config.js";
+import { getChannels } from "./config.js";
 import { Group } from "./services/groups.js";
 
-const config = getConfig();
+const channels = getChannels();
 
 const STATE_PATH: string = "./state.json";
 
@@ -32,10 +31,9 @@ export class State {
         console.log(stateSerialized);
 
         const messages: Dictionary<Message> = {};
-        const roomsPingChannel = (client.channels.cache.get(config.roomPingChannel)) as TextChannel;
 
         for (const key of Object.keys(stateSerialized.messages)) {
-            const message = await roomsPingChannel.messages.fetch(stateSerialized.messages[key]);
+            const message = await channels.roomPing.messages.fetch(stateSerialized.messages[key]);
 
             if (message)
                 messages[key] = message;

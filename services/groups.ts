@@ -1,11 +1,10 @@
-import { TextChannel } from "discord.js";
-import { getConfig } from "../config.js";
+import { getChannels, getConfig } from "../config.js";
 import { loadState, State } from "../state.js";
-import { client } from "../index.js";
 import * as utils from "../utils.js";
 import { Dictionary } from "../dictionary.js";
 
 const config = getConfig();
+const channels = getChannels();
 
 interface Mii {
     data: string,
@@ -147,7 +146,7 @@ async function sendPings() {
         if (config.logServices)
             console.log(`Sending message ${content}`);
 
-        const message = await (client.channels.cache.get(config.roomPingChannel) as TextChannel | null)?.send({
+        const message = await channels.roomPing.send({
             content: content,
         });
 

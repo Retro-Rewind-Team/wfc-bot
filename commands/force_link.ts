@@ -1,10 +1,10 @@
-import { CacheType, ChatInputCommandInteraction, EmbedBuilder, MessageFlags, SlashCommandBuilder, TextChannel } from "discord.js";
+import { CacheType, ChatInputCommandInteraction, EmbedBuilder, MessageFlags, SlashCommandBuilder } from "discord.js";
 import { getColor, makeRequest, pidToFc, resolvePidFromString, validateID } from "../utils.js";
-import { getConfig } from "../config.js";
+import { getChannels, getConfig } from "../config.js";
 import { currentlyVerifying } from "./link.js";
-import { client } from "../index.js";
 
 const config = getConfig();
+const channels = getChannels();
 
 export default {
     modOnly: true,
@@ -79,7 +79,7 @@ export default {
             if (res.Replaced && res.Replaced != "")
                 embed.addFields({ name: "Replaced", value: `<@${res.Replaced}>` });
 
-            await (client.channels.cache.get(config.logsChannel) as TextChannel | null)?.send({ embeds: [embed] });
+            await channels.logs.send({ embeds: [embed] });
         }
     }
 };

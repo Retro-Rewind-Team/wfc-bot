@@ -1,7 +1,6 @@
-import { AutocompleteInteraction, CacheType, ChatInputCommandInteraction, EmbedBuilder, GuildMember, Locale, MessageFlags, SlashCommandBuilder, TextChannel } from "discord.js";
+import { AutocompleteInteraction, CacheType, ChatInputCommandInteraction, EmbedBuilder, GuildMember, Locale, MessageFlags, SlashCommandBuilder } from "discord.js";
 import { processCrashdump } from "./crashdump_shared.js";
-import { Config, getConfig } from "../config.js";
-import { client } from "../index.js";
+import { getChannels } from "../config.js";
 import { exit } from "process";
 import { getColor } from "../utils.js";
 import { Dictionary } from "../dictionary.js";
@@ -9,7 +8,7 @@ import { Dictionary } from "../dictionary.js";
 const sheetsUrl = "https://docs.google.com/spreadsheets/d/1kas1J6RcIePcaRRxtTluPZm8C8kydpaoQBtRg15M-zM/export?format=tsv&gid=1003203252#gid=1003203252";
 
 const prefixRegex: RegExp = new RegExp(/\\c{[a-z0-9]*}([a-zA-Z0-9 ]*)\\c{off}/);
-const config: Config = getConfig();
+const channels = getChannels();
 
 const Options = {
     File: "file",
@@ -382,9 +381,9 @@ export default {
                 choices = SheetLangToLocaleInfo["Common/English"].Tracks;
 
             const sheetLang = DiscordLocaleToSheetLang[interaction.locale]
-                    ?? DiscordLocaleToSheetLang[Locale.EnglishUS];
+                ?? DiscordLocaleToSheetLang[Locale.EnglishUS];
             const nodeLocale = SheetLangToLocaleInfo[sheetLang].NodeJSLocale
-                    ?? SheetLangToLocaleInfo["Common/English"].NodeJSLocale;
+                ?? SheetLangToLocaleInfo["Common/English"].NodeJSLocale;
 
             const englishLocale = SheetLangToLocaleInfo["Common/English"];
 
@@ -497,7 +496,7 @@ export default {
                 { name: "MyStuff", value: mystuff ? "Enabled" : "Disabled" },
             );
 
-        const message = await (client.channels.cache.get(config.crashReportChannel) as TextChannel | null)?.send({
+        const message = await channels.crashReport.send({
             content: out,
             embeds: [embed],
         });

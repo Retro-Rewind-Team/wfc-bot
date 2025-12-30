@@ -1,9 +1,9 @@
-import { CacheType, ChatInputCommandInteraction, EmbedBuilder, GuildMember, PermissionFlagsBits, SlashCommandBuilder, TextChannel, User } from "discord.js";
-import { getConfig, setConfig } from "../config.js";
-import { client } from "../index.js";
+import { CacheType, ChatInputCommandInteraction, EmbedBuilder, GuildMember, PermissionFlagsBits, SlashCommandBuilder, User } from "discord.js";
+import { getChannels, getConfig, setConfig } from "../config.js";
 import { getColor } from "../utils.js";
 
 const config = getConfig();
+const channels = getChannels();
 
 async function sendEmbed(interaction: ChatInputCommandInteraction<CacheType>, action: string, updatedUser: User) {
     const member = interaction.member as GuildMember | null;
@@ -18,7 +18,7 @@ async function sendEmbed(interaction: ChatInputCommandInteraction<CacheType>, ac
         )
         .setTimestamp();
 
-    await (client.channels.cache.get(config.logsChannel) as TextChannel | null)?.send({ embeds: [embed] });
+    await channels.logs.send({ embeds: [embed] });
 }
 
 export default {

@@ -1,9 +1,9 @@
-import { EmbedBuilder, TextChannel } from "discord.js";
-import { client, } from "../index.js";
-import { getConfig } from "../config.js";
+import { EmbedBuilder } from "discord.js";
+import { getChannels, getConfig } from "../config.js";
 import { createUserEmbed, makeRequest, WiiLinkUser } from "../utils.js";
 
 const config = getConfig();
+const channels = getChannels();
 
 const numRegex = /[0-9]+/;
 
@@ -42,7 +42,7 @@ async function fetchNewPlayers() {
         }
     }
 
-    const message = await (client.channels.cache.get(config.newPlayerLogsChannel) as TextChannel | null)?.send({
+    const message = channels.newPlayerLogs.send({
         embeds: embeds,
         content: ping ? "<@391240445201743873>" : "",
     });

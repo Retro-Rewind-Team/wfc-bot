@@ -1,10 +1,10 @@
-import { CacheType, ChatInputCommandInteraction, EmbedBuilder, GuildMember, MessageFlags, SlashCommandBuilder, TextChannel } from "discord.js";
-import { getConfig } from "../config.js";
+import { CacheType, ChatInputCommandInteraction, EmbedBuilder, GuildMember, MessageFlags, SlashCommandBuilder } from "discord.js";
+import { getChannels, getConfig } from "../config.js";
 import crypto from "crypto";
-import { client } from "../index.js";
 import { fmtHex, getColor, makeRequest, resolveModRestrictPermission } from "../utils.js";
 
 const config = getConfig();
+const channels = getChannels();
 
 const RRID = 0x0A;
 const CTGPCID = 0x29C;
@@ -69,7 +69,7 @@ async function sendHashResponseEmbed(owner: GuildMember | null, packID: number, 
             });
     }
 
-    await (client.channels.cache.get(config.packOwnersLogsChannel) as TextChannel | null)?.send({ embeds: [embed] });
+    await channels.packOwnersLogs.send({ embeds: [embed] });
 }
 
 interface HashResponse {
@@ -268,7 +268,7 @@ async function sendDelEmbed(owner: GuildMember | null, packID: number, version: 
         .addFields({ name: "Version", value: `${version}/${fmtHex(version)}` })
         .setTimestamp();
 
-    await (client.channels.cache.get(config.packOwnersLogsChannel) as TextChannel | null)?.send({ embeds: [embed] });
+    await channels.packOwnersLogs.send({ embeds: [embed] });
 }
 
 async function del(interaction: ChatInputCommandInteraction<CacheType>) {

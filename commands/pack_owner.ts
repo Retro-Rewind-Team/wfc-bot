@@ -1,10 +1,10 @@
-import { CacheType, ChatInputCommandInteraction, EmbedBuilder, GuildMember, PermissionFlagsBits, SlashCommandBuilder, TextChannel, User } from "discord.js";
-import { getConfig, setConfig } from "../config.js";
+import { CacheType, ChatInputCommandInteraction, EmbedBuilder, GuildMember, PermissionFlagsBits, SlashCommandBuilder, User } from "discord.js";
+import { getChannels, getConfig, setConfig } from "../config.js";
 import { packIDToName, PackOpts } from "./hash.js";
-import { client } from "../index.js";
 import { fmtHex, getColor } from "../utils.js";
 
 const config = getConfig();
+const channels = getChannels();
 
 async function sendEmbed(moderator: GuildMember | null, action: string, packID: number, user: User) {
     const embed = new EmbedBuilder()
@@ -16,7 +16,7 @@ async function sendEmbed(moderator: GuildMember | null, action: string, packID: 
         )
         .setTimestamp();
 
-    await (client.channels.cache.get(config.logsChannel) as TextChannel | null)?.send({ embeds: [embed] });
+    await channels.logs.send({ embeds: [embed] });
 }
 
 export default {

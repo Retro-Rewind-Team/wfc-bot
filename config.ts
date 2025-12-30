@@ -1,4 +1,4 @@
-import { PermissionFlagsBits } from "discord.js";
+import { Client, PermissionFlagsBits, TextChannel } from "discord.js";
 import { Dictionary } from "./dictionary.js";
 import { existsSync, readFileSync, writeFileSync } from "fs";
 import { exit } from "process";
@@ -116,4 +116,41 @@ export function setConfig(config: Config) {
     _config = config;
 
     writeFileSync(_path, JSON.stringify(_config, null, 4), { encoding: "utf8" });
+}
+
+interface Channels {
+    logs: TextChannel,
+    publicLogs: TextChannel,
+    packOwnersLogs: TextChannel,
+    crashReport: TextChannel,
+    newPlayerLogs: TextChannel,
+    roomPing: TextChannel,
+}
+
+let _channels: Channels;
+
+export async function initChannels(client: Client<boolean>) {
+    _channels = {
+        logs: await fetchChannel(client, _config.logsChannel, "logs"),
+        publicLogs: await fetchChannel(client, _config.publicLogsChannel, "publicLogs"),
+        packOwnersLogs: await fetchChannel(client, _config.packOwnersLogsChannel, "packOwnersLogs"),
+        crashReport: await fetchChannel(client, _config.crashReportChannel, "crashReport"),
+        newPlayerLogs: await fetchChannel(client, _config.newPlayerLogsChannel, "newPlayerLogs"),
+        roomPing: await fetchChannel(client, _config.roomPingChannel, "roomPing"),
+    };
+}
+
+export function getChannels(): Channels {
+    return _channels;
+}
+
+async function fetchChannel(client: Client<boolean>, channelID: string, fieldName: string): Promise<TextChannel> {
+    const ret = await client.channels.fetch(channelID);
+
+    if (!ret)
+        throw new Error(`Failed to fetch channelID ${channelID} for field ${fieldName}`);
+    else
+        console.log(`${fieldName} set to channel ${(ret as TextChannel).name}`);
+
+    return ret as TextChannel;
 }

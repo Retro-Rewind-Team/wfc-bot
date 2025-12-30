@@ -1,12 +1,12 @@
 import crypto from "crypto";
-import { CacheType, ChatInputCommandInteraction, EmbedBuilder, GuildMember, PermissionFlagsBits, TextChannel } from "discord.js";
-import { client } from "./index.js";
-import { getConfig } from "./config.js";
+import { CacheType, ChatInputCommandInteraction, EmbedBuilder, GuildMember, PermissionFlagsBits } from "discord.js";
+import { getChannels, getConfig } from "./config.js";
 import { Dictionary } from "./dictionary.js";
 
 const fcRegex = new RegExp(/[0-9]{4}-[0-9]{4}-[0-9]{4}/);
 const pidRegex = new RegExp(/^\d+$/);
 const config = getConfig();
+const channels = getChannels();
 const urlBase = `http://${config.wfcServer}:${config.wfcPort}`;
 
 let currentColor = 0;
@@ -174,7 +174,7 @@ export async function sendEmbedLog(interaction: ChatInputCommandInteraction<Cach
     if (opts)
         privEmbed.addFields(...opts);
 
-    await (client.channels.cache.get(config.logsChannel) as TextChannel | null)?.send({ embeds: [privEmbed] });
+    await channels.logs.send({ embeds: [privEmbed] });
     await interaction.reply({ content: `Successful ${action} performed on friend code "${fc}"` });
 
     if (noPublicEmbed)
@@ -199,7 +199,7 @@ export async function sendEmbedLog(interaction: ChatInputCommandInteraction<Cach
         pubEmbed.addFields(...filtered);
     }
 
-    await (client.channels.cache.get(config.publicLogsChannel) as TextChannel | null)?.send({ embeds: [pubEmbed] });
+    await channels.publicLogs.send({ embeds: [pubEmbed] });
 }
 
 export function fmtHex(n: number): string {

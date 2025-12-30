@@ -1,9 +1,8 @@
-import { AutocompleteInteraction, ButtonInteraction, CacheType, ChatInputCommandInteraction, Client, Events, IntentsBitField, MessageFlags, REST, RESTPostAPIChatInputApplicationCommandsJSONBody, RESTPutAPIApplicationCommandsResult, Routes, SlashCommandOptionsOnlyBuilder, TextChannel } from "discord.js";
-import { getConfig, initConfig } from "./config.js";
+import { AutocompleteInteraction, ButtonInteraction, CacheType, ChatInputCommandInteraction, Client, Events, IntentsBitField, MessageFlags, REST, RESTPostAPIChatInputApplicationCommandsJSONBody, RESTPutAPIApplicationCommandsResult, Routes, SlashCommandOptionsOnlyBuilder } from "discord.js";
+import { getConfig, initChannels, initConfig } from "./config.js";
 import { Dictionary } from "./dictionary.js";
 import * as fs from "fs";
 import * as path from "path";
-import { exit } from "process";
 
 export const client = new Client({
     intents: [IntentsBitField.Flags.Guilds, IntentsBitField.Flags.GuildMessages]
@@ -41,24 +40,7 @@ let config = getConfig();
 client.once(Events.ClientReady, async function(readyClient) {
     console.log(`Logged in as ${readyClient.user.tag}`);
 
-    const channel = await client.channels.fetch(config.logsChannel);
-
-    if (!channel) {
-        console.error("Invalid channelid set for logs!");
-        exit(1);
-    }
-    else
-        console.log(`Logs set to send to channel ${(channel as TextChannel).name}`);
-
-    const pubchannel = await client.channels.fetch(config.publicLogsChannel);
-
-    if (!pubchannel) {
-        console.error("Invalid channelid set for public logs!");
-        exit(1);
-    }
-    else
-        console.log(`Public logs set to send to channel ${(pubchannel as TextChannel).name}`);
-    // Runs once a minute
+    initChannels(client);
 });
 
 client.login(config["token"]);
