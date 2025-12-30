@@ -82,9 +82,18 @@ async function fetchGroups() {
     await sendPings();
 }
 
-const pingedRooms: Group[] = [];
+let pingedRooms: Group[] = [];
 const roomMessages: Dictionary<Message> = {};
 async function sendPings() {
+    // Replace old groups in pingedRooms with the refreshed groups
+    const newPingedRooms: Group[] = [];
+    for (const group of pingedRooms) {
+        for (const newGroup of groups!.rooms)
+            if (group.id == newGroup.id)
+                newPingedRooms.push(newGroup);
+    }
+    pingedRooms = newPingedRooms;
+
     // Update existing logged rooms
     for (const group of pingedRooms) {
         const roomMessage = roomMessages[group.id];
