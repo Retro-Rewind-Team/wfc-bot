@@ -88,8 +88,12 @@ async function sendPings() {
     // Update existing logged rooms
     for (const group of pingedRooms) {
         const roomMessage = roomMessages[group.id];
-        if (!roomMessage)
+        if (!roomMessage) {
+            if (config.logServices)
+                console.log(`Missing message for group ${group.id}`);
+
             continue;
+        }
 
         const groupName = config.roomTypeNameMap[group.rk] ?? group.rk;
         // Guaranteed to exist, otherwise the message would not exist
@@ -97,24 +101,32 @@ async function sendPings() {
 
         // Delete the room
         if (!groupsContains(groups!.rooms, group)) {
+            const message = await roomMessage.edit(`<@&${groupPing}>, room ${group.id} has closed.`);
+
+            // If the message fails to edit, do not delete the room
+            if (!message) {
+                console.log(`Failed to edit close message for ${group.id}`);
+                continue;
+            }
+
             if (config.logServices)
                 console.log(`Room ${group.id} has closed`);
 
             pingedRooms.splice(groupsIndexOf(pingedRooms, group), 1);
-
-            await roomMessage.edit(`<@&${groupPing}>, room ${group.id} has closed.`);
             delete roomMessages[group.id];
 
-            return;
+            continue;
         }
 
         // Otherwise, update the room.
         const playerCount = Object.keys(group.players).length;
-        await roomMessage.edit(
+        const message = await roomMessage.edit(
             `<@&${groupPing}>, ${aOrAn(groupName)} ${groupName} room (${group.id}) is open with ${playerCount} ${utils.plural(playerCount, "player")}!`
         );
 
-        if (config.logServices)
+        if (!message)
+            console.log(`Failed to edit message for room ${group.id}`);
+        else if (config.logServices)
             console.log(`Updated room ${group.id} with playercount ${playerCount}`);
     }
 
