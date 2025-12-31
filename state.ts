@@ -28,8 +28,6 @@ export class State {
     }
 
     static async fromSerialized(stateSerialized: StateSerialized): Promise<State> {
-        console.log(stateSerialized);
-
         const messages: Dictionary<Message> = {};
 
         for (const key of Object.keys(stateSerialized.messages)) {
