@@ -6,7 +6,6 @@ import { Dictionary } from "./dictionary.js";
 const fcRegex = new RegExp(/[0-9]{4}-[0-9]{4}-[0-9]{4}/);
 const pidRegex = new RegExp(/^\d+$/);
 const config = getConfig();
-const channels = getChannels();
 const urlBase = `http://${config.wfcServer}:${config.wfcPort}`;
 
 let currentColor = 0;
@@ -174,7 +173,7 @@ export async function sendEmbedLog(interaction: ChatInputCommandInteraction<Cach
     if (opts)
         privEmbed.addFields(...opts);
 
-    await channels.logs.send({ embeds: [privEmbed] });
+    await getChannels().logs.send({ embeds: [privEmbed] });
     await interaction.reply({ content: `Successful ${action} performed on friend code "${fc}"` });
 
     if (noPublicEmbed)
@@ -199,7 +198,7 @@ export async function sendEmbedLog(interaction: ChatInputCommandInteraction<Cach
         pubEmbed.addFields(...filtered);
     }
 
-    await channels.publicLogs.send({ embeds: [pubEmbed] });
+    await getChannels().publicLogs.send({ embeds: [pubEmbed] });
 }
 
 export function fmtHex(n: number): string {
