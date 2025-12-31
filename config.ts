@@ -109,6 +109,9 @@ export function initConfig(path: string) {
 }
 
 export function getConfig(): Config {
+    if (!_config)
+        throw "_config accessed before being initialized";
+
     return _config;
 }
 
@@ -141,6 +144,9 @@ export async function initChannels(client: Client<boolean>) {
 }
 
 export function getChannels(): Channels {
+    if (!_channels)
+        throw "_channels accessed before being initialized";
+
     return _channels;
 }
 
