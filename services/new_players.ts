@@ -37,7 +37,7 @@ async function fetchNewPlayers() {
             if (!matches || matches.length < 1)
                 continue;
 
-            if (matches[0].startsWith("3") || matches[0].startsWith("4"))
+            if (Number.parseInt(matches[0].charAt(0)) < 5)
                 ping = true;
         }
     }
