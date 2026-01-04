@@ -41,6 +41,29 @@ client.once(Events.ClientReady, async function(readyClient) {
     console.log(`Logged in as ${readyClient.user.tag}`);
 
     initChannels(client);
+
+    const commandsRoot = path.join(import.meta.dirname ?? __dirname, "commands");
+    const commandFiles = fs.readdirSync(commandsRoot).filter(file => file.endsWith(".js"));
+
+    // Because of really strange node behavior involving import and resolving
+    // promises, commands cannot be awaited, so a callback is used instead.
+    resolveCommands(commandsRoot, commandFiles, (commands) => {
+        client.on(Events.InteractionCreate, async interaction => {
+            if (interaction.isAutocomplete())
+                handleAutocomplete(interaction, commands);
+            else if (interaction.isChatInputCommand())
+                handleCommand(interaction as ChatInputCommandInteraction<CacheType>, commands);
+            else if (interaction.isButton())
+                handleButton(interaction);
+        });
+
+        if (refresh)
+            refreshCommands(commands);
+
+        const servicesRoot = path.join(import.meta.dirname ?? __dirname, "services");
+        const serviceFiles = fs.readdirSync(servicesRoot).filter(file => file.endsWith(".js"));
+        startServices(servicesRoot, serviceFiles);
+    });
 });
 
 client.login(config["token"]);
@@ -260,26 +283,3 @@ async function refreshCommands(commands: Dictionary<Command>) {
         console.log(`Successfully reloaded ${adminData.length} application (/) commands for guild ${guildId}`);
     }
 }
-
-const commandsRoot = path.join(import.meta.dirname ?? __dirname, "commands");
-const commandFiles = fs.readdirSync(commandsRoot).filter(file => file.endsWith(".js"));
-
-// Because of really strange node behavior involving import and resolving
-// promises, commands cannot be awaited, so a callback is used instead.
-resolveCommands(commandsRoot, commandFiles, (commands) => {
-    client.on(Events.InteractionCreate, async interaction => {
-        if (interaction.isAutocomplete())
-            handleAutocomplete(interaction, commands);
-        else if (interaction.isChatInputCommand())
-            handleCommand(interaction as ChatInputCommandInteraction<CacheType>, commands);
-        else if (interaction.isButton())
-            handleButton(interaction);
-    });
-
-    if (refresh)
-        refreshCommands(commands);
-
-    const servicesRoot = path.join(import.meta.dirname ?? __dirname, "services");
-    const serviceFiles = fs.readdirSync(servicesRoot).filter(file => file.endsWith(".js"));
-    startServices(servicesRoot, serviceFiles);
-});
