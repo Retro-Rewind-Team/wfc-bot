@@ -394,3 +394,14 @@ export async function queryJson(url: string) {
 
     return json;
 }
+
+export function wrapTryCatch(fn: () => void) {
+    return () => {
+        try {
+            fn();
+        }
+        catch (e) {
+            console.error(e);
+        }
+    };
+}

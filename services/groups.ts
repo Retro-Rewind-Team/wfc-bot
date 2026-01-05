@@ -50,19 +50,14 @@ export function getGroups() {
 const fetchGroupsUrl = `http://${config.wfcServer}:${config.wfcPort}/api/groups`;
 
 async function fetchGroups() {
-    try {
-        const groupsJson = (await utils.queryJson(fetchGroupsUrl)) ?? utils.throwInline("Empty or no json response from groups api.");
-        groups = { timestamp: Date.now(), rooms: groupsJson };
+    const groupsJson = (await utils.queryJson(fetchGroupsUrl)) ?? utils.throwInline("Empty or no json response from groups api.");
+    groups = { timestamp: Date.now(), rooms: groupsJson };
 
-        if (config.logServices)
-            console.log(`Successfully fetched groups! Time is ${new Date(Date.now())}`);
+    if (config.logServices)
+        console.log(`Successfully fetched groups! Time is ${new Date(Date.now())}`);
 
-        await sendPings();
-    }
-    catch (e) {
-        console.error(`Failed to fetch groups, error: ${e}`);
-        return;
-    }
+    await sendPings();
+    return;
 }
 
 async function sendPings() {
@@ -210,9 +205,8 @@ function aOrAn(following: string) {
 
 export default {
     register: function() {
-        setInterval(fetchGroups, 60000);
+        setInterval(utils.wrapTryCatch(fetchGroups), 60000);
 
-        // Call to shut up the compiler.
-        fetchGroups();
+        utils.wrapTryCatch(fetchGroups)();
     },
 };

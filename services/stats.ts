@@ -24,35 +24,31 @@ export function getStats() {
 const fetchStatsUrl = `http://${config.wfcServer}:${config.wfcPort}/api/stats`;
 
 async function fetchStats() {
-    try {
-        stats = await utils.queryJson(fetchStatsUrl)
-            ?? utils.throwInline("Empty or no json response from stats api.");
-        const players = stats!.mariokartwii.active;
-        const rooms = stats!.mariokartwii.groups;
+    stats = await utils.queryJson(fetchStatsUrl)
+        ?? utils.throwInline("Empty or no json response from stats api.");
+    const players = stats!.mariokartwii.active;
+    const rooms = stats!.mariokartwii.groups;
 
-        const presenceText =
-            `${players} ${utils.plural(players, "player")} in ${rooms} ${utils.plural(rooms, "room")}!`;
+    const presenceText =
+        `${players} ${utils.plural(players, "player")} in ${rooms} ${utils.plural(rooms, "room")}!`;
 
-        client.user?.setPresence({
-            status: "online",
-            activities: [{
-                name: "Stats",
-                type: 4,
-                state: presenceText,
-            }]
-        });
+    client.user?.setPresence({
+        status: "online",
+        activities: [{
+            name: "Stats",
+            type: 4,
+            state: presenceText,
+        }]
+    });
 
-        if (config.logServices)
-            console.log(`Successfully fetched stats! Time is ${new Date(Date.now())}. ${presenceText}`);
-    }
-    catch (e) {
-        console.error(`Failed to fetch stats, error: ${e}`);
-    }
+    if (config.logServices)
+        console.log(`Successfully fetched stats! Time is ${new Date(Date.now())}. ${presenceText}`);
 }
 
 export default {
     register: function() {
-        setInterval(fetchStats, 60000);
-        fetchStats();
+        setInterval(utils.wrapTryCatch(fetchStats), 60000);
+
+        utils.wrapTryCatch(fetchStats)();
     },
 };

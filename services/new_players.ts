@@ -1,6 +1,6 @@
 import { EmbedBuilder } from "discord.js";
 import { getChannels, getConfig } from "../config.js";
-import { createUserEmbed, makeRequest, WiiLinkUser } from "../utils.js";
+import { createUserEmbed, makeRequest, WiiLinkUser, wrapTryCatch } from "../utils.js";
 
 const config = getConfig();
 const channels = getChannels();
@@ -55,7 +55,8 @@ async function fetchNewPlayers() {
 
 export default {
     register: function() {
-        setInterval(fetchNewPlayers, 60000);
-        fetchNewPlayers();
+        setInterval(wrapTryCatch(fetchNewPlayers), 60000);
+
+        wrapTryCatch(fetchNewPlayers)();
     }
 };
