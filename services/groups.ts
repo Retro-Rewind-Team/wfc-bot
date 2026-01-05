@@ -199,6 +199,9 @@ function groupsIndexOf(groups: Group[], group: Group) {
 }
 
 function aOrAn(following: string) {
+    if (!following)
+        return "a";
+
     const start = following.charAt(0).toLowerCase();
     const isVowel = start == "a" || start == "e" || start == "i" || start == "o" || start == "u";
 
