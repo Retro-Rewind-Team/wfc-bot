@@ -56,13 +56,13 @@ async function fetchGroups() {
 
         if (config.logServices)
             console.log(`Successfully fetched groups! Time is ${new Date(Date.now())}`);
+
+        await sendPings();
     }
     catch (e) {
         console.error(`Failed to fetch groups, error: ${e}`);
         return;
     }
-
-    await sendPings();
 }
 
 async function sendPings() {
