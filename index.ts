@@ -175,16 +175,18 @@ async function handleCommand(interaction: ChatInputCommandInteraction<CacheType>
     }
     catch (error) {
         console.error(error);
-        if (interaction.replied || interaction.deferred)
+        if (interaction.replied || interaction.deferred) {
             await interaction.followUp({
                 content: "There was an error while executing this command!",
                 flags: MessageFlags.Ephemeral,
             });
-        else
+        }
+        else {
             await interaction.reply({
                 content: "There was an error while executing this command!",
                 flags: MessageFlags.Ephemeral,
             });
+        }
     }
 }
 

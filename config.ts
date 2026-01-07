@@ -63,7 +63,7 @@ export function initConfig(path: string) {
     _path = path;
 
     try {
-        if (!existsSync(path))
+        if (!existsSync(path)) {
             setConfig({
                 token: "your bot's token",
                 applicationID: "your application id",
@@ -96,6 +96,7 @@ export function initConfig(path: string) {
                 leaderboardServer: "localhost",
                 logServices: false,
             });
+        }
 
         const buf = readFileSync(path, { encoding: "utf8" });
         _config = JSON.parse(buf);

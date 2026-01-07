@@ -22,7 +22,7 @@ export default {
 
         const [valid, err] = validateID(id);
         if (!valid) {
-            await interaction.reply({ 
+            await interaction.reply({
                 content: `Error checking friend code or pid "${id}": ${err}`,
                 flags: MessageFlags.Ephemeral
             });
@@ -76,12 +76,13 @@ export default {
                     });
                 }
 
-                if (res.count > 25) {
+                if (res.count > 25)
                     embed.setFooter({ text: `Showing 25 of ${res.count} suspicious jumps` });
-                }
+
 
                 await interaction.editReply({ embeds: [embed] });
-            } else {
+            }
+            else {
                 const errorText = await leaderboardResponse.text();
                 console.error(`Failed to get suspicious jumps for ${pid}: ${leaderboardResponse.status}`);
                 console.error(`Error details: ${errorText}`);
@@ -89,7 +90,8 @@ export default {
                     content: `Failed to retrieve suspicious jumps for friend code "${fc}": error ${leaderboardResponse.status}`
                 });
             }
-        } catch (error) {
+        }
+        catch (error) {
             console.error(`Error calling leaderboard API for player ${pid}:`, error);
             await interaction.editReply({
                 content: `Failed to retrieve suspicious jumps for friend code "${fc}": network error`

@@ -57,16 +57,18 @@ async function sendHashResponseEmbed(owner: GuildMember | null, packID: number, 
     for (let i = 0; i < 4; i++) {
         const hashResponse = hashResponses[i];
 
-        if (hashResponse)
+        if (hashResponse) {
             embed.addFields({
                 name: hashResponse.regionName,
                 value: `Hash: ${hashResponse.hash}\nMagic: ${hashResponse.magic}\nOffset: ${hashResponse.offset}`,
             });
-        else
+        }
+        else {
             embed.addFields({
                 name: regionIdxToName(i),
                 value: "None",
             });
+        }
     }
 
     await channels.packOwnersLogs.send({ embeds: [embed] });
@@ -99,9 +101,9 @@ function hash(buffer: Buffer): HashResponse[] {
 
     // Credit rambo (https://github.com/EpicUsername12)
     const regionSizes = [];
-    for (let i = 0; i < 4; i++) {
+    for (let i = 0; i < 4; i++)
         regionSizes.push(buffer.readUint32BE(i * 4));
-    }
+
 
     for (let i = 0; i < 4; i++) {
         if (regionSizes[i] === 0) {

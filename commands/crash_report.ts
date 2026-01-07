@@ -412,9 +412,10 @@ export default {
         // No locale support for other options.
         let filtered;
 
-        if (focused.value.length > 0)
+        if (focused.value.length > 0) {
             filtered = choices.filter(choice =>
                 choice.toLowerCase().includes(focused.value.toLowerCase()));
+        }
         else
             filtered = choices;
 

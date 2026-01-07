@@ -10,7 +10,9 @@ export default tseslint.config({
         tseslint.configs.recommended,
     ],
     rules: {
-        indent: ["error", 4],
+        indent: ["error", 4, {
+            "SwitchCase": 0,
+        }],
         "@typescript-eslint/no-unused-vars": ["error", { "argsIgnorePattern": "^_" }],
         semi: ["warn", "always"],
         quotes: ["warn", "double"],
@@ -19,5 +21,8 @@ export default tseslint.config({
             ignoreDeclarationSort: true,
             ignoreMemberSort: false,
         }],
+        curly: ["error", "multi-or-nest"],
+        "brace-style": ["error", "stroustrup"],
+        "no-trailing-spaces": "error",
     },
 });

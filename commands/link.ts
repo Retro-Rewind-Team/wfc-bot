@@ -64,10 +64,11 @@ async function beginLink(interaction: ChatInputCommandInteraction<CacheType>, pi
             content: `Failed to link friend code "${fc}": error ${res.Error ?? "no error message provided"}`
         });
     }
-    else
+    else {
         await interaction.editReply({
             content: `Verification started for "${fc}"! Please add "${config.friendbot}" within 10 minutes!`,
         });
+    }
 
     return success;
 }
@@ -108,12 +109,14 @@ async function timeoutLink(interaction: ChatInputCommandInteraction<CacheType>, 
         action: "reset"
     });
 
-    if (success)
+    if (success) {
         await interaction.followUp({
             content: `Profile linking for "${fc}" cancelled!`
         });
-    else
+    }
+    else {
         await interaction.followUp({
             content: `Failed to cancel linking for "${fc}": error ${res.Error ?? "no error message provided"}`
         });
+    }
 }
