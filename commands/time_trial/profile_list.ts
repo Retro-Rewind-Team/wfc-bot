@@ -1,8 +1,8 @@
 import { ActionRowBuilder, APIMessageTopLevelComponent, ButtonBuilder, ButtonInteraction, ButtonStyle, CacheType, ChatInputCommandInteraction, EmbedBuilder, SlashCommandBuilder } from "discord.js";
-import { getConfig } from "../config.js";
-import { Dictionary } from "../dictionary.js";
-import { registerButtonHandlerByMessageID } from "../index.js";
-import { resolveModRestrictPermission } from "../utils.js";
+import { getConfig } from "../../config.js";
+import { Dictionary } from "../../dictionary.js";
+import { registerButtonHandlerByMessageID } from "../../index.js";
+import { resolveModRestrictPermission } from "../../utils.js";
 
 const config = getConfig();
 const PROFILES_PER_PAGE = 10;
@@ -73,7 +73,7 @@ export default {
 
                     const embed = new EmbedBuilder()
                         .setColor(0x3498db)
-                        .setTitle(`📋 Time Trial Profiles`)
+                        .setTitle("📋 Time Trial Profiles")
                         .setDescription(`Total profiles: ${profiles.length}`)
                         .setFooter({ text: `Page ${page + 1} of ${totalPages}` })
                         .setTimestamp();
@@ -167,7 +167,7 @@ async function handleButton(buttonInteraction: ButtonInteraction<CacheType>) {
 
     const embed = new EmbedBuilder()
         .setColor(0x3498db)
-        .setTitle(`📋 Time Trial Profiles`)
+        .setTitle("📋 Time Trial Profiles")
         .setDescription(`Total profiles: ${state.profiles.length}`)
         .setFooter({ text: `Page ${newPage + 1} of ${state.totalPages}` })
         .setTimestamp();

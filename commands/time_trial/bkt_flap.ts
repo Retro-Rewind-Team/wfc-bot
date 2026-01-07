@@ -1,7 +1,7 @@
 import { CacheType, ChatInputCommandInteraction, EmbedBuilder, SlashCommandBuilder } from "discord.js";
-import { getConfig } from "../config.js";
-import { resolveModRestrictPermission } from "../utils.js";
-import { handleTrackAutocomplete } from "../tt-utils.js";
+import { getConfig } from "../../config.js";
+import { resolveModRestrictPermission } from "../../utils.js";
+import { handleTrackAutocomplete } from "./tt_utils.js";
 
 const config = getConfig();
 
@@ -46,7 +46,7 @@ export default {
         await interaction.deferReply();
 
         const leaderboardUrl = `http://${config.leaderboardServer}:${config.leaderboardPort}`;
-        
+
         try {
             const trackResponse = await fetch(`${leaderboardUrl}/api/timetrial/tracks/${trackId}`, {
                 method: "GET",
@@ -121,7 +121,7 @@ export default {
 
                 const countryFlag = flapSubmission.countryAlpha2 ? `:flag_${flapSubmission.countryAlpha2.toLowerCase()}:` : "🌐";
                 const ccBadge = cc === 150 ? "150cc" : "200cc";
-                
+
                 let badges = `\`${ccBadge}\``;
                 if (flapSubmission.shroomless) badges += " `Shroomless`";
                 if (flapSubmission.glitch) badges += " `Glitch`";

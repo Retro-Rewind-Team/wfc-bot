@@ -1,7 +1,7 @@
 import { CacheType, ChatInputCommandInteraction, EmbedBuilder, SlashCommandBuilder } from "discord.js";
-import { getConfig } from "../config.js";
-import { resolveModRestrictPermission } from "../utils.js";
-import { handleTrackAutocomplete, handleProfileAutocomplete } from "../tt-utils.js";
+import { getConfig } from "../../config.js";
+import { resolveModRestrictPermission } from "../../utils.js";
+import { handleProfileAutocomplete, handleTrackAutocomplete } from "./tt_utils.js";
 
 const config = getConfig();
 
@@ -119,7 +119,7 @@ export default {
                 const ccBadge = submission.cc === 150 ? "150cc" : "200cc";
                 const driftCategoryName = submission.driftCategory === 0 ? "Outside" : "Inside";
                 const driftTypeWithCategory = `${submission.driftTypeName} ${driftCategoryName}`;
-                
+
                 let badges = `\`${ccBadge}\``;
                 if (submission.shroomless) badges += " `Shroomless`";
                 if (submission.glitch) badges += " `Glitch`";

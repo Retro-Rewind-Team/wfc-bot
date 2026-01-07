@@ -1,7 +1,7 @@
 import { CacheType, ChatInputCommandInteraction, EmbedBuilder, SlashCommandBuilder } from "discord.js";
-import { getConfig } from "../config.js";
-import { resolveModRestrictPermission } from "../utils.js";
-import { handleTrackAutocomplete } from "../tt-utils.js";
+import { getConfig } from "../../config.js";
+import { resolveModRestrictPermission } from "../../utils.js";
+import { handleTrackAutocomplete } from "./tt_utils.js";
 
 const config = getConfig();
 
@@ -86,7 +86,7 @@ export default {
         await interaction.deferReply();
 
         const leaderboardUrl = `http://${config.leaderboardServer}:${config.leaderboardPort}`;
-        
+
         const params = new URLSearchParams({
             trackId: trackId.toString(),
             cc: cc.toString(),
@@ -117,7 +117,7 @@ export default {
 
                 const countryFlag = wr.countryAlpha2 ? `:flag_${wr.countryAlpha2.toLowerCase()}:` : "🌐";
                 const ccBadge = wr.cc === 150 ? "150cc" : "200cc";
-                
+
                 let badges = `\`${ccBadge}\``;
                 if (wr.shroomless) badges += " `Shroomless`";
                 if (wr.glitch) badges += " `Glitch`";
@@ -133,7 +133,7 @@ export default {
                 if (driftCategory === "inside") appliedFilters.push("Inside Drift");
                 if (driftCategory === "outside") appliedFilters.push("Outside Drift");
 
-                const filterText = appliedFilters.length > 0 
+                const filterText = appliedFilters.length > 0
                     ? `\n**Filters:** ${appliedFilters.join(", ")}`
                     : "";
 

@@ -1,7 +1,7 @@
 import { CacheType, ChatInputCommandInteraction, EmbedBuilder, SlashCommandBuilder } from "discord.js";
-import { getConfig } from "../config.js";
-import { resolveModRestrictPermission } from "../utils.js";
-import { handleProfileAutocomplete, handleTrackAutocomplete } from "../tt-utils.js";
+import { getConfig } from "../../config.js";
+import { resolveModRestrictPermission } from "../../utils.js";
+import { handleProfileAutocomplete, handleTrackAutocomplete } from "./tt_utils.js";
 
 const config = getConfig();
 

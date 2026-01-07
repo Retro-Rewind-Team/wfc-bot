@@ -37,17 +37,36 @@ for (let i = 2; i < process.argv.length; i++) {
 initConfig(configPath.length > 0 ? configPath : path.join(process.cwd(), "config.json"));
 let config = getConfig();
 
+function findCommadFiles(root: string): string[] {
+    let ret: string[] = [];
+    const files = fs.readdirSync(root);
+
+    for (const file of files) {
+        const full = path.join(root, file);
+
+        if (file.endsWith(".js")) {
+            ret.push(full);
+            continue;
+        }
+
+        if (fs.statSync(full).isDirectory())
+            ret = ret.concat(findCommadFiles(full));
+    }
+
+    return ret;
+}
+
 client.once(Events.ClientReady, async function(readyClient) {
     console.log(`Logged in as ${readyClient.user.tag}`);
 
     initChannels(client);
 
     const commandsRoot = path.join(import.meta.dirname ?? __dirname, "commands");
-    const commandFiles = fs.readdirSync(commandsRoot).filter(file => file.endsWith(".js"));
+    const commandFiles = findCommadFiles(commandsRoot);
 
     // Because of really strange node behavior involving import and resolving
     // promises, commands cannot be awaited, so a callback is used instead.
-    resolveCommands(commandsRoot, commandFiles, (commands) => {
+    resolveCommands(commandFiles, (commands) => {
         client.on(Events.InteractionCreate, async interaction => {
             if (interaction.isAutocomplete())
                 handleAutocomplete(interaction, commands);
@@ -98,11 +117,11 @@ interface Command {
     exec: (_: ChatInputCommandInteraction<CacheType>) => Promise<void>,
 }
 
-async function resolveCommands(root: string, files: string[], callback: (_: Dictionary<Command>) => void) {
+async function resolveCommands(files: string[], callback: (_: Dictionary<Command>) => void) {
     const ret: Dictionary<Command> = {};
 
     for (const file of files) {
-        let spec = await import(path.join(root, file));
+        let spec = await import(file);
         spec = spec.default;
 
         if (spec == undefined || spec == null)

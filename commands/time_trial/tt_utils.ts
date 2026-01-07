@@ -1,5 +1,5 @@
 import { AutocompleteInteraction } from "discord.js";
-import { getConfig } from "./config.js";
+import { getConfig } from "../../config.js";
 
 const config = getConfig();
 
@@ -106,7 +106,7 @@ export async function fetchCountries(): Promise<Country[]> {
 export async function handleTrackAutocomplete(interaction: AutocompleteInteraction) {
     const focusedValue = interaction.options.getFocused().toLowerCase();
     const tracks = await fetchTracks();
-    
+
     const filtered = tracks
         .filter(track => track.name.toLowerCase().includes(focusedValue))
         .slice(0, 25)
@@ -121,7 +121,7 @@ export async function handleTrackAutocomplete(interaction: AutocompleteInteracti
 export async function handleProfileAutocomplete(interaction: AutocompleteInteraction) {
     const focusedValue = interaction.options.getFocused().toLowerCase();
     const profiles = await fetchProfiles();
-    
+
     const filtered = profiles
         .filter(profile => profile.displayName.toLowerCase().includes(focusedValue))
         .slice(0, 25)
@@ -136,9 +136,9 @@ export async function handleProfileAutocomplete(interaction: AutocompleteInterac
 export async function handleCountryAutocomplete(interaction: AutocompleteInteraction) {
     const focusedValue = interaction.options.getFocused().toLowerCase();
     const countries = await fetchCountries();
-    
+
     const filtered = countries
-        .filter(country => 
+        .filter(country =>
             country.name.toLowerCase().includes(focusedValue) ||
             country.alpha2.toLowerCase().includes(focusedValue)
         )
