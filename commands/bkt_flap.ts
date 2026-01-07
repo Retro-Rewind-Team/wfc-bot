@@ -121,9 +121,8 @@ export default {
 
                 const countryFlag = flapSubmission.countryAlpha2 ? `:flag_${flapSubmission.countryAlpha2.toLowerCase()}:` : "🌐";
                 const ccBadge = cc === 150 ? "150cc" : "200cc";
-                const categoryBadge = nonGlitchOnly ? "Non-Glitch/Shortcut" : "Unrestricted";
                 
-                let badges = `\`${ccBadge}\` \`${categoryBadge}\``;
+                let badges = `\`${ccBadge}\``;
                 if (flapSubmission.shroomless) badges += " `Shroomless`";
                 if (flapSubmission.glitch) badges += " `Glitch`";
 
