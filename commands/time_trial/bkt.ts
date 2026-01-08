@@ -93,9 +93,9 @@ export default {
 
     autocomplete: async function(interaction: AutocompleteInteraction) {
         const focusedOption = interaction.options.getFocused(true);
-        if (focusedOption.name == "track") {
+        if (focusedOption.name == "track")
             await handleTrackAutocomplete(interaction);
-        }
+
     },
 
     exec: async function(interaction: ChatInputCommandInteraction<CacheType>) {
@@ -117,18 +117,18 @@ export default {
             nonGlitchOnly: nonGlitchOnly.toString()
         });
 
-        if (shroomless && shroomless != "all") {
+        if (shroomless && shroomless != "all")
             params.append("shroomless", shroomless);
-        }
-        if (vehicle && vehicle != "all") {
+
+        if (vehicle && vehicle != "all")
             params.append("vehicle", vehicle);
-        }
-        if (drift && drift != "all") {
+
+        if (drift && drift != "all")
             params.append("drift", drift);
-        }
-        if (driftCategory && driftCategory != "all") {
+
+        if (driftCategory && driftCategory != "all")
             params.append("driftCategory", driftCategory);
-        }
+
 
         const response = await fetch(`${leaderboardUrl}/api/moderation/timetrial/bkt?${params}`, {
             method: "GET",
@@ -190,17 +190,20 @@ export default {
             }
 
             await interaction.editReply({ embeds: [embed] });
-        } else if (response.status == 404) {
+        }
+        else if (response.status == 404) {
             await interaction.editReply({
                 content: "No times found matching the specified filters"
             });
-        } else {
+        }
+        else {
             const errorText = await response.text();
             let errorMessage: string;
             try {
                 const errorData = JSON.parse(errorText) as ErrorResponse;
                 errorMessage = errorData.message || errorData.title || response.statusText;
-            } catch {
+            }
+            catch {
                 errorMessage = errorText || response.statusText;
             }
 

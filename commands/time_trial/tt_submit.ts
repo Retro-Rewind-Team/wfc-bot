@@ -78,11 +78,11 @@ export default {
 
     autocomplete: async function(interaction: AutocompleteInteraction) {
         const focusedOption = interaction.options.getFocused(true);
-        if (focusedOption.name == "track") {
+        if (focusedOption.name == "track")
             await handleTrackAutocomplete(interaction);
-        } else if (focusedOption.name == "profile") {
+        else if (focusedOption.name == "profile")
             await handleProfileAutocomplete(interaction);
-        }
+
     },
 
     exec: async function(interaction: ChatInputCommandInteraction<CacheType>) {
@@ -164,13 +164,15 @@ export default {
                 .setFooter({ text: `Submission ID: ${submission.id}` });
 
             await interaction.editReply({ embeds: [embed] });
-        } else {
+        }
+        else {
             const errorText = await response.text();
             let errorMessage: string;
             try {
                 const errorData = JSON.parse(errorText) as ErrorResponse;
                 errorMessage = errorData.message || errorData.title || response.statusText;
-            } catch {
+            }
+            catch {
                 errorMessage = errorText || response.statusText;
             }
 

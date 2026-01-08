@@ -35,9 +35,9 @@ const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
 
 export async function fetchTracks(): Promise<Track[]> {
     const now = Date.now();
-    if (tracksCache && (now - tracksCacheTime) < CACHE_DURATION) {
+    if (tracksCache && (now - tracksCacheTime) < CACHE_DURATION)
         return tracksCache;
-    }
+
 
     const leaderboardUrl = `http://${config.leaderboardServer}:${config.leaderboardPort}`;
     const response = await fetch(`${leaderboardUrl}/api/timetrial/tracks`, {
@@ -50,7 +50,8 @@ export async function fetchTracks(): Promise<Track[]> {
         tracksCache = tracks || [];
         tracksCacheTime = now;
         return tracksCache || [];
-    } else {
+    }
+    else {
         console.error(`Failed to fetch tracks: ${response.status}`);
         return [];
     }
@@ -66,7 +67,8 @@ export async function fetchProfiles(): Promise<TTProfile[]> {
     if (response.ok) {
         const data = await response.json() as { profiles: TTProfile[] };
         return data.profiles || [];
-    } else {
+    }
+    else {
         console.error(`Failed to fetch profiles: ${response.status}`);
         return [];
     }
@@ -82,7 +84,8 @@ export async function fetchCountries(): Promise<Country[]> {
     if (response.ok) {
         const data = await response.json() as { countries: Country[] };
         return data.countries || [];
-    } else {
+    }
+    else {
         console.error(`Failed to fetch countries: ${response.status}`);
         return [];
     }

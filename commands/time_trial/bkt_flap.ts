@@ -67,9 +67,9 @@ export default {
 
     autocomplete: async function(interaction: AutocompleteInteraction) {
         const focusedOption = interaction.options.getFocused(true);
-        if (focusedOption.name == "track") {
+        if (focusedOption.name == "track")
             await handleTrackAutocomplete(interaction);
-        }
+
     },
 
     exec: async function(interaction: ChatInputCommandInteraction<CacheType>) {
@@ -118,9 +118,9 @@ export default {
             const flapDisplay = data.fastestLapDisplay;
 
             let searchUrl = `${leaderboardUrl}/api/moderation/timetrial/submissions/search?trackId=${trackId}&cc=${cc}&limit=100`;
-            if (nonGlitchOnly) {
-                searchUrl += `&glitch=false`;
-            }
+            if (nonGlitchOnly)
+                searchUrl += "&glitch=false";
+
 
             const searchResponse = await fetch(
                 searchUrl,
@@ -203,18 +203,21 @@ export default {
             }
 
             await interaction.editReply({ embeds: [embed] });
-        } else if (response.status == 404) {
+        }
+        else if (response.status == 404) {
             const category = nonGlitchOnly ? "non-glitch/shortcut" : "unrestricted";
             await interaction.editReply({
                 content: `No times found for ${track.name} at ${cc}cc (${category})`
             });
-        } else {
+        }
+        else {
             const errorText = await response.text();
             let errorMessage: string;
             try {
                 const errorData = JSON.parse(errorText) as ErrorResponse;
                 errorMessage = errorData.message || errorData.title || response.statusText;
-            } catch {
+            }
+            catch {
                 errorMessage = errorText || response.statusText;
             }
 

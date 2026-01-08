@@ -44,9 +44,9 @@ export default {
 
     autocomplete: async function(interaction: AutocompleteInteraction) {
         const focusedOption = interaction.options.getFocused(true);
-        if (focusedOption.name == "country") {
+        if (focusedOption.name == "country")
             await handleCountryAutocomplete(interaction);
-        }
+
     },
 
     exec: async function(interaction: ChatInputCommandInteraction<CacheType>) {
@@ -57,9 +57,9 @@ export default {
 
         const leaderboardUrl = `http://${config.leaderboardServer}:${config.leaderboardPort}`;
         const body: CreateProfileRequest = { displayName };
-        if (countryCode) {
+        if (countryCode)
             body.countryCode = parseInt(countryCode);
-        }
+
 
         const response = await fetch(`${leaderboardUrl}/api/moderation/timetrial/profile/create`, {
             method: "POST",
@@ -86,7 +86,8 @@ export default {
                 .setTimestamp();
 
             await interaction.editReply({ embeds: [embed] });
-        } else {
+        }
+        else {
             const errorData = await response.json() as ErrorResponse;
             await interaction.editReply({
                 content: `Failed to create profile: ${errorData.message || response.statusText}`

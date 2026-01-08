@@ -25,9 +25,9 @@ export default {
 
     autocomplete: async function(interaction: AutocompleteInteraction) {
         const focusedOption = interaction.options.getFocused(true);
-        if (focusedOption.name == "profile") {
+        if (focusedOption.name == "profile")
             await handleProfileAutocomplete(interaction);
-        }
+
     },
 
     exec: async function(interaction: ChatInputCommandInteraction<CacheType>) {
@@ -51,7 +51,8 @@ export default {
                 .setTimestamp();
 
             await interaction.editReply({ embeds: [embed] });
-        } else {
+        }
+        else {
             const errorData = await response.json() as DeleteProfileResponse;
             await interaction.editReply({
                 content: `Failed to delete profile: ${errorData.message || response.statusText}`

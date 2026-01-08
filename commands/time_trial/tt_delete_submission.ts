@@ -45,7 +45,8 @@ export default {
                 .setTimestamp();
 
             await interaction.editReply({ embeds: [embed] });
-        } else {
+        }
+        else {
             const errorData = await response.json() as DeleteResponse;
             await interaction.editReply({
                 content: `Failed to delete submission: ${errorData.message || response.statusText}`

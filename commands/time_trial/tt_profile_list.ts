@@ -131,12 +131,14 @@ export default {
                     currentPage: 0,
                     totalPages: totalPages
                 };
-            } else {
+            }
+            else {
                 await interaction.editReply({
                     embeds: [createEmbed(0)]
                 });
             }
-        } else {
+        }
+        else {
             await interaction.editReply({
                 content: `Failed to fetch profiles: ${response.statusText}`
             });
