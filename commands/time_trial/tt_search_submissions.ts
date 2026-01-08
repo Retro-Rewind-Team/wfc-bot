@@ -1,9 +1,30 @@
-import { CacheType, ChatInputCommandInteraction, EmbedBuilder, SlashCommandBuilder } from "discord.js";
+import { AutocompleteInteraction, CacheType, ChatInputCommandInteraction, EmbedBuilder, SlashCommandBuilder } from "discord.js";
 import { getConfig } from "../../config.js";
 import { resolveModRestrictPermission } from "../../utils.js";
 import { handleProfileAutocomplete, handleTrackAutocomplete } from "./tt_utils.js";
 
 const config = getConfig();
+
+interface Submission {
+    id: number;
+    playerName: string;
+    trackName: string;
+    finishTimeDisplay: string;
+    cc: number;
+    driftCategory: number;
+    shroomless: boolean;
+    glitch: boolean;
+    countryAlpha2: string | null;
+    dateSet: string;
+}
+
+interface SearchSubmissionsResponse {
+    submissions: Submission[];
+}
+
+interface ErrorResponse {
+    message?: string;
+}
 
 export default {
     modOnly: true,
@@ -54,11 +75,11 @@ export default {
             .setMaxValue(25))
         .setDefaultMemberPermissions(resolveModRestrictPermission()),
 
-    autocomplete: async function(interaction: any) {
+    autocomplete: async function(interaction: AutocompleteInteraction) {
         const focusedOption = interaction.options.getFocused(true);
-        if (focusedOption.name === "profile") {
+        if (focusedOption.name == "profile") {
             await handleProfileAutocomplete(interaction);
-        } else if (focusedOption.name === "track") {
+        } else if (focusedOption.name == "track") {
             await handleTrackAutocomplete(interaction);
         }
     },
@@ -75,65 +96,58 @@ export default {
         const params = new URLSearchParams();
         if (profileId) params.append("ttProfileId", profileId);
         if (trackId) params.append("trackId", trackId);
-        if (cc !== null) params.append("cc", cc.toString());
-        if (driftCategory !== null) params.append("driftCategory", driftCategory.toString());
-        if (glitch !== null) params.append("glitch", glitch.toString());
-        if (shroomless !== null) params.append("shroomless", shroomless.toString());
+        if (cc != null) params.append("cc", cc.toString());
+        if (driftCategory != null) params.append("driftCategory", driftCategory.toString());
+        if (glitch != null) params.append("glitch", glitch.toString());
+        if (shroomless != null) params.append("shroomless", shroomless.toString());
         params.append("limit", limit.toString());
 
         await interaction.deferReply();
 
         const leaderboardUrl = `http://${config.leaderboardServer}:${config.leaderboardPort}`;
-        try {
-            const response = await fetch(`${leaderboardUrl}/api/moderation/timetrial/submissions/search?${params.toString()}`, {
-                method: "GET",
-                headers: { "Authorization": `Bearer ${config.wfcSecret}` }
+        const response = await fetch(`${leaderboardUrl}/api/moderation/timetrial/submissions/search?${params.toString()}`, {
+            method: "GET",
+            headers: { "Authorization": `Bearer ${config.wfcSecret}` }
+        });
+
+        if (response.ok) {
+            const result = await response.json() as SearchSubmissionsResponse;
+            const submissions = result.submissions;
+
+            if (submissions.length == 0) {
+                await interaction.editReply({ content: "No submissions found matching your filters." });
+                return;
+            }
+
+            const embed = new EmbedBuilder()
+                .setColor(0x3498db)
+                .setTitle("🔍 Submission Search Results")
+                .setDescription(`Found ${submissions.length} submission(s)`)
+                .setTimestamp();
+
+            submissions.forEach((sub: Submission) => {
+                const countryFlag = sub.countryAlpha2 ? `:flag_${sub.countryAlpha2.toLowerCase()}:` : "🌍";
+                const ccBadge = sub.cc == 150 ? "150cc" : "200cc";
+                const driftBadge = sub.driftCategory == 0 ? "Outside" : "Inside";
+                let badges = `\`${ccBadge}\` \`${driftBadge}\``;
+                if (sub.shroomless) badges += " `Shroomless`";
+                if (sub.glitch) badges += " `Glitch`";
+
+                const dateSet = new Date(sub.dateSet);
+                const timestamp = `<t:${Math.floor(dateSet.getTime() / 1000)}:R>`;
+
+                embed.addFields({
+                    name: `${sub.trackName} - ${sub.finishTimeDisplay}`,
+                    value: `**ID:** \`${sub.id}\` | ${countryFlag} ${sub.playerName}\n${badges} | **Date Set:** ${timestamp}`,
+                    inline: false
+                });
             });
 
-            if (response.ok) {
-                const result = await response.json();
-                const submissions = result.submissions;
-
-                if (submissions.length === 0) {
-                    await interaction.editReply({ content: "No submissions found matching your filters." });
-                    return;
-                }
-
-                const embed = new EmbedBuilder()
-                    .setColor(0x3498db)
-                    .setTitle("🔍 Submission Search Results")
-                    .setDescription(`Found ${submissions.length} submission(s)`)
-                    .setTimestamp();
-
-                submissions.forEach((sub: any) => {
-                    const countryFlag = sub.countryAlpha2 ? `:flag_${sub.countryAlpha2.toLowerCase()}:` : "🌐";
-                    const ccBadge = sub.cc === 150 ? "150cc" : "200cc";
-                    const driftBadge = sub.driftCategory === 0 ? "Outside" : "Inside";
-                    let badges = `\`${ccBadge}\` \`${driftBadge}\``;
-                    if (sub.shroomless) badges += " `Shroomless`";
-                    if (sub.glitch) badges += " `Glitch`";
-
-                    const submittedDate = new Date(sub.submittedAt);
-                    const timestamp = `<t:${Math.floor(submittedDate.getTime() / 1000)}:R>`;
-
-                    embed.addFields({
-                        name: `${sub.trackName} - ${sub.finishTimeDisplay}`,
-                        value: `**ID:** \`${sub.id}\` | ${countryFlag} ${sub.playerName}\n${badges} | **Submitted:** ${timestamp}`,
-                        inline: false
-                    });
-                });
-
-                await interaction.editReply({ embeds: [embed] });
-            } else {
-                const errorData = await response.json();
-                await interaction.editReply({
-                    content: `Failed to search submissions: ${errorData.message || response.statusText}`
-                });
-            }
-        } catch (error) {
-            console.error("Error searching submissions:", error);
+            await interaction.editReply({ embeds: [embed] });
+        } else {
+            const errorData = await response.json() as ErrorResponse;
             await interaction.editReply({
-                content: "Network error while searching submissions"
+                content: `Failed to search submissions: ${errorData.message || response.statusText}`
             });
         }
     }

@@ -40,70 +40,55 @@ export async function fetchTracks(): Promise<Track[]> {
     }
 
     const leaderboardUrl = `http://${config.leaderboardServer}:${config.leaderboardPort}`;
-    try {
-        const response = await fetch(`${leaderboardUrl}/api/timetrial/tracks`, {
-            method: "GET",
-            headers: { "Authorization": `Bearer ${config.wfcSecret}` }
-        });
+    const response = await fetch(`${leaderboardUrl}/api/timetrial/tracks`, {
+        method: "GET",
+        headers: { "Authorization": `Bearer ${config.wfcSecret}` }
+    });
 
-        if (response.ok) {
-            const tracks = await response.json();
-            tracksCache = tracks || [];
-            tracksCacheTime = now;
-            return tracksCache || [];
-        } else {
-            console.error(`Failed to fetch tracks: ${response.status}`);
-            return [];
-        }
-    } catch (error) {
-        console.error("Error fetching tracks:", error);
+    if (response.ok) {
+        const tracks = await response.json() as Track[];
+        tracksCache = tracks || [];
+        tracksCacheTime = now;
+        return tracksCache || [];
+    } else {
+        console.error(`Failed to fetch tracks: ${response.status}`);
         return [];
     }
 }
 
 export async function fetchProfiles(): Promise<TTProfile[]> {
     const leaderboardUrl = `http://${config.leaderboardServer}:${config.leaderboardPort}`;
-    try {
-        const response = await fetch(`${leaderboardUrl}/api/moderation/timetrial/profiles`, {
-            method: "GET",
-            headers: { "Authorization": `Bearer ${config.wfcSecret}` }
-        });
+    const response = await fetch(`${leaderboardUrl}/api/moderation/timetrial/profiles`, {
+        method: "GET",
+        headers: { "Authorization": `Bearer ${config.wfcSecret}` }
+    });
 
-        if (response.ok) {
-            const data = await response.json();
-            return data.profiles || [];
-        } else {
-            console.error(`Failed to fetch profiles: ${response.status}`);
-            return [];
-        }
-    } catch (error) {
-        console.error("Error fetching profiles:", error);
+    if (response.ok) {
+        const data = await response.json() as { profiles: TTProfile[] };
+        return data.profiles || [];
+    } else {
+        console.error(`Failed to fetch profiles: ${response.status}`);
         return [];
     }
 }
 
 export async function fetchCountries(): Promise<Country[]> {
     const leaderboardUrl = `http://${config.leaderboardServer}:${config.leaderboardPort}`;
-    try {
-        const response = await fetch(`${leaderboardUrl}/api/moderation/countries`, {
-            method: "GET",
-            headers: { "Authorization": `Bearer ${config.wfcSecret}` }
-        });
+    const response = await fetch(`${leaderboardUrl}/api/moderation/countries`, {
+        method: "GET",
+        headers: { "Authorization": `Bearer ${config.wfcSecret}` }
+    });
 
-        if (response.ok) {
-            const data = await response.json();
-            return data.countries || [];
-        } else {
-            console.error(`Failed to fetch countries: ${response.status}`);
-            return [];
-        }
-    } catch (error) {
-        console.error("Error fetching countries:", error);
+    if (response.ok) {
+        const data = await response.json() as { countries: Country[] };
+        return data.countries || [];
+    } else {
+        console.error(`Failed to fetch countries: ${response.status}`);
         return [];
     }
 }
 
-export async function handleTrackAutocomplete(interaction: AutocompleteInteraction) {
+export async function handleTrackAutocomplete(interaction: AutocompleteInteraction): Promise<void> {
     const focusedValue = interaction.options.getFocused().toLowerCase();
     const tracks = await fetchTracks();
 
@@ -118,7 +103,7 @@ export async function handleTrackAutocomplete(interaction: AutocompleteInteracti
     await interaction.respond(filtered);
 }
 
-export async function handleProfileAutocomplete(interaction: AutocompleteInteraction) {
+export async function handleProfileAutocomplete(interaction: AutocompleteInteraction): Promise<void> {
     const focusedValue = interaction.options.getFocused().toLowerCase();
     const profiles = await fetchProfiles();
 
@@ -133,7 +118,7 @@ export async function handleProfileAutocomplete(interaction: AutocompleteInterac
     await interaction.respond(filtered);
 }
 
-export async function handleCountryAutocomplete(interaction: AutocompleteInteraction) {
+export async function handleCountryAutocomplete(interaction: AutocompleteInteraction): Promise<void> {
     const focusedValue = interaction.options.getFocused().toLowerCase();
     const countries = await fetchCountries();
 

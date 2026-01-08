@@ -1,9 +1,33 @@
-import { CacheType, ChatInputCommandInteraction, EmbedBuilder, SlashCommandBuilder } from "discord.js";
+import { AutocompleteInteraction, CacheType, ChatInputCommandInteraction, EmbedBuilder, SlashCommandBuilder } from "discord.js";
 import { getConfig } from "../../config.js";
 import { resolveModRestrictPermission } from "../../utils.js";
 import { handleTrackAutocomplete } from "./tt_utils.js";
 
 const config = getConfig();
+
+interface BKTResponse {
+    id: number;
+    trackName: string;
+    playerName: string;
+    finishTimeDisplay: string;
+    fastestLapDisplay: string;
+    cc: number;
+    shroomless: boolean;
+    glitch: boolean;
+    countryAlpha2: string;
+    characterName: string;
+    vehicleName: string;
+    controllerName: string;
+    driftTypeName: string;
+    driftCategoryName: string;
+    dateSet: string;
+    lapSplitsDisplay?: string[];
+}
+
+interface ErrorResponse {
+    message?: string;
+    title?: string;
+}
 
 export default {
     modOnly: false,
@@ -67,9 +91,9 @@ export default {
             ))
         .setDefaultMemberPermissions(resolveModRestrictPermission()),
 
-    autocomplete: async function(interaction: any) {
+    autocomplete: async function(interaction: AutocompleteInteraction) {
         const focusedOption = interaction.options.getFocused(true);
-        if (focusedOption.name === "track") {
+        if (focusedOption.name == "track") {
             await handleTrackAutocomplete(interaction);
         }
     },
@@ -93,102 +117,95 @@ export default {
             nonGlitchOnly: nonGlitchOnly.toString()
         });
 
-        if (shroomless && shroomless !== "all") {
+        if (shroomless && shroomless != "all") {
             params.append("shroomless", shroomless);
         }
-        if (vehicle && vehicle !== "all") {
+        if (vehicle && vehicle != "all") {
             params.append("vehicle", vehicle);
         }
-        if (drift && drift !== "all") {
+        if (drift && drift != "all") {
             params.append("drift", drift);
         }
-        if (driftCategory && driftCategory !== "all") {
+        if (driftCategory && driftCategory != "all") {
             params.append("driftCategory", driftCategory);
         }
 
-        try {
-            const response = await fetch(`${leaderboardUrl}/api/moderation/timetrial/bkt?${params}`, {
-                method: "GET",
-                headers: { "Authorization": `Bearer ${config.wfcSecret}` }
-            });
+        const response = await fetch(`${leaderboardUrl}/api/moderation/timetrial/bkt?${params}`, {
+            method: "GET",
+            headers: { "Authorization": `Bearer ${config.wfcSecret}` }
+        });
 
-            if (response.ok) {
-                const wr = await response.json();
+        if (response.ok) {
+            const wr = await response.json() as BKTResponse;
 
-                const countryFlag = wr.countryAlpha2 ? `:flag_${wr.countryAlpha2.toLowerCase()}:` : "🌐";
-                const ccBadge = wr.cc === 150 ? "150cc" : "200cc";
+            const countryFlag = wr.countryAlpha2 ? `:flag_${wr.countryAlpha2.toLowerCase()}:` : "🌐";
+            const ccBadge = wr.cc == 150 ? "150cc" : "200cc";
 
-                let badges = `\`${ccBadge}\``;
-                if (wr.shroomless) badges += " `Shroomless`";
-                if (wr.glitch) badges += " `Glitch`";
+            let badges = `\`${ccBadge}\``;
+            if (wr.shroomless) badges += " `Shroomless`";
+            if (wr.glitch) badges += " `Glitch`";
 
-                const appliedFilters: string[] = [];
-                if (nonGlitchOnly) appliedFilters.push("Non-Glitch/Shortcut");
-                if (shroomless === "only") appliedFilters.push("Shroomless Only");
-                if (shroomless === "exclude") appliedFilters.push("No Shroomless");
-                if (vehicle === "bikes") appliedFilters.push("Bikes Only");
-                if (vehicle === "karts") appliedFilters.push("Karts Only");
-                if (drift === "manual") appliedFilters.push("Manual Drift");
-                if (drift === "hybrid") appliedFilters.push("Hybrid Drift");
-                if (driftCategory === "inside") appliedFilters.push("Inside Drift");
-                if (driftCategory === "outside") appliedFilters.push("Outside Drift");
+            const appliedFilters: string[] = [];
+            if (nonGlitchOnly) appliedFilters.push("Non-Glitch/Shortcut");
+            if (shroomless == "only") appliedFilters.push("Shroomless Only");
+            if (shroomless == "exclude") appliedFilters.push("No Shroomless");
+            if (vehicle == "bikes") appliedFilters.push("Bikes Only");
+            if (vehicle == "karts") appliedFilters.push("Karts Only");
+            if (drift == "manual") appliedFilters.push("Manual Drift");
+            if (drift == "hybrid") appliedFilters.push("Hybrid Drift");
+            if (driftCategory == "inside") appliedFilters.push("Inside Drift");
+            if (driftCategory == "outside") appliedFilters.push("Outside Drift");
 
-                const filterText = appliedFilters.length > 0
-                    ? `\n**Filters:** ${appliedFilters.join(", ")}`
-                    : "";
+            const filterText = appliedFilters.length > 0
+                ? `\n**Filters:** ${appliedFilters.join(", ")}`
+                : "";
 
-                const dateSet = new Date(wr.dateSet);
+            const dateSet = new Date(wr.dateSet);
 
-                const driftInfo = `${wr.driftTypeName || "Unknown"} ${wr.driftCategoryName || ""}`.trim();
+            const driftInfo = `${wr.driftTypeName || "Unknown"} ${wr.driftCategoryName || ""}`.trim();
 
-                const embed = new EmbedBuilder()
-                    .setColor(0xffd700)
-                    .setTitle(`🏆 Best Known Time: ${wr.trackName}`)
-                    .setDescription(`**${wr.finishTimeDisplay}** by ${countryFlag} **${wr.playerName}**${filterText}`)
-                    .addFields(
-                        { name: "Time", value: wr.finishTimeDisplay || "N/A", inline: true },
-                        { name: "Fastest Lap", value: wr.fastestLapDisplay || "N/A", inline: true },
-                        { name: "Categories", value: badges, inline: true },
-                        { name: "Setup", value: `${wr.characterName || "Unknown"} + ${wr.vehicleName || "Unknown"}`, inline: true },
-                        { name: "Controller", value: wr.controllerName || "Unknown", inline: true },
-                        { name: "Drift", value: driftInfo, inline: true },
-                        { name: "Date Set", value: `<t:${Math.floor(dateSet.getTime() / 1000)}:D>`, inline: true },
-                        { name: "\u200B", value: "\u200B", inline: true },
-                        { name: "\u200B", value: "\u200B", inline: true }
-                    )
-                    .setTimestamp()
-                    .setFooter({ text: `Submission ID: ${wr.id}` });
+            const embed = new EmbedBuilder()
+                .setColor(0xffd700)
+                .setTitle(`🏆 Best Known Time: ${wr.trackName}`)
+                .setDescription(`**${wr.finishTimeDisplay}** by ${countryFlag} **${wr.playerName}**${filterText}`)
+                .addFields(
+                    { name: "Time", value: wr.finishTimeDisplay || "N/A", inline: true },
+                    { name: "Fastest Lap", value: wr.fastestLapDisplay || "N/A", inline: true },
+                    { name: "Categories", value: badges, inline: true },
+                    { name: "Setup", value: `${wr.characterName || "Unknown"} + ${wr.vehicleName || "Unknown"}`, inline: true },
+                    { name: "Controller", value: wr.controllerName || "Unknown", inline: true },
+                    { name: "Drift", value: driftInfo, inline: true },
+                    { name: "Date Set", value: `<t:${Math.floor(dateSet.getTime() / 1000)}:D>`, inline: true },
+                    { name: "\u200B", value: "\u200B", inline: true },
+                    { name: "\u200B", value: "\u200B", inline: true }
+                )
+                .setTimestamp()
+                .setFooter({ text: `Submission ID: ${wr.id}` });
 
-                if (wr.lapSplitsDisplay && wr.lapSplitsDisplay.length > 0) {
-                    const lapSplits = wr.lapSplitsDisplay
-                        .map((time: string, index: number) => `Lap ${index + 1}: ${time}`)
-                        .join("\n");
-                    embed.addFields({ name: "Lap Splits", value: lapSplits, inline: false });
-                }
-
-                await interaction.editReply({ embeds: [embed] });
-            } else if (response.status === 404) {
-                await interaction.editReply({
-                    content: "No times found matching the specified filters"
-                });
-            } else {
-                const errorText = await response.text();
-                let errorMessage: string;
-                try {
-                    const errorData = JSON.parse(errorText);
-                    errorMessage = errorData.message || errorData.title || response.statusText;
-                } catch {
-                    errorMessage = errorText || response.statusText;
-                }
-
-                await interaction.editReply({
-                    content: `Failed to fetch BKT: ${errorMessage}`
-                });
+            if (wr.lapSplitsDisplay && wr.lapSplitsDisplay.length > 0) {
+                const lapSplits = wr.lapSplitsDisplay
+                    .map((time: string, index: number) => `Lap ${index + 1}: ${time}`)
+                    .join("\n");
+                embed.addFields({ name: "Lap Splits", value: lapSplits, inline: false });
             }
-        } catch (error) {
-            console.error("Error fetching BKT:", error);
+
+            await interaction.editReply({ embeds: [embed] });
+        } else if (response.status == 404) {
             await interaction.editReply({
-                content: "Network error while fetching BKT"
+                content: "No times found matching the specified filters"
+            });
+        } else {
+            const errorText = await response.text();
+            let errorMessage: string;
+            try {
+                const errorData = JSON.parse(errorText) as ErrorResponse;
+                errorMessage = errorData.message || errorData.title || response.statusText;
+            } catch {
+                errorMessage = errorText || response.statusText;
+            }
+
+            await interaction.editReply({
+                content: `Failed to fetch BKT: ${errorMessage}`
             });
         }
     }
