@@ -252,6 +252,9 @@ async function list(interaction: ChatInputCommandInteraction<CacheType>) {
             value += "\n";
         }
 
+        if (value.length >= 1024)
+            value = "Hashes too long to display...";
+
         embed.addFields({ name: `${packIDToName(packID)}/${fmtHex(packID)}`, value: value });
     }
 
