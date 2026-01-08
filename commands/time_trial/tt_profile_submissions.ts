@@ -1,6 +1,5 @@
 import { AutocompleteInteraction, CacheType, ChatInputCommandInteraction, EmbedBuilder, SlashCommandBuilder } from "discord.js";
 import { getConfig } from "../../config.js";
-import { resolveModRestrictPermission } from "../../utils.js";
 import { handleProfileAutocomplete } from "./tt_utils.js";
 
 const config = getConfig();
@@ -44,8 +43,7 @@ export default {
             .setDescription("Number of submissions to show (default: 10)")
             .setRequired(false)
             .setMinValue(1)
-            .setMaxValue(25))
-        .setDefaultMemberPermissions(resolveModRestrictPermission()),
+            .setMaxValue(25)),
 
     autocomplete: async function(interaction: AutocompleteInteraction) {
         const focusedOption = interaction.options.getFocused(true);

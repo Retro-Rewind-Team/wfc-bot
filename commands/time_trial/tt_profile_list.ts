@@ -2,7 +2,6 @@ import { ActionRowBuilder, APIMessageTopLevelComponent, ButtonBuilder, ButtonInt
 import { getConfig } from "../../config.js";
 import { Dictionary } from "../../dictionary.js";
 import { registerButtonHandlerByMessageID } from "../../index.js";
-import { resolveModRestrictPermission } from "../../utils.js";
 
 const config = getConfig();
 const PROFILES_PER_PAGE = 10;
@@ -54,8 +53,7 @@ export default {
 
     data: new SlashCommandBuilder()
         .setName("tt_profile_list")
-        .setDescription("List all Time Trial profiles")
-        .setDefaultMemberPermissions(resolveModRestrictPermission()),
+        .setDescription("List all Time Trial profiles"),
 
     exec: async function(interaction: ChatInputCommandInteraction<CacheType>) {
         await interaction.deferReply();

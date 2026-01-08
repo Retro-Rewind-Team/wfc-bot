@@ -1,6 +1,5 @@
 import { CacheType, ChatInputCommandInteraction, EmbedBuilder, SlashCommandBuilder } from "discord.js";
 import { getConfig } from "../../config.js";
-import { resolveModRestrictPermission } from "../../utils.js";
 
 const config = getConfig();
 
@@ -19,8 +18,7 @@ export default {
         .addIntegerOption(option => option
             .setName("submission_id")
             .setDescription("The submission ID to delete")
-            .setRequired(true))
-        .setDefaultMemberPermissions(resolveModRestrictPermission()),
+            .setRequired(true)),
 
     exec: async function(interaction: ChatInputCommandInteraction<CacheType>) {
         const submissionId = interaction.options.getInteger("submission_id", true);

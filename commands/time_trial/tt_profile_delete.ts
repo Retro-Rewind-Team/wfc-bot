@@ -1,6 +1,5 @@
 import { AutocompleteInteraction, CacheType, ChatInputCommandInteraction, EmbedBuilder, SlashCommandBuilder } from "discord.js";
 import { getConfig } from "../../config.js";
-import { resolveModRestrictPermission } from "../../utils.js";
 import { handleProfileAutocomplete } from "./tt_utils.js";
 
 const config = getConfig();
@@ -21,8 +20,7 @@ export default {
             .setName("profile")
             .setDescription("Profile to delete")
             .setRequired(true)
-            .setAutocomplete(true))
-        .setDefaultMemberPermissions(resolveModRestrictPermission()),
+            .setAutocomplete(true)),
 
     autocomplete: async function(interaction: AutocompleteInteraction) {
         const focusedOption = interaction.options.getFocused(true);

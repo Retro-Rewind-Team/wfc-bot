@@ -1,6 +1,5 @@
 import { AutocompleteInteraction, CacheType, ChatInputCommandInteraction, EmbedBuilder, SlashCommandBuilder } from "discord.js";
 import { getConfig } from "../../config.js";
-import { resolveModRestrictPermission } from "../../utils.js";
 import { handleTrackAutocomplete } from "./tt_utils.js";
 
 const config = getConfig();
@@ -88,8 +87,7 @@ export default {
                 { name: "All drift categories", value: "all" },
                 { name: "Inside drift only", value: "inside" },
                 { name: "Outside drift only", value: "outside" }
-            ))
-        .setDefaultMemberPermissions(resolveModRestrictPermission()),
+            )),
 
     autocomplete: async function(interaction: AutocompleteInteraction) {
         const focusedOption = interaction.options.getFocused(true);

@@ -1,6 +1,5 @@
 import { AutocompleteInteraction, CacheType, ChatInputCommandInteraction, EmbedBuilder, SlashCommandBuilder } from "discord.js";
 import { getConfig } from "../../config.js";
-import { resolveModRestrictPermission } from "../../utils.js";
 import { handleCountryAutocomplete, handleProfileAutocomplete } from "./tt_utils.js";
 
 const config = getConfig();
@@ -47,8 +46,7 @@ export default {
             .setName("country")
             .setDescription("New country (optional)")
             .setRequired(false)
-            .setAutocomplete(true))
-        .setDefaultMemberPermissions(resolveModRestrictPermission()),
+            .setAutocomplete(true)),
 
     autocomplete: async function(interaction: AutocompleteInteraction) {
         const focusedOption = interaction.options.getFocused(true);

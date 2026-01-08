@@ -1,6 +1,5 @@
 import { AutocompleteInteraction, CacheType, ChatInputCommandInteraction, EmbedBuilder, SlashCommandBuilder } from "discord.js";
 import { getConfig } from "../../config.js";
-import { resolveModRestrictPermission } from "../../utils.js";
 import { handleProfileAutocomplete, handleTrackAutocomplete } from "./tt_utils.js";
 
 const config = getConfig();
@@ -74,8 +73,7 @@ export default {
         .addBooleanOption(option => option
             .setName("glitch")
             .setDescription("Glitch/shortcut run")
-            .setRequired(false))
-        .setDefaultMemberPermissions(resolveModRestrictPermission()),
+            .setRequired(false)),
 
     autocomplete: async function(interaction: AutocompleteInteraction) {
         const focusedOption = interaction.options.getFocused(true);
