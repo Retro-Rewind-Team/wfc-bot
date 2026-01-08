@@ -88,27 +88,33 @@ client.once(Events.ClientReady, async function(readyClient) {
 client.login(config["token"]);
 
 // TODO: Make this function not suck?
-function isAllowedInteraction(interaction: ChatInputCommandInteraction<CacheType>, modOnly: boolean, adminOnly: boolean) {
+function isAllowedInteraction(interaction: ChatInputCommandInteraction<CacheType>, command: Command) {
     config = getConfig();
 
     const err: string[] = [];
 
-    let user = true;
+    let allowed = true;
 
-    if (adminOnly && !config.allowedAdmins.includes(interaction.user.id)) {
+    if (command.adminOnly && !config.allowedAdmins.includes(interaction.user.id)) {
         err.push("not an admin");
-        user = false;
+        allowed = false;
     }
 
-    if (modOnly && !config.allowedModerators.includes(interaction.user.id)) {
+    if (command.modOnly && !config.allowedModerators.includes(interaction.user.id)) {
         err.push("not a moderator");
-        user = false;
+        allowed = false;
     }
 
-    return [user, err.join(", ")];
+    if (command.bktOnly && !config.allowedBKTUpdaters.includes(interaction.user.id)) {
+        err.push("not a bkt updater");
+        allowed = false;
+    }
+
+    return [allowed, err.join(", ")];
 }
 
 interface Command {
+    bktOnly: boolean,
     modOnly: boolean,
     adminOnly: boolean,
     data: SlashCommandOptionsOnlyBuilder,
@@ -135,6 +141,16 @@ async function resolveCommands(files: string[], callback: (_: Dictionary<Command
                 console.error(`Failed to run init for spec ${file}, ${e}`);
             }
         }
+
+        // Set default permissions
+        if (!("adminOnly" in spec))
+            spec.adminOnly = true;
+
+        if (!("modOnly" in spec))
+            spec.modOnly = false;
+
+        if (!("bktOnly" in spec))
+            spec.bktOnly = false;
 
         if ("data" in spec && "exec" in spec) {
             const name = path.basename(file, ".js");
@@ -179,7 +195,7 @@ async function handleCommand(interaction: ChatInputCommandInteraction<CacheType>
                 continue;
 
             const command = commands[cname];
-            const [allowed, err] = isAllowedInteraction(interaction, command.modOnly, command.adminOnly);
+            const [allowed, err] = isAllowedInteraction(interaction, command);
             if (!allowed) {
                 await interaction.reply({ content: `Command ${cname} is not allowed! Error: ${err}` });
                 return;

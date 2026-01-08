@@ -13,6 +13,7 @@ export interface Config {
     adminServers: string[]
     allowedAdmins: string[]
     allowedModerators: string[]
+    allowedBKTUpdaters: string[]
     logsChannel: string
     publicLogsChannel: string
     packOwnersLogsChannel: string
@@ -78,6 +79,9 @@ export function initConfig(path: string) {
                     "Allow user ids here."
                 ],
                 allowedModerators: [
+                    "Allow user ids here."
+                ],
+                allowedBKTUpdaters: [
                     "Allow user ids here."
                 ],
                 logsChannel: "Channel id to send successful moderative actions to.",

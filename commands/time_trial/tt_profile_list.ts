@@ -48,7 +48,8 @@ const lastButton = new ButtonBuilder()
     .setStyle(ButtonStyle.Primary);
 
 export default {
-    modOnly: true,
+    bktOnly: true,
+    modOnly: false,
     adminOnly: false,
 
     data: new SlashCommandBuilder()

@@ -10,7 +10,8 @@ interface DeleteProfileResponse {
 }
 
 export default {
-    modOnly: true,
+    bktOnly: true,
+    modOnly: false,
     adminOnly: false,
 
     data: new SlashCommandBuilder()
