@@ -1,4 +1,4 @@
-import { CacheType, ChatInputCommandInteraction, EmbedBuilder, GuildMember, PermissionFlagsBits, SlashCommandBuilder, User } from "discord.js";
+import { CacheType, ChatInputCommandInteraction, EmbedBuilder, GuildMember, MessageFlags, PermissionFlagsBits, SlashCommandBuilder, User } from "discord.js";
 import { getChannels, getConfig, setConfig } from "../config.js";
 import { getColor } from "../utils.js";
 
@@ -38,6 +38,8 @@ export default {
             .addUserOption(option => option.setName("user")
                 .setDescription("The user to remove as a moderator")
                 .setRequired(true)))
+        .addSubcommand(subcommand => subcommand.setName("list")
+            .setDescription("List moderators"))
         .setDefaultMemberPermissions(PermissionFlagsBits.Administrator),
 
     exec: async function(interaction: ChatInputCommandInteraction<CacheType>) {
@@ -47,7 +49,8 @@ export default {
         if (!config.allowedModerators)
             config.allowedModerators = [];
 
-        if (subcommand === "add") {
+        switch (subcommand) {
+        case "add": {
             if (!config.allowedModerators.includes(user.id)) {
                 config.allowedModerators.push(user.id);
 
@@ -58,8 +61,10 @@ export default {
             }
             else
                 await interaction.reply({ content: `User ${user.tag} is already a moderator.` });
+
+            break;
         }
-        else if (subcommand === "remove") {
+        case "remove": {
             const index = config.allowedModerators.indexOf(user.id);
 
             if (index > -1) {
@@ -73,6 +78,23 @@ export default {
             }
             else
                 await interaction.reply({ content: `User ${user.tag} is not a moderator.` });
+
+            break;
+        }
+        case "list": {
+            const uids = Object.values(config.allowedModerators);
+
+            let content = uids.map((uid) => `<@${uid}>`).join("\n");
+            if (content.length == 0)
+                content = "No moderators are set!";
+
+            await interaction.reply({
+                content: content,
+                flags: MessageFlags.Ephemeral
+            });
+
+            break;
+        }
         }
     }
 };
