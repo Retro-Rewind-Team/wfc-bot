@@ -58,14 +58,6 @@ export default {
                 { name: "150cc", value: 150 },
                 { name: "200cc", value: 200 }
             ))
-        .addIntegerOption(option => option
-            .setName("drift_category")
-            .setDescription("Drift category")
-            .setRequired(true)
-            .addChoices(
-                { name: "Outside", value: 0 },
-                { name: "Inside", value: 1 }
-            ))
         .addBooleanOption(option => option
             .setName("shroomless")
             .setDescription("Shroomless run")
@@ -89,7 +81,6 @@ export default {
         const trackId = interaction.options.getString("track", true);
         const profileId = interaction.options.getString("profile", true);
         const cc = interaction.options.getInteger("cc", true);
-        const driftCategory = interaction.options.getInteger("drift_category", true);
         const shroomless = interaction.options.getBoolean("shroomless") ?? false;
         const glitch = interaction.options.getBoolean("glitch") ?? false;
 
@@ -120,7 +111,6 @@ export default {
         formData.append("trackId", trackId);
         formData.append("ttProfileId", profileId);
         formData.append("cc", cc.toString());
-        formData.append("driftCategory", driftCategory.toString());
         formData.append("shroomless", shroomless.toString());
         formData.append("glitch", glitch.toString());
 
