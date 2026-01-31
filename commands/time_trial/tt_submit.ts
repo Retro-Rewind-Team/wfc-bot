@@ -133,8 +133,11 @@ export default {
             const driftTypeWithCategory = `${submission.driftTypeName} ${driftCategoryName}`;
 
             let badges = `\`${ccBadge}\``;
-            if (submission.shroomless) badges += " `Shroomless`";
-            if (submission.glitch) badges += " `Glitch`";
+            if (submission.shroomless)
+                badges += " `Shroomless`";
+
+            if (submission.glitch)
+                badges += " `Glitch`";
 
             const embed = new EmbedBuilder()
                 .setColor(0x00ff00)
