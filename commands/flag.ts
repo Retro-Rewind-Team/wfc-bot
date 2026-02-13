@@ -14,11 +14,15 @@ export default {
         .addStringOption(option => option.setName("id")
             .setDescription("friend code or pid to flag")
             .setRequired(true))
+        .addStringOption(option => option.setName("reason")
+            .setDescription("reason for flagging this user")
+            .setRequired(true))
         .setDefaultMemberPermissions(resolveModRestrictPermission()),
 
     exec: async function(interaction: ChatInputCommandInteraction<CacheType>) {
         let id = interaction.options.getString("id", true);
         id = id.trim();
+        const reason = interaction.options.getString("reason", true);
 
         const [valid, err] = validateID(id);
         if (!valid) {
@@ -41,7 +45,8 @@ export default {
                 },
                 body: JSON.stringify({
                     pid: pid.toString(),
-                    moderator: moderator
+                    moderator: moderator,
+                    reason: reason
                 })
             });
 
@@ -49,7 +54,7 @@ export default {
                 await interaction.reply({
                     content: `Successfully flagged player with friend code "${fc}" as suspicious.`
                 });
-                console.log(`Successfully flagged player ${pid}`);
+                console.log(`Successfully flagged player ${pid} for reason: ${reason}`);
             }
             else {
                 const errorText = await leaderboardResponse.text();
