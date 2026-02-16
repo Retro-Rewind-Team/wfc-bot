@@ -48,22 +48,14 @@ export function getGroups() {
     return groups;
 }
 
-// const fetchGroupsUrl = `http://${config.wfcServer}:${config.wfcPort}/api/groups`;  // change this back
-const fetchGroupsUrl = `https://status.rwfc.net/groups`;  // todo change this back
+const fetchGroupsUrl = `http://${config.wfcServer}:${config.wfcPort}/api/groups`;
 
 async function fetchGroups() {
-    // todo change this back too since the api used in the code is different, but i dont have access to it
-    const apiResponse = await utils.queryJson(fetchGroupsUrl);
-    // const groupsJson = (await utils.queryJson(fetchGroupsUrl)) ?? utils.throwInline("Empty or no json response from groups api.");
-    if (!apiResponse || !apiResponse.rooms) {
-        if (config.logServices) console.error("invalid api response")
-        return;
-    }
-    // groups = { timestamp: Date.now(), rooms: groupsJson };
-    groups = { timestamp: apiResponse.timestamp || Date.now(), rooms: apiResponse.rooms };
+    const groupsJson = (await utils.queryJson(fetchGroupsUrl)) ?? utils.throwInline("Empty or no json response from groups api.");
+    groups = { timestamp: Date.now(), rooms: groupsJson };
 
     if (config.logServices)
-        console.log(`Successfully fetched groups! Time is ${new Date(Date.now())}.\n fetched ${groups.rooms.length} rooms`);
+        console.log(`Successfully fetched groups! Time is ${new Date(Date.now())}. fetched ${groups.rooms.length} rooms`);
 
     await sendPings();
     return;
