@@ -37,7 +37,9 @@ async function fetchNewPlayers() {
             if (!matches || matches.length < 1)
                 continue;
 
-            if (Number.parseInt(matches[0].slice(0, 2)) < 5)
+            const leading2: number = Number.parseInt(matches[0].slice(0, 2));
+
+            if (leading2 >= 4 && leading2 < 10)
                 ping = true;
         }
     }
