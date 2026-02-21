@@ -33,6 +33,7 @@ export interface Group {
     host: string,
     rk: string,
     players: Dictionary<Player>,
+    averageVR?: number,  // fetched from the api
 }
 
 interface Groups {
@@ -54,7 +55,7 @@ async function fetchGroups() {
     groups = { timestamp: Date.now(), rooms: groupsJson };
 
     if (config.logServices)
-        console.log(`Successfully fetched groups! Time is ${new Date(Date.now())}`);
+        console.log(`Successfully fetched groups! Time is ${new Date(Date.now())}. fetched ${groups.rooms.length} rooms`);
 
     await sendPings();
     return;
@@ -75,8 +76,16 @@ async function sendPings() {
         }
 
         const groupName = config.roomTypeNameMap[group.rk] ?? group.rk;
-        // Guaranteed to exist, otherwise the message would not exist
-        const groupPing = config.roomPingRoles[group.rk];
+        const playerCount = Object.keys(group.players).length;
+        const isHighVR = group.averageVR && group.averageVR >= config.highVrThreshold;
+        const isSweatyRoom = isHighVR && playerCount > 5;
+
+        let groupPing = config.roomPingRoles[group.rk];
+        if (isSweatyRoom && config.highVrPingRole) {
+            groupPing = config.highVrPingRole;
+        }
+
+        const roleMention = groupPing ? `<@&${groupPing}>,` : `Room Update:`;
 
         // Delete the room
         if (!groupsContains(groups!.rooms, group)) {
@@ -98,9 +107,15 @@ async function sendPings() {
         }
 
         // Otherwise, update the room.
-        const playerCount = Object.keys(group.players).length;
+        const highVRDisplay = isSweatyRoom ? ` and **${group.averageVR}** Avg VR` : "";
+        let roomMessageUpdate = ""
+        if (roleMention == "Room Update:") {
+            roomMessageUpdate = `${roleMention} ${aOrAn(groupName)} ${groupName} room (${group.id}) is open, but is not considered high VR anymore.`
+        } else {
+            roomMessageUpdate = `${roleMention} ${aOrAn(groupName)} ${groupName} room (${group.id}) is open with ${playerCount} ${utils.plural(playerCount, "player")}${highVRDisplay}!`
+        }
         const message = await roomMessage.edit(
-            `<@&${groupPing}>, ${aOrAn(groupName)} ${groupName} room (${group.id}) is open with ${playerCount} ${utils.plural(playerCount, "player")}!`
+            roomMessageUpdate
         );
 
         if (!message)
@@ -127,16 +142,36 @@ async function sendPings() {
         }
 
         const groupName = config.roomTypeNameMap[group.rk] ?? group.rk;
-        const groupPing = config.roomPingRoles[group.rk];
+        let groupPing = config.roomPingRoles[group.rk];
 
-        if (!groupPing) {
+        const high_vr_threshold = config.highVrThreshold;
+        const isHighVR = group.averageVR && group.averageVR >= high_vr_threshold;
+        const playerCount = Object.keys(group.players).length;
+        let isSweatyRoom = false;
+        if (isHighVR && playerCount > 10) {
+            isSweatyRoom = true;
+        } else if (isHighVR && playerCount < 11) {
+            console.log(`Skipping high vr room ${group.id} with low player count ${playerCount}`);
+        }
+
+        if (isSweatyRoom && config.highVrPingRole) {
+            // set groupPing to high vr role regardless of mode, but only if the room is above threshhold and has enough players.
+            groupPing = config.highVrPingRole;
+        }
+
+
+        if (!groupPing) {  // room is not in the pingable roles and is not sweaty (high vr & 6+ players)
             if (config.logServices)
                 console.error(`No role has been configured to alert for rooms of type ${group.rk}, for room ${group.id}`);
 
             continue;
         }
 
-        const content = `<@&${groupPing}>, ${aOrAn(groupName)} ${groupName} room (${group.id}) has opened!`;
+        let content = `<@&${groupPing}>, ${aOrAn(groupName)} ${groupName} room (${group.id}) has opened!`;
+
+        if (isSweatyRoom) {
+            content = `<@&${groupPing}>, ${aOrAn(groupName)} ${groupName} room (${group.id}) with ${group.averageVR} VR and ${playerCount} players has opened!`;
+        }
 
         if (config.logServices)
             console.log(`Sending message ${content}`);
