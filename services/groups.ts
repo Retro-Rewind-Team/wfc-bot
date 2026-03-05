@@ -33,7 +33,7 @@ export interface Group {
     host: string,
     rk: string,
     players: Dictionary<Player>,
-    averageVR?: number,  // fetched from the api
+    averageVR: number,
 }
 
 interface Groups {
@@ -57,6 +57,15 @@ async function fetchGroups() {
     if (config.logServices)
         console.log(`Successfully fetched groups! Time is ${new Date(Date.now())}. fetched ${groups.rooms.length} rooms`);
 
+    for (const room of groups.rooms) {
+        let totalVR = 0;
+
+        for (const player of Object.values(room.players))
+            totalVR += Number(player.ev);
+
+        room.averageVR = Math.floor(totalVR / Object.keys(room.players).length);
+    }
+
     await sendPings();
     return;
 }
@@ -77,15 +86,14 @@ async function sendPings() {
 
         const groupName = config.roomTypeNameMap[group.rk] ?? group.rk;
         const playerCount = Object.keys(group.players).length;
-        const isHighVR = group.averageVR && group.averageVR >= config.highVrThreshold;
+        const isHighVR = group.averageVR && group.averageVR >= config.highVRMinVR;
         const isSweatyRoom = isHighVR && playerCount > 5;
 
         let groupPing = config.roomPingRoles[group.rk];
-        if (isSweatyRoom && config.highVrPingRole) {
-            groupPing = config.highVrPingRole;
-        }
+        if (isSweatyRoom && config.highVRPingRole)
+            groupPing = config.highVRPingRole;
 
-        const roleMention = groupPing ? `<@&${groupPing}>,` : `Room Update:`;
+        const roleMention = groupPing ? `<@&${groupPing}>,` : "Room Update:";
 
         // Delete the room
         if (!groupsContains(groups!.rooms, group)) {
@@ -108,12 +116,12 @@ async function sendPings() {
 
         // Otherwise, update the room.
         const highVRDisplay = isSweatyRoom ? ` and **${group.averageVR}** Avg VR` : "";
-        let roomMessageUpdate = ""
-        if (roleMention == "Room Update:") {
-            roomMessageUpdate = `${roleMention} ${aOrAn(groupName)} ${groupName} room (${group.id}) is open, but is not considered high VR anymore.`
-        } else {
-            roomMessageUpdate = `${roleMention} ${aOrAn(groupName)} ${groupName} room (${group.id}) is open with ${playerCount} ${utils.plural(playerCount, "player")}${highVRDisplay}!`
-        }
+        let roomMessageUpdate = "";
+        if (roleMention == "Room Update:")
+            roomMessageUpdate = `${roleMention} ${aOrAn(groupName)} ${groupName} room (${group.id}) is open, but is not considered high VR anymore.`;
+        else
+            roomMessageUpdate = `${roleMention} ${aOrAn(groupName)} ${groupName} room (${group.id}) is open with ${playerCount} ${utils.plural(playerCount, "player")}${highVRDisplay}!`;
+
         const message = await roomMessage.edit(
             roomMessageUpdate
         );
@@ -144,21 +152,24 @@ async function sendPings() {
         const groupName = config.roomTypeNameMap[group.rk] ?? group.rk;
         let groupPing = config.roomPingRoles[group.rk];
 
-        const high_vr_threshold = config.highVrThreshold;
-        const isHighVR = group.averageVR && group.averageVR >= high_vr_threshold;
+        const isHighVR = group.averageVR >= config.highVRMinVR;
         const playerCount = Object.keys(group.players).length;
-        let isSweatyRoom = false;
-        if (isHighVR && playerCount > 10) {
-            isSweatyRoom = true;
-        } else if (isHighVR && playerCount < 11) {
+        const isSweatyRoom = isHighVR && playerCount >= config.highVRMinPlayers;
+
+        if (isHighVR && !isSweatyRoom)
             console.log(`Skipping high vr room ${group.id} with low player count ${playerCount}`);
-        }
 
-        if (isSweatyRoom && config.highVrPingRole) {
+        if (isSweatyRoom) {
             // set groupPing to high vr role regardless of mode, but only if the room is above threshhold and has enough players.
-            groupPing = config.highVrPingRole;
-        }
+            groupPing = config.highVRPingRole;
 
+            if (!groupPing) {
+                if (config.logServices)
+                    console.error(`No role has been configured to alert for high Vr rooms, for room ${group.id}`);
+
+                continue;
+            }
+        }
 
         if (!groupPing) {  // room is not in the pingable roles and is not sweaty (high vr & 6+ players)
             if (config.logServices)
@@ -169,9 +180,8 @@ async function sendPings() {
 
         let content = `<@&${groupPing}>, ${aOrAn(groupName)} ${groupName} room (${group.id}) has opened!`;
 
-        if (isSweatyRoom) {
+        if (isSweatyRoom)
             content = `<@&${groupPing}>, ${aOrAn(groupName)} ${groupName} room (${group.id}) with ${group.averageVR} VR and ${playerCount} players has opened!`;
-        }
 
         if (config.logServices)
             console.log(`Sending message ${content}`);

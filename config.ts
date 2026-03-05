@@ -22,8 +22,9 @@ export interface Config {
     roomPingChannel: string,
     roomTypeNameMap: Dictionary<string>,
     roomPingRoles: Dictionary<string>,
-    highVrPingRole: string,
-    highVrThreshold: number,
+    highVRPingRole: string,
+    highVRMinVR: number,
+    highVRMinPlayers: number,
     modRestrictPerm: string
     friendbot: string
     packOwners: Dictionary<string[]>
@@ -94,8 +95,9 @@ export function initConfig(path: string) {
                 roomPingChannel: "Channel id to send room openings to.",
                 roomTypeNameMap: {},
                 roomPingRoles: {},
-                highVrPingRole: "Role ID for the high vr ping role",
-                highVrThreshold: 50000, // it's the threshold where if a room is above it the highVrPingRole will be pinged.
+                highVRPingRole: "Role ID for the high vr ping role",
+                highVRMinVR: 40000, // it's the threshold where if a room is above it the highVrPingRole will be pinged.
+                highVRMinPlayers: 6,
                 modRestrictPerm: "Permission used to restrict mod commands. See PermissionFlagsBits",
                 friendbot: "FC used to link discord accounts to WFC profiles.",
                 packOwners: {},
