@@ -53,10 +53,23 @@ export default {
                     return;
                 }
 
+                const reasonLines: string[] = [];
+                if (res.player.flagReason)
+                    reasonLines.push(`Flag Reason: ${res.player.flagReason}`);
+                if (res.player.unflagReason)
+                    reasonLines.push(`Last Unflag Reason: ${res.player.unflagReason}`);
+
+                const description = [
+                    `Friend Code: ${fc}`,
+                    `Total Suspicious Jumps: ${res.count}`,
+                    `Currently Flagged: ${res.player.isSuspicious ? "Yes" : "No"}`,
+                    ...reasonLines
+                ].join("\n");
+
                 const embed = new EmbedBuilder()
                     .setColor(getColor())
                     .setTitle(`Suspicious VR Jumps for ${res.player.name}`)
-                    .setDescription(`Friend Code: ${fc}\nTotal Suspicious Jumps: ${res.count}\nCurrently Flagged: ${res.player.isSuspicious ? "Yes" : "No"}`)
+                    .setDescription(description)
                     .setTimestamp();
 
                 const jumpsToShow = res.suspiciousJumps.slice(0, 25);
@@ -78,7 +91,6 @@ export default {
 
                 if (res.count > 25)
                     embed.setFooter({ text: `Showing 25 of ${res.count} suspicious jumps` });
-
 
                 await interaction.editReply({ embeds: [embed] });
             }
