@@ -46,7 +46,7 @@ export default {
             if (leaderboardResponse.ok) {
                 const res = await leaderboardResponse.json();
 
-                if (res.count === 0) {
+                if (res.count === 0 && !res.player.flagReason && !res.player.unflagReason) {
                     await interaction.editReply({
                         content: `No suspicious VR jumps found for player ${res.player.name} (${fc})`
                     });
@@ -89,8 +89,11 @@ export default {
                     });
                 }
 
-                if (res.count > 25)
+                if (res.count === 0) {
+                    embed.setFooter({ text: "No suspicious jumps detected" });
+                } else if (res.count > 25) {
                     embed.setFooter({ text: `Showing 25 of ${res.count} suspicious jumps` });
+                }
 
                 await interaction.editReply({ embeds: [embed] });
             }
