@@ -89,11 +89,11 @@ export default {
                     });
                 }
 
-                if (res.count === 0) {
+                if (res.count === 0)
                     embed.setFooter({ text: "No suspicious jumps detected" });
-                } else if (res.count > 25) {
+                else if (res.count > 25)
                     embed.setFooter({ text: `Showing 25 of ${res.count} suspicious jumps` });
-                }
+
 
                 await interaction.editReply({ embeds: [embed] });
             }
