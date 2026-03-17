@@ -221,22 +221,28 @@ export default {
         const appliedFilters: string[] = [];
         if (nonGlitchOnly)
             appliedFilters.push("Non-Glitch/Shortcut");
+
         if (shroomless == "only")
             appliedFilters.push("Shroomless Only");
-        if (shroomless == "exclude")
+        else if (shroomless == "exclude")
             appliedFilters.push("No Shroomless");
+
         if (vehicle == "bikes")
             appliedFilters.push("Bikes Only");
-        if (vehicle == "karts")
+        else if (vehicle == "karts")
             appliedFilters.push("Karts Only");
-        if (!isFlap && drift == "manual")
-            appliedFilters.push("Manual Drift");
-        if (!isFlap && drift == "hybrid")
-            appliedFilters.push("Hybrid Drift");
-        if (!isFlap && driftCategory == "inside")
-            appliedFilters.push("Inside Drift");
-        if (!isFlap && driftCategory == "outside")
-            appliedFilters.push("Outside Drift");
+
+        if (!isFlap) {
+            if (drift == "manual")
+                appliedFilters.push("Manual Drift");
+            else if (drift == "hybrid")
+                appliedFilters.push("Hybrid Drift");
+
+            if (driftCategory == "inside")
+                appliedFilters.push("Inside Drift");
+            else if (driftCategory == "outside")
+                appliedFilters.push("Outside Drift");
+        }
 
         const filterText = appliedFilters.length > 0
             ? `\n**Filters:** ${appliedFilters.join(", ")}`
