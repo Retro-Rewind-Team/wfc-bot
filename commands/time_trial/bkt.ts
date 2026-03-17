@@ -1,6 +1,6 @@
 import { AutocompleteInteraction, CacheType, ChatInputCommandInteraction, EmbedBuilder, SlashCommandBuilder } from "discord.js";
 import { getConfig } from "../../config.js";
-import { handleTrackAutocomplete, Track } from "./tt_utils.js";
+import { handleTrackAutocomplete } from "./tt_utils.js";
 
 const config = getConfig();
 
@@ -128,7 +128,7 @@ export default {
             return;
         }
 
-        const track = await trackResponse.json() as Track;
+        const track = await trackResponse.json() as { name: string };
 
         let submission: BKTResponse | null = null;
         let response: Response;
