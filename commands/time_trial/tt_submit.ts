@@ -145,7 +145,7 @@ export default {
             if (submission.glitch)
                 badges += " `Glitch`";
 
-            if (submission.isFlap) 
+            if (submission.isFlap)
                 badges += " `Flap Run`";
 
             const embed = new EmbedBuilder()

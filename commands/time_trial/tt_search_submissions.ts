@@ -97,13 +97,20 @@ export default {
         const limit = interaction.options.getInteger("limit") ?? 25;
 
         const params = new URLSearchParams();
-        if (profileId) params.append("ttProfileId", profileId);
-        if (trackId) params.append("trackId", trackId);
-        if (cc != null) params.append("cc", cc.toString());
-        if (driftCategory != null) params.append("driftCategory", driftCategory.toString());
-        if (glitch != null) params.append("glitch", glitch.toString());
-        if (shroomless != null) params.append("shroomless", shroomless.toString());
-        if (isFlap != null) params.append("isFlap", isFlap.toString());
+        if (profileId)
+            params.append("ttProfileId", profileId);
+        if (trackId)
+            params.append("trackId", trackId);
+        if (cc != null)
+            params.append("cc", cc.toString());
+        if (driftCategory != null)
+            params.append("driftCategory", driftCategory.toString());
+        if (glitch != null)
+            params.append("glitch", glitch.toString());
+        if (shroomless != null)
+            params.append("shroomless", shroomless.toString());
+        if (isFlap != null)
+            params.append("isFlap", isFlap.toString());
         params.append("limit", limit.toString());
 
         await interaction.deferReply();
@@ -134,9 +141,12 @@ export default {
                 const ccBadge = sub.cc == 150 ? "150cc" : "200cc";
                 const driftBadge = sub.driftCategory == 0 ? "Outside" : "Inside";
                 let badges = `\`${ccBadge}\` \`${driftBadge}\``;
-                if (sub.shroomless) badges += " `Shroomless`";
-                if (sub.glitch) badges += " `Glitch`";
-                if (sub.isFlap) badges += " `Flap Run`";
+                if (sub.shroomless)
+                    badges += " `Shroomless`";
+                if (sub.glitch)
+                    badges += " `Glitch`";
+                if (sub.isFlap)
+                    badges += " `Flap Run`";
 
                 const dateSet = new Date(sub.dateSet);
                 const timestamp = `<t:${Math.floor(dateSet.getTime() / 1000)}:R>`;

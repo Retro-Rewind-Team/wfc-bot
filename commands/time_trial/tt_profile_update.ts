@@ -74,8 +74,10 @@ export default {
 
         const leaderboardUrl = `http://${config.leaderboardServer}:${config.leaderboardPort}`;
         const body: UpdateProfileRequest = {};
-        if (displayName) body.displayName = displayName.trim();
-        if (countryCode) body.countryCode = parseInt(countryCode);
+        if (displayName)
+            body.displayName = displayName.trim();
+        if (countryCode)
+            body.countryCode = parseInt(countryCode);
 
         const response = await fetch(`${leaderboardUrl}/api/moderation/timetrial/profile/${profileId}`, {
             method: "PUT",

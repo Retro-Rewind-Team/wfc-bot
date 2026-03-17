@@ -24,5 +24,6 @@ export default tseslint.config({
         curly: ["error", "multi-or-nest"],
         "brace-style": ["error", "stroustrup"],
         "no-trailing-spaces": "error",
+        "nonblock-statement-body-position": ["error", "below"],
     },
 });

@@ -141,8 +141,10 @@ export default {
                 page: "1",
                 pageSize: "1"
             });
-            if (shroomless && shroomless !== "all") params.append("shroomless", shroomless);
-            if (vehicle && vehicle !== "all") params.append("vehicle", vehicle);
+            if (shroomless && shroomless !== "all")
+                params.append("shroomless", shroomless);
+            if (vehicle && vehicle !== "all")
+                params.append("vehicle", vehicle);
 
             response = await fetch(`${leaderboardUrl}/api/timetrial/leaderboard/flap?${params}`, {
                 method: "GET",
@@ -160,10 +162,14 @@ export default {
                 cc: cc.toString(),
                 nonGlitchOnly: nonGlitchOnly.toString()
             });
-            if (shroomless && shroomless !== "all") params.append("shroomless", shroomless);
-            if (vehicle && vehicle !== "all") params.append("vehicle", vehicle);
-            if (drift && drift !== "all") params.append("drift", drift);
-            if (driftCategory && driftCategory !== "all") params.append("driftCategory", driftCategory);
+            if (shroomless && shroomless !== "all")
+                params.append("shroomless", shroomless);
+            if (vehicle && vehicle !== "all")
+                params.append("vehicle", vehicle);
+            if (drift && drift !== "all")
+                params.append("drift", drift);
+            if (driftCategory && driftCategory !== "all")
+                params.append("driftCategory", driftCategory);
 
             response = await fetch(`${leaderboardUrl}/api/moderation/timetrial/bkt?${params}`, {
                 method: "GET",
@@ -207,19 +213,30 @@ export default {
         const countryFlag = submission.countryAlpha2 ? `:flag_${submission.countryAlpha2.toLowerCase()}:` : "🌐";
         const ccBadge = submission.cc == 150 ? "150cc" : "200cc";
         let badges = `\`${ccBadge}\``;
-        if (submission.shroomless) badges += " `Shroomless`";
-        if (submission.glitch) badges += " `Glitch`";
+        if (submission.shroomless)
+            badges += " `Shroomless`";
+        if (submission.glitch)
+            badges += " `Glitch`";
 
         const appliedFilters: string[] = [];
-        if (nonGlitchOnly) appliedFilters.push("Non-Glitch/Shortcut");
-        if (shroomless == "only") appliedFilters.push("Shroomless Only");
-        if (shroomless == "exclude") appliedFilters.push("No Shroomless");
-        if (vehicle == "bikes") appliedFilters.push("Bikes Only");
-        if (vehicle == "karts") appliedFilters.push("Karts Only");
-        if (!isFlap && drift == "manual") appliedFilters.push("Manual Drift");
-        if (!isFlap && drift == "hybrid") appliedFilters.push("Hybrid Drift");
-        if (!isFlap && driftCategory == "inside") appliedFilters.push("Inside Drift");
-        if (!isFlap && driftCategory == "outside") appliedFilters.push("Outside Drift");
+        if (nonGlitchOnly)
+            appliedFilters.push("Non-Glitch/Shortcut");
+        if (shroomless == "only")
+            appliedFilters.push("Shroomless Only");
+        if (shroomless == "exclude")
+            appliedFilters.push("No Shroomless");
+        if (vehicle == "bikes")
+            appliedFilters.push("Bikes Only");
+        if (vehicle == "karts")
+            appliedFilters.push("Karts Only");
+        if (!isFlap && drift == "manual")
+            appliedFilters.push("Manual Drift");
+        if (!isFlap && drift == "hybrid")
+            appliedFilters.push("Hybrid Drift");
+        if (!isFlap && driftCategory == "inside")
+            appliedFilters.push("Inside Drift");
+        if (!isFlap && driftCategory == "outside")
+            appliedFilters.push("Outside Drift");
 
         const filterText = appliedFilters.length > 0
             ? `\n**Filters:** ${appliedFilters.join(", ")}`

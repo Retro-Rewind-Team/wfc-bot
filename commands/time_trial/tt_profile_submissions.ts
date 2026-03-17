@@ -85,9 +85,12 @@ export default {
                 const ccBadge = sub.cc == 150 ? "150cc" : "200cc";
                 const driftBadge = sub.driftCategory == 0 ? "Outside" : "Inside";
                 let badges = `\`${ccBadge}\` \`${driftBadge}\``;
-                if (sub.shroomless) badges += " `Shroomless`";
-                if (sub.glitch) badges += " `Glitch`";
-                if (sub.isFlap) badges += " `Flap Run`";
+                if (sub.shroomless)
+                    badges += " `Shroomless`";
+                if (sub.glitch)
+                    badges += " `Glitch`";
+                if (sub.isFlap)
+                    badges += " `Flap Run`";
 
                 const dateSet = new Date(sub.dateSet);
                 const timestamp = `<t:${Math.floor(dateSet.getTime() / 1000)}:R>`;
