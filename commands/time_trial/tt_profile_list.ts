@@ -47,7 +47,6 @@ const lastButton = new ButtonBuilder()
     .setStyle(ButtonStyle.Primary);
 
 export default {
-    bktOnly: true,
     modOnly: false,
     adminOnly: false,
 

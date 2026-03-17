@@ -22,7 +22,6 @@ interface ErrorResponse {
 }
 
 export default {
-    bktOnly: true,
     modOnly: false,
     adminOnly: false,
 
