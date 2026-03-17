@@ -13,6 +13,7 @@ interface Submission {
     driftCategory: number;
     shroomless: boolean;
     glitch: boolean;
+    isFlap: boolean;
     countryAlpha2: string | null;
     dateSet: string;
 }
@@ -48,7 +49,6 @@ export default {
         const focusedOption = interaction.options.getFocused(true);
         if (focusedOption.name == "profile")
             await handleProfileAutocomplete(interaction);
-
     },
 
     exec: async function(interaction: ChatInputCommandInteraction<CacheType>) {
@@ -87,6 +87,7 @@ export default {
                 let badges = `\`${ccBadge}\` \`${driftBadge}\``;
                 if (sub.shroomless) badges += " `Shroomless`";
                 if (sub.glitch) badges += " `Glitch`";
+                if (sub.isFlap) badges += " `Flap Run`";
 
                 const dateSet = new Date(sub.dateSet);
                 const timestamp = `<t:${Math.floor(dateSet.getTime() / 1000)}:R>`;

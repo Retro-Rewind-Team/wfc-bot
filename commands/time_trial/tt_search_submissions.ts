@@ -13,6 +13,7 @@ interface Submission {
     driftCategory: number;
     shroomless: boolean;
     glitch: boolean;
+    isFlap: boolean;
     countryAlpha2: string | null;
     dateSet: string;
 }
@@ -66,6 +67,10 @@ export default {
             .setName("shroomless")
             .setDescription("Shroomless runs only (optional)")
             .setRequired(false))
+        .addBooleanOption(option => option
+            .setName("is_flap")
+            .setDescription("Filter by flap runs (optional)")
+            .setRequired(false))
         .addIntegerOption(option => option
             .setName("limit")
             .setDescription("Number of results (default: 25)")
@@ -79,7 +84,6 @@ export default {
             await handleProfileAutocomplete(interaction);
         else if (focusedOption.name == "track")
             await handleTrackAutocomplete(interaction);
-
     },
 
     exec: async function(interaction: ChatInputCommandInteraction<CacheType>) {
@@ -89,6 +93,7 @@ export default {
         const driftCategory = interaction.options.getInteger("drift_category");
         const glitch = interaction.options.getBoolean("glitch");
         const shroomless = interaction.options.getBoolean("shroomless");
+        const isFlap = interaction.options.getBoolean("is_flap");
         const limit = interaction.options.getInteger("limit") ?? 25;
 
         const params = new URLSearchParams();
@@ -98,6 +103,7 @@ export default {
         if (driftCategory != null) params.append("driftCategory", driftCategory.toString());
         if (glitch != null) params.append("glitch", glitch.toString());
         if (shroomless != null) params.append("shroomless", shroomless.toString());
+        if (isFlap != null) params.append("isFlap", isFlap.toString());
         params.append("limit", limit.toString());
 
         await interaction.deferReply();
@@ -124,12 +130,13 @@ export default {
                 .setTimestamp();
 
             submissions.forEach((sub: Submission) => {
-                const countryFlag = sub.countryAlpha2 ? `:flag_${sub.countryAlpha2.toLowerCase()}:` : "🌍";
+                const countryFlag = sub.countryAlpha2 ? `:flag_${sub.countryAlpha2.toLowerCase()}:` : "🌐";
                 const ccBadge = sub.cc == 150 ? "150cc" : "200cc";
                 const driftBadge = sub.driftCategory == 0 ? "Outside" : "Inside";
                 let badges = `\`${ccBadge}\` \`${driftBadge}\``;
                 if (sub.shroomless) badges += " `Shroomless`";
                 if (sub.glitch) badges += " `Glitch`";
+                if (sub.isFlap) badges += " `Flap Run`";
 
                 const dateSet = new Date(sub.dateSet);
                 const timestamp = `<t:${Math.floor(dateSet.getTime() / 1000)}:R>`;

@@ -1,6 +1,6 @@
 import { AutocompleteInteraction, CacheType, ChatInputCommandInteraction, EmbedBuilder, SlashCommandBuilder } from "discord.js";
 import { getConfig } from "../../config.js";
-import { handleTrackAutocomplete } from "./tt_utils.js";
+import { handleTrackAutocomplete, Track } from "./tt_utils.js";
 
 const config = getConfig();
 
@@ -13,6 +13,7 @@ interface BKTResponse {
     cc: number;
     shroomless: boolean;
     glitch: boolean;
+    isFlap: boolean;
     countryAlpha2: string;
     characterName: string;
     vehicleName: string;
@@ -21,6 +22,10 @@ interface BKTResponse {
     driftCategoryName: string;
     dateSet: string;
     lapSplitsDisplay?: string[];
+}
+
+interface FlapLeaderboardResponse {
+    submissions: BKTResponse[];
 }
 
 interface ErrorResponse {
@@ -34,7 +39,7 @@ export default {
 
     data: new SlashCommandBuilder()
         .setName("bkt")
-        .setDescription("Get the Best Known Time (World Record) for a track with optional filters")
+        .setDescription("Get the Best Known Time for a track, or the best Flap run with the flap option")
         .addStringOption(option => option
             .setName("track")
             .setDescription("Track")
@@ -51,6 +56,10 @@ export default {
         .addBooleanOption(option => option
             .setName("no_glitch")
             .setDescription("Only show non-glitch/shortcut runs (default: unrestricted)")
+            .setRequired(false))
+        .addBooleanOption(option => option
+            .setName("flap")
+            .setDescription("Show the best flap run instead of the best finish time (default: false)")
             .setRequired(false))
         .addStringOption(option => option
             .setName("shroomless")
@@ -72,7 +81,7 @@ export default {
             ))
         .addStringOption(option => option
             .setName("drift")
-            .setDescription("Filter by drift type")
+            .setDescription("Filter by drift type (regular BKT only)")
             .setRequired(false)
             .addChoices(
                 { name: "All drift types", value: "all" },
@@ -81,7 +90,7 @@ export default {
             ))
         .addStringOption(option => option
             .setName("drift_category")
-            .setDescription("Filter by drift category")
+            .setDescription("Filter by drift category (regular BKT only)")
             .setRequired(false)
             .addChoices(
                 { name: "All drift categories", value: "all" },
@@ -93,13 +102,13 @@ export default {
         const focusedOption = interaction.options.getFocused(true);
         if (focusedOption.name == "track")
             await handleTrackAutocomplete(interaction);
-
     },
 
     exec: async function(interaction: ChatInputCommandInteraction<CacheType>) {
         const trackId = parseInt(interaction.options.getString("track", true));
         const cc = interaction.options.getInteger("cc", true);
         const nonGlitchOnly = interaction.options.getBoolean("no_glitch") ?? false;
+        const isFlap = interaction.options.getBoolean("flap") ?? false;
         const shroomless = interaction.options.getString("shroomless");
         const vehicle = interaction.options.getString("vehicle");
         const drift = interaction.options.getString("drift");
@@ -109,105 +118,145 @@ export default {
 
         const leaderboardUrl = `http://${config.leaderboardServer}:${config.leaderboardPort}`;
 
-        const params = new URLSearchParams({
-            trackId: trackId.toString(),
-            cc: cc.toString(),
-            nonGlitchOnly: nonGlitchOnly.toString()
-        });
-
-        if (shroomless && shroomless != "all")
-            params.append("shroomless", shroomless);
-
-        if (vehicle && vehicle != "all")
-            params.append("vehicle", vehicle);
-
-        if (drift && drift != "all")
-            params.append("drift", drift);
-
-        if (driftCategory && driftCategory != "all")
-            params.append("driftCategory", driftCategory);
-
-
-        const response = await fetch(`${leaderboardUrl}/api/moderation/timetrial/bkt?${params}`, {
+        const trackResponse = await fetch(`${leaderboardUrl}/api/timetrial/tracks/${trackId}`, {
             method: "GET",
             headers: { "Authorization": `Bearer ${config.wfcSecret}` }
         });
 
-        if (response.ok) {
-            const wr = await response.json() as BKTResponse;
-
-            const countryFlag = wr.countryAlpha2 ? `:flag_${wr.countryAlpha2.toLowerCase()}:` : "🌐";
-            const ccBadge = wr.cc == 150 ? "150cc" : "200cc";
-
-            let badges = `\`${ccBadge}\``;
-            if (wr.shroomless) badges += " `Shroomless`";
-            if (wr.glitch) badges += " `Glitch`";
-
-            const appliedFilters: string[] = [];
-            if (nonGlitchOnly) appliedFilters.push("Non-Glitch/Shortcut");
-            if (shroomless == "only") appliedFilters.push("Shroomless Only");
-            if (shroomless == "exclude") appliedFilters.push("No Shroomless");
-            if (vehicle == "bikes") appliedFilters.push("Bikes Only");
-            if (vehicle == "karts") appliedFilters.push("Karts Only");
-            if (drift == "manual") appliedFilters.push("Manual Drift");
-            if (drift == "hybrid") appliedFilters.push("Hybrid Drift");
-            if (driftCategory == "inside") appliedFilters.push("Inside Drift");
-            if (driftCategory == "outside") appliedFilters.push("Outside Drift");
-
-            const filterText = appliedFilters.length > 0
-                ? `\n**Filters:** ${appliedFilters.join(", ")}`
-                : "";
-
-            const dateSet = new Date(wr.dateSet);
-
-            const driftInfo = `${wr.driftTypeName || "Unknown"} ${wr.driftCategoryName || ""}`.trim();
-
-            const embed = new EmbedBuilder()
-                .setColor(0xffd700)
-                .setTitle(`🏆 Best Known Time: ${wr.trackName}`)
-                .setDescription(`**${wr.finishTimeDisplay}** by ${countryFlag} **${wr.playerName}**${filterText}`)
-                .addFields(
-                    { name: "Time", value: wr.finishTimeDisplay || "N/A", inline: true },
-                    { name: "Fastest Lap", value: wr.fastestLapDisplay || "N/A", inline: true },
-                    { name: "Categories", value: badges, inline: true },
-                    { name: "Setup", value: `${wr.characterName || "Unknown"} + ${wr.vehicleName || "Unknown"}`, inline: true },
-                    { name: "Controller", value: wr.controllerName || "Unknown", inline: true },
-                    { name: "Drift", value: driftInfo, inline: true },
-                    { name: "Date Set", value: `<t:${Math.floor(dateSet.getTime() / 1000)}:D>`, inline: true },
-                    { name: "\u200B", value: "\u200B", inline: true },
-                    { name: "\u200B", value: "\u200B", inline: true }
-                )
-                .setTimestamp()
-                .setFooter({ text: `Submission ID: ${wr.id}` });
-
-            if (wr.lapSplitsDisplay && wr.lapSplitsDisplay.length > 0) {
-                const lapSplits = wr.lapSplitsDisplay
-                    .map((time: string, index: number) => `Lap ${index + 1}: ${time}`)
-                    .join("\n");
-                embed.addFields({ name: "Lap Splits", value: lapSplits, inline: false });
-            }
-
-            await interaction.editReply({ embeds: [embed] });
+        if (!trackResponse.ok) {
+            await interaction.editReply({ content: `Track with ID ${trackId} not found` });
+            return;
         }
-        else if (response.status == 404) {
-            await interaction.editReply({
-                content: "No times found matching the specified filters"
+
+        const track = await trackResponse.json() as Track;
+
+        let submission: BKTResponse | null = null;
+        let response: Response;
+
+        if (isFlap) {
+            const params = new URLSearchParams({
+                trackId: trackId.toString(),
+                cc: cc.toString(),
+                glitchAllowed: (!nonGlitchOnly).toString(),
+                page: "1",
+                pageSize: "1"
             });
+            if (shroomless && shroomless !== "all") params.append("shroomless", shroomless);
+            if (vehicle && vehicle !== "all") params.append("vehicle", vehicle);
+
+            response = await fetch(`${leaderboardUrl}/api/timetrial/leaderboard/flap?${params}`, {
+                method: "GET",
+                headers: { "Authorization": `Bearer ${config.wfcSecret}` }
+            });
+
+            if (response.ok) {
+                const data = await response.json() as FlapLeaderboardResponse;
+                submission = data.submissions?.[0] ?? null;
+            }
         }
         else {
-            const errorText = await response.text();
-            let errorMessage: string;
-            try {
-                const errorData = JSON.parse(errorText) as ErrorResponse;
-                errorMessage = errorData.message || errorData.title || response.statusText;
-            }
-            catch {
-                errorMessage = errorText || response.statusText;
-            }
-
-            await interaction.editReply({
-                content: `Failed to fetch BKT: ${errorMessage}`
+            const params = new URLSearchParams({
+                trackId: trackId.toString(),
+                cc: cc.toString(),
+                nonGlitchOnly: nonGlitchOnly.toString()
             });
+            if (shroomless && shroomless !== "all") params.append("shroomless", shroomless);
+            if (vehicle && vehicle !== "all") params.append("vehicle", vehicle);
+            if (drift && drift !== "all") params.append("drift", drift);
+            if (driftCategory && driftCategory !== "all") params.append("driftCategory", driftCategory);
+
+            response = await fetch(`${leaderboardUrl}/api/moderation/timetrial/bkt?${params}`, {
+                method: "GET",
+                headers: { "Authorization": `Bearer ${config.wfcSecret}` }
+            });
+
+            if (response.ok)
+                submission = await response.json() as BKTResponse;
         }
+
+        if (!response.ok) {
+            if (response.status == 404) {
+                const category = nonGlitchOnly ? "non-glitch/shortcut" : "unrestricted";
+                await interaction.editReply({
+                    content: `No ${isFlap ? "flap runs" : "times"} found for ${track.name} at ${cc}cc (${category})`
+                });
+            }
+            else {
+                const errorText = await response.text();
+                let errorMessage: string;
+                try {
+                    const errorData = JSON.parse(errorText) as ErrorResponse;
+                    errorMessage = errorData.message || errorData.title || response.statusText;
+                }
+                catch {
+                    errorMessage = errorText || response.statusText;
+                }
+                await interaction.editReply({ content: `Failed to fetch BKT: ${errorMessage}` });
+            }
+            return;
+        }
+
+        if (!submission) {
+            const category = nonGlitchOnly ? "non-glitch/shortcut" : "unrestricted";
+            await interaction.editReply({
+                content: `No ${isFlap ? "flap runs" : "times"} found for ${track.name} at ${cc}cc (${category})`
+            });
+            return;
+        }
+
+        const countryFlag = submission.countryAlpha2 ? `:flag_${submission.countryAlpha2.toLowerCase()}:` : "🌐";
+        const ccBadge = submission.cc == 150 ? "150cc" : "200cc";
+        let badges = `\`${ccBadge}\``;
+        if (submission.shroomless) badges += " `Shroomless`";
+        if (submission.glitch) badges += " `Glitch`";
+
+        const appliedFilters: string[] = [];
+        if (nonGlitchOnly) appliedFilters.push("Non-Glitch/Shortcut");
+        if (shroomless == "only") appliedFilters.push("Shroomless Only");
+        if (shroomless == "exclude") appliedFilters.push("No Shroomless");
+        if (vehicle == "bikes") appliedFilters.push("Bikes Only");
+        if (vehicle == "karts") appliedFilters.push("Karts Only");
+        if (!isFlap && drift == "manual") appliedFilters.push("Manual Drift");
+        if (!isFlap && drift == "hybrid") appliedFilters.push("Hybrid Drift");
+        if (!isFlap && driftCategory == "inside") appliedFilters.push("Inside Drift");
+        if (!isFlap && driftCategory == "outside") appliedFilters.push("Outside Drift");
+
+        const filterText = appliedFilters.length > 0
+            ? `\n**Filters:** ${appliedFilters.join(", ")}`
+            : "";
+
+        const driftInfo = `${submission.driftTypeName || "Unknown"} ${submission.driftCategoryName || ""}`.trim();
+        const dateSet = new Date(submission.dateSet);
+
+        const primaryTime = isFlap ? submission.fastestLapDisplay : submission.finishTimeDisplay;
+        const secondaryLabel = isFlap ? "Finish Time" : "Fastest Lap";
+        const secondaryTime = isFlap ? submission.finishTimeDisplay : submission.fastestLapDisplay;
+
+        const embed = new EmbedBuilder()
+            .setColor(isFlap ? 0xff8c00 : 0xffd700)
+            .setTitle(`${isFlap ? "⚡ Best Flap Run" : "🏆 Best Known Time"}: ${track.name}`)
+            .setDescription(`**${primaryTime}** by ${countryFlag} **${submission.playerName}**${filterText}`)
+            .addFields(
+                { name: isFlap ? "Fastest Lap" : "Time", value: primaryTime || "N/A", inline: true },
+                { name: secondaryLabel, value: secondaryTime || "N/A", inline: true },
+                { name: "Categories", value: badges, inline: true },
+                { name: "Setup", value: `${submission.characterName || "Unknown"} + ${submission.vehicleName || "Unknown"}`, inline: true },
+                { name: "Controller", value: submission.controllerName || "Unknown", inline: true },
+                { name: "Drift", value: driftInfo, inline: true },
+                { name: "Date Set", value: `<t:${Math.floor(dateSet.getTime() / 1000)}:D>`, inline: true },
+                { name: "\u200B", value: "\u200B", inline: true },
+                { name: "\u200B", value: "\u200B", inline: true }
+            )
+            .setTimestamp()
+            .setFooter({ text: `Submission ID: ${submission.id}` });
+
+        if (submission.lapSplitsDisplay && submission.lapSplitsDisplay.length > 0) {
+            const lapSplits = submission.lapSplitsDisplay
+                .map((time, index) => `Lap ${index + 1}: ${time}`)
+                .join("\n");
+            embed.addFields({ name: "Lap Splits", value: lapSplits, inline: false });
+        }
+
+        await interaction.editReply({ embeds: [embed] });
     }
 };

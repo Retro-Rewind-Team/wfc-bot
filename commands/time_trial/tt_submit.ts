@@ -15,6 +15,7 @@ interface SubmissionResponse {
         driftCategory: number;
         shroomless: boolean;
         glitch: boolean;
+        isFlap: boolean;
         countryAlpha2: string | null;
         characterName: string;
         vehicleName: string;
@@ -65,6 +66,10 @@ export default {
         .addBooleanOption(option => option
             .setName("glitch")
             .setDescription("Glitch/shortcut run")
+            .setRequired(false))
+        .addBooleanOption(option => option
+            .setName("is_flap")
+            .setDescription("Tag this run as a dedicated flap run (will not appear on regular leaderboard)")
             .setRequired(false)),
 
     autocomplete: async function(interaction: AutocompleteInteraction) {
@@ -73,7 +78,6 @@ export default {
             await handleTrackAutocomplete(interaction);
         else if (focusedOption.name == "profile")
             await handleProfileAutocomplete(interaction);
-
     },
 
     exec: async function(interaction: ChatInputCommandInteraction<CacheType>) {
@@ -83,6 +87,7 @@ export default {
         const cc = interaction.options.getInteger("cc", true);
         const shroomless = interaction.options.getBoolean("shroomless") ?? false;
         const glitch = interaction.options.getBoolean("glitch") ?? false;
+        const isFlap = interaction.options.getBoolean("is_flap") ?? false;
 
         if (!ghostFile.name.toLowerCase().endsWith(".rkg")) {
             await interaction.reply({
@@ -113,6 +118,7 @@ export default {
         formData.append("cc", cc.toString());
         formData.append("shroomless", shroomless.toString());
         formData.append("glitch", glitch.toString());
+        formData.append("isFlap", isFlap.toString());
 
         const leaderboardUrl = `http://${config.leaderboardServer}:${config.leaderboardPort}`;
         const response = await fetch(`${leaderboardUrl}/api/moderation/timetrial/submit`, {
@@ -139,13 +145,16 @@ export default {
             if (submission.glitch)
                 badges += " `Glitch`";
 
+            if (submission.isFlap) 
+                badges += " `Flap Run`";
+
             const embed = new EmbedBuilder()
-                .setColor(0x00ff00)
-                .setTitle("✅ Ghost Submitted")
-                .setDescription(`**${submission.trackName}** - ${submission.finishTimeDisplay}`)
+                .setColor(submission.isFlap ? 0xff8c00 : 0x00ff00)
+                .setTitle(submission.isFlap ? "⚡ Flap Run Submitted" : "✅ Ghost Submitted")
+                .setDescription(`**${submission.trackName}** - ${submission.isFlap ? submission.fastestLapDisplay : submission.finishTimeDisplay}`)
                 .addFields(
                     { name: "Player", value: `${countryFlag} ${submission.playerName}`, inline: true },
-                    { name: "Time", value: submission.finishTimeDisplay, inline: true },
+                    { name: "Finish Time", value: submission.finishTimeDisplay, inline: true },
                     { name: "Fastest Lap", value: submission.fastestLapDisplay || "N/A", inline: true },
                     { name: "Setup", value: `${submission.characterName} + ${submission.vehicleName}`, inline: true },
                     { name: "Controller", value: submission.controllerName, inline: true },
