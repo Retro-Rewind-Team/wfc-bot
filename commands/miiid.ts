@@ -58,9 +58,9 @@ export default {
             content: `Mii File: ${binaryAttachment.name}\n`
                 + `Mii Name: ${miiName}\n`
                 + `Creator: ${creatorName}\n`
-                + `MiiID: ${miiID}, ${miiID.toString(16)}, ${miiID.toString(2)}\n`
-                + `Mii TimeStamp: ${miiDate.toLocaleString()}\n`
-                + `SysID: ${sysID}, ${sysID.toString(16)}, ${sysID.toString(2)}`,
+                + `MiiID: ${miiID.toString(16)}\n`
+                + `SysID: ${sysID.toString(16)}\n`
+                + `Mii TimeStamp: ${miiDate.toLocaleString()}`,
             flags: MessageFlags.Ephemeral,
         });
     },
