@@ -26,8 +26,8 @@ const fetchStatsUrl = `http://${config.wfcServer}:${config.wfcPort}/api/stats`;
 async function fetchStats() {
     stats = await utils.queryJson(fetchStatsUrl)
         ?? utils.throwInline("Empty or no json response from stats api.");
-    const players = stats!.mariokartwii.active;
-    const rooms = stats!.mariokartwii.groups;
+    const players = stats?.mariokartwii?.active ?? 0;
+    const rooms = stats?.mariokartwii?.groups ?? 0;
 
     const presenceText =
         `${players} ${utils.plural(players, "player")} in ${rooms} ${utils.plural(rooms, "room")}!`;
