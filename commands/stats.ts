@@ -1,5 +1,5 @@
 import { CacheType, ChatInputCommandInteraction, EmbedBuilder, SlashCommandBuilder } from "discord.js";
-import { getColor, pidToFc, resolvePidFromString, validateID } from "../utils.js";
+import { getColor, getMiiImageURL, pidToFc, resolvePidFromString, validateID } from "../utils.js";
 import { getConfig } from "../config.js";
 
 const config = getConfig();
@@ -83,7 +83,7 @@ export default {
                 .setColor(stats.isSuspicious ? 0xff0000 : getColor())
                 .setTitle(`📊 Player Stats: ${stats.name || "Unknown"}`)
                 .setDescription(`**Friend Code:** \`${fc}\`\n**Player ID:** \`${stats.pid}\`\n\u200B`)
-                .setThumbnail(`https://${config.statusServer}/miiimg?fc=${fc}`)
+                .setThumbnail(getMiiImageURL(fc))
                 .addFields(
                     {
                         name: "🏆 Rating",

@@ -153,7 +153,7 @@ export interface WiiLinkUser {
 export async function sendEmbedLog(interaction: ChatInputCommandInteraction<CacheType>, action: string, fc: string, user: WiiLinkUser, opts: SendEmbedOpt[], hideMiiName = false, noPublicEmbed = false) {
     const miiName = user.LastInGameSn != "" ? user.LastInGameSn : "Unknown";
     const member = interaction.member as GuildMember | null;
-    const thumbnail = `https://${config.statusServer}/miiimg?fc=${fc}`;
+    const thumbnail = getMiiImageURL(fc);
 
     const privEmbed = new EmbedBuilder()
         .setColor(getColor())
@@ -281,8 +281,10 @@ export function createUserEmbed(user: WiiLinkUser, priv: boolean): EmbedBuilder 
     const embed = new EmbedBuilder()
         .setColor(getColor())
         .setTitle(`Player info for friend code ${fc}`)
-        .setThumbnail(`https://${config.statusServer}/miiimg?fc=${fc}`)
+        .setThumbnail(getMiiImageURL(fc))
         .setTimestamp();
+
+    console.log(getMiiImageURL(fc));
 
     let issuedDate = Date.parse(user.BanIssued);
     let expiresDate = Date.parse(user.BanExpires);
@@ -404,4 +406,8 @@ export function wrapTryCatch(fn: () => void) {
             console.error(e);
         }
     };
+}
+
+export function getMiiImageURL(fc: string) {
+    return config.miiEndPoint.replace("{fc}", fc);
 }
