@@ -1,13 +1,13 @@
 import { CacheType, ChatInputCommandInteraction, MessageFlags, SlashCommandBuilder } from "discord.js";
-import { processMiiBuf } from "./miiid_shared.js";
+import { formatMiiData, processMiiBuf } from "./mii_shared.js";
 
 export default {
     modOnly: false,
     adminOnly: false,
 
     data: new SlashCommandBuilder()
-        .setName("miiid")
-        .setDescription("Extract the miiid field from a mii file")
+        .setName("mii_info")
+        .setDescription("Extract mii info from a mii file")
         .addAttachmentOption(option => option.setName("file")
             .setDescription("The mii file")
             .setRequired(true)),
@@ -27,15 +27,10 @@ export default {
 
         const buffer = Buffer.from(await binaryResponse.arrayBuffer());
 
-        const mii = processMiiBuf(buffer);
+        const mii = processMiiBuf(binaryAttachment.name, buffer);
 
         await interaction.reply({
-            content: `Mii File: ${binaryAttachment.name}\n`
-                + `Mii Name: ${mii.name}\n`
-                + `Creator: ${mii.creator}\n`
-                + `MiiID: ${mii.miiID.toString(16)}\n`
-                + `SysID: ${mii.sysID.toString(16)}\n`
-                + `Mii TimeStamp: ${mii.date.toLocaleString()}`,
+            content: formatMiiData(mii),
             flags: MessageFlags.Ephemeral,
         });
     },
