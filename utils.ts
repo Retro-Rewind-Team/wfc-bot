@@ -148,6 +148,8 @@ export interface WiiLinkUser {
     BanReasonHidden: string,
     BanIssued: string,
     BanExpires: string,
+    VR?: number | null,
+    BR?: number | null,
 }
 
 export async function sendEmbedLog(interaction: ChatInputCommandInteraction<CacheType>, action: string, fc: string, user: WiiLinkUser, opts: SendEmbedOpt[], hideMiiName = false, noPublicEmbed = false) {
@@ -278,6 +280,8 @@ function fmtDeviceID(deviceIDs: number[]) {
 
 export function createUserEmbed(user: WiiLinkUser, priv: boolean): EmbedBuilder {
     const fc = pidToFc(user.ProfileId);
+    const vr = user.VR != null ? user.VR.toLocaleString() : "Unknown";
+    const br = user.BR != null ? user.BR.toLocaleString() : "Unknown";
     const embed = new EmbedBuilder()
         .setColor(getColor())
         .setTitle(`Player info for friend code ${fc}`)
@@ -306,6 +310,8 @@ export function createUserEmbed(user: WiiLinkUser, priv: boolean): EmbedBuilder 
     embed.addFields(
         { name: "Profile ID", value: `${user.ProfileId}` },
         { name: "Mii Name", value: `${user.LastInGameSn}` },
+        { name: "VR", value: vr },
+        { name: "BR", value: br },
         { name: "Open Host", value: `${user.OpenHost}` },
         { name: "Banned", value: `${user.Restricted}${expiredBan ? " (Expired)" : ""}` },
         { name: "Discord ID", value: user.DiscordID.length != 0 ? `<@${user.DiscordID}>` : "None Linked" }
