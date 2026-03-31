@@ -1,5 +1,5 @@
 import crypto from "crypto";
-import { CacheType, ChatInputCommandInteraction, EmbedBuilder, GuildMember, PermissionFlagsBits } from "discord.js";
+import { CacheType, ChatInputCommandInteraction, EmbedBuilder, GuildMember, PermissionFlagsBits, TextChannel } from "discord.js";
 import { getChannels, getConfig } from "./config.js";
 import { Dictionary } from "./dictionary.js";
 
@@ -150,7 +150,33 @@ export interface WiiLinkUser {
     BanExpires: string,
 }
 
-export async function sendEmbedLog(interaction: ChatInputCommandInteraction<CacheType>, action: string, fc: string, user: WiiLinkUser, opts: SendEmbedOpt[], hideMiiName = false, noPublicEmbed = false) {
+export async function sendEmbedLog(
+    interaction: ChatInputCommandInteraction<CacheType>,
+    action: string,
+    fc: string,
+    user: WiiLinkUser,
+    opts: SendEmbedOpt[],
+    hideMiiName = false,
+    noPublicEmbed = false,
+    showInteractionMember = false
+) {
+    const channel = getChannels().publicLogs;
+
+    await sendEmbedLogPriv(interaction, action, fc, user, opts);
+
+    if (noPublicEmbed)
+        return;
+
+    await sendEmbedLogPub(interaction, action, fc, user, opts, channel, hideMiiName, showInteractionMember);
+}
+
+async function sendEmbedLogPriv(
+    interaction: ChatInputCommandInteraction<CacheType>,
+    action: string,
+    fc: string,
+    user: WiiLinkUser,
+    opts: SendEmbedOpt[]
+) {
     const miiName = user.LastInGameSn != "" ? user.LastInGameSn : "Unknown";
     const member = interaction.member as GuildMember | null;
     const thumbnail = getMiiImageURL(fc);
@@ -175,19 +201,40 @@ export async function sendEmbedLog(interaction: ChatInputCommandInteraction<Cach
 
     await getChannels().logs.send({ embeds: [privEmbed] });
     await interaction.reply({ content: `Successful ${action} performed on friend code "${fc}"` });
+}
 
-    if (noPublicEmbed)
-        return;
+async function sendEmbedLogPub(
+    interaction: ChatInputCommandInteraction<CacheType>,
+    action: string,
+    fc: string,
+    user: WiiLinkUser,
+    opts: SendEmbedOpt[],
+    channel: TextChannel,
+    hideMiiName: boolean,
+    showInteractionMember: boolean
+) {
+    const miiName = user.LastInGameSn != "" ? user.LastInGameSn : "Unknown";
+    const member = interaction.member as GuildMember | null;
+    const thumbnail = getMiiImageURL(fc);
 
-    const pubEmbed = new EmbedBuilder()
-        .setColor(getColor())
-        .setTitle(`${action.charAt(0).toUpperCase() + action.slice(1)} performed by moderator`)
+    const pubEmbed = new EmbedBuilder();
+
+    if (showInteractionMember) {
+        pubEmbed.addFields(
+            { name: "Server", value: interaction.guild!.name },
+            { name: "User", value: `<@${member?.id ?? "Unknown"}>` },
+        );
+    }
+
+    pubEmbed.setColor(getColor())
+        .setTitle(showInteractionMember ?
+            `${action.charAt(0).toUpperCase() + action.slice(1)} performed by ${member?.displayName ?? "Unknown"}` :
+            `${action.charAt(0).toUpperCase() + action.slice(1)} performed by moderator`)
         .addFields(
             { name: "Friend Code", value: fc },
             { name: "Mii Name", value: hideMiiName ? "\\*\\*\\*\\*\\*" : miiName }
         )
         .setTimestamp();
-
 
     if (!hideMiiName)
         pubEmbed.setThumbnail(thumbnail);
@@ -198,7 +245,7 @@ export async function sendEmbedLog(interaction: ChatInputCommandInteraction<Cach
         pubEmbed.addFields(...filtered);
     }
 
-    await getChannels().publicLogs.send({ embeds: [pubEmbed] });
+    await channel.send({ embeds: [pubEmbed] });
 }
 
 export function fmtHex(n: number): string {
