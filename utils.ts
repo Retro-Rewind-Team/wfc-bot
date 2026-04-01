@@ -158,9 +158,10 @@ export async function sendEmbedLog(
     opts: SendEmbedOpt[],
     hideMiiName = false,
     noPublicEmbed = false,
-    showInteractionMember = false
+    showInteractionMember = false,
+    pubChannel: TextChannel | null = null,
 ) {
-    const channel = getChannels().publicLogs;
+    const channel = pubChannel ?? getChannels().publicLogs;
 
     await sendEmbedLogPriv(interaction, action, fc, user, opts);
 
@@ -211,7 +212,7 @@ async function sendEmbedLogPub(
     opts: SendEmbedOpt[],
     channel: TextChannel,
     hideMiiName: boolean,
-    showInteractionMember: boolean
+    showInteractionMember: boolean,
 ) {
     const miiName = user.LastInGameSn != "" ? user.LastInGameSn : "Unknown";
     const member = interaction.member as GuildMember | null;

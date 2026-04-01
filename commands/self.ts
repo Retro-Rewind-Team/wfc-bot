@@ -1,5 +1,5 @@
 import { CacheType, ChatInputCommandInteraction, SlashCommandBuilder } from "discord.js";
-import { getConfig } from "../config.js";
+import { getChannels, getConfig } from "../config.js";
 import { makeRequest, pidToFc, resolvePidFromString, sendEmbedLog, validateID, WiiLinkUser } from "../utils.js";
 
 const config = getConfig();
@@ -60,6 +60,7 @@ export default {
                 false,
                 false,
                 true,
+                getChannels().publicSelfLogs,
             );
         }
         else {
