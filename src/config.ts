@@ -16,6 +16,7 @@ export interface Config {
     userPermissions: Dictionary<number>,
     logsChannel: string
     publicLogsChannel: string
+    publicSelfLogsChannel: string
     packOwnersLogsChannel: string
     crashReportChannel: string
     newPlayerLogsChannel: string,
@@ -78,6 +79,7 @@ export async function initConfig(path: string): Promise<void> {
                 userPermissions: {},
                 logsChannel: "Channel id to send successful moderative actions to.",
                 publicLogsChannel: "Channel id to send the public version of moderative actions to.",
+                publicSelfLogsChannel: "Channel id to send the public version of self actions to.",
                 packOwnersLogsChannel: "Channel id to send the hash logs to.",
                 crashReportChannel: "Channel id to send crash reports to.",
                 newPlayerLogsChannel: "Channel id to send new players to.",
@@ -133,6 +135,7 @@ export async function setConfig(config: Config): Promise<void> {
 interface Channels {
     logs: TextChannel,
     publicLogs: TextChannel,
+    publicSelfLogs: TextChannel,
     packOwnersLogs: TextChannel,
     crashReport: TextChannel,
     newPlayerLogs: TextChannel,
@@ -146,6 +149,7 @@ export async function initChannels(client: Client<boolean>): Promise<void> {
     _channels = {
         logs: await fetchChannel<TextChannel>(client, _config.logsChannel, "logs"),
         publicLogs: await fetchChannel<TextChannel>(client, _config.publicLogsChannel, "publicLogs"),
+        publicSelfLogs: await fetchChannel<TextChannel>(client, _config.publicSelfLogsChannel, "publicSelfLogs"),
         packOwnersLogs: await fetchChannel<TextChannel>(client, _config.packOwnersLogsChannel, "packOwnersLogs"),
         crashReport: await fetchChannel<TextChannel>(client, _config.crashReportChannel, "crashReport"),
         newPlayerLogs: await fetchChannel<TextChannel>(client, _config.newPlayerLogsChannel, "newPlayerLogs"),

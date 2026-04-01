@@ -1,6 +1,6 @@
 import { CacheType, ChatInputCommandInteraction, SlashCommandBuilder } from "discord.js";
-import { getConfig } from "../config.js";
-import { makeRequest, pidToFc, resolvePidFromString, sendEmbedLog, validateID, WiiLinkUser } from "../utils.js";
+import { getChannels, getConfig } from "#src/config.js";
+import { makeWFCRequest, pidToFc, resolvePidFromString, sendEmbedLog, validateID } from "#src/utils.js";
 
 const config = getConfig();
 
@@ -43,7 +43,7 @@ export default {
             pid = resolvePidFromString(id);
         }
 
-        const [success, res] = await makeRequest("/api/self", "POST", {
+        const [success, res] = await makeWFCRequest("/api/self", "POST", {
             secret: config.wfcSecret,
             discordID: discordID,
             command: subcommand,
@@ -53,13 +53,15 @@ export default {
         if (success) {
             await sendEmbedLog(
                 interaction,
-                "self-kick",
-                pidToFc((res.User as WiiLinkUser).ProfileId),
                 res.User,
-                [],
-                false,
-                false,
-                true,
+                {
+                    action: subcommand == "froom-kick" ? "froom-kick" : "self-kick",
+                    hideMii: false,
+                    noPublicEmbed: false,
+                    showBanInfo: false,
+                    verbose: false,
+                    pubChannel: getChannels().publicSelfLogs,
+                }
             );
         }
         else {

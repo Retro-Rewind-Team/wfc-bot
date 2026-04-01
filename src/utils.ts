@@ -1,6 +1,6 @@
 import { _fetch as fetch } from "#src/fetch.js";
 import crypto from "crypto";
-import { CacheType, ChatInputCommandInteraction, EmbedBuilder, GuildMember, PermissionFlagsBits } from "discord.js";
+import { CacheType, ChatInputCommandInteraction, EmbedBuilder, GuildMember, PermissionFlagsBits, TextChannel } from "discord.js";
 import { getChannels, getConfig } from "#src/config.js";
 import { Dictionary } from "#src/dictionary.js";
 
@@ -162,6 +162,7 @@ export interface SendEmbedLogOpts {
     noPublicEmbed?: boolean;
     verbose?: boolean;
     showBanInfo?: boolean;
+    pubChannel?: TextChannel;
 }
 
 export async function sendEmbedLog(
@@ -217,7 +218,7 @@ export async function sendEmbedLog(
         showBanInfo: opts.showBanInfo,
     });
 
-    await getChannels().publicLogs.send({ embeds: [pubEmbed] });
+    await (opts.pubChannel ?? getChannels().publicLogs).send({ embeds: [pubEmbed] });
 }
 
 export function fmtHex(n: number): string {
