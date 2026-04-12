@@ -1,6 +1,6 @@
-import { CacheType, ChatInputCommandInteraction, SlashCommandBuilder } from "discord.js";
-import { pidToFc, resolveModRestrictPermission, resolvePidFromString, validateID } from "../utils.js";
-import { getConfig } from "../config.js";
+import { CacheType, ChatInputCommandInteraction, EmbedBuilder, GuildMember, SlashCommandBuilder } from "discord.js";
+import { getChannels, getConfig } from "../config.js";
+import { getColor, getMiiImageURL, pidToFc, resolveModRestrictPermission, resolvePidFromString, validateID } from "../utils.js";
 
 const config = getConfig();
 
@@ -51,6 +51,21 @@ export default {
             });
 
             if (leaderboardResponse.ok) {
+                const member = interaction.member as GuildMember | null;
+
+                const embed = new EmbedBuilder()
+                    .setColor(getColor())
+                    .setTitle(`Unflag performed by ${member?.displayName ?? "Unknown"}`)
+                    .setThumbnail(getMiiImageURL(fc))
+                    .addFields(
+                        { name: "Server", value: interaction.guild!.name },
+                        { name: "Moderator", value: `<@${member?.id ?? "Unknown"}>` },
+                        { name: "Friend Code", value: fc },
+                        { name: "Reason", value: reason },
+                    )
+                    .setTimestamp();
+
+                await getChannels().logs.send({ embeds: [embed] });
                 await interaction.reply({
                     content: `Successfully removed suspicious flag from player with friend code "${fc}"`
                 });
