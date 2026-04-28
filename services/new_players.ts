@@ -5,8 +5,6 @@ import { createUserEmbed, makeRequest, WiiLinkUser, wrapTryCatch } from "../util
 const config = getConfig();
 const channels = getChannels();
 
-const numRegex = /[0-9]+/;
-
 async function fetchNewPlayers() {
     const [success, res] = await makeRequest("/api/new_players", "POST", {
         secret: config.wfcSecret,
@@ -24,29 +22,12 @@ async function fetchNewPlayers() {
         return;
     }
 
-    let ping: boolean = false;
-
     const embeds: EmbedBuilder[] = [];
-    for (const user of res.Users as WiiLinkUser[]) {
+    for (const user of res.Users as WiiLinkUser[])
         embeds.push(createUserEmbed(user, true));
-
-        // Ping wrkus for csnums within a specific range
-        for (const csnum of user.Csnum) {
-            const matches = numRegex.exec(csnum);
-
-            if (!matches || matches.length < 1)
-                continue;
-
-            const leading2: number = Number.parseInt(matches[0].slice(0, 2));
-
-            if (leading2 >= 4 && leading2 < 10)
-                ping = true;
-        }
-    }
 
     const message = channels.newPlayerLogs.send({
         embeds: embeds,
-        content: ping ? "<@391240445201743873>" : "",
     });
 
     if (!message) {
