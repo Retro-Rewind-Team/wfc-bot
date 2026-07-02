@@ -63,6 +63,12 @@ export async function loadState(): Promise<State> {
         }
 
         const buf = readFileSync(STATE_PATH, { encoding: "utf8" });
+        if (buf == null || buf.length == 0) {
+            const state = new State({}, []);
+            state.save();
+            return state;
+        }
+
         return State.fromSerialized(JSON.parse(buf));
     }
     catch (e) {
