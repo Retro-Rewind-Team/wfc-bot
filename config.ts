@@ -16,6 +16,7 @@ export interface Config {
     allowedBKTUpdaters: string[]
     logsChannel: string
     publicLogsChannel: string
+    publicSelfLogsChannel: string
     packOwnersLogsChannel: string
     crashReportChannel: string
     newPlayerLogsChannel: string,
@@ -89,6 +90,7 @@ export function initConfig(path: string) {
                 ],
                 logsChannel: "Channel id to send successful moderative actions to.",
                 publicLogsChannel: "Channel id to send the public version of moderative actions to.",
+                publicSelfLogsChannel: "Channel id to send public self actions to.",
                 packOwnersLogsChannel: "Channel id to send the hash logs to.",
                 crashReportChannel: "Channel id to send crash reports to.",
                 newPlayerLogsChannel: "Channel id to send new players to.",
@@ -135,6 +137,7 @@ export function setConfig(config: Config) {
 interface Channels {
     logs: TextChannel,
     publicLogs: TextChannel,
+    publicSelfLogs: TextChannel,
     packOwnersLogs: TextChannel,
     crashReport: TextChannel,
     newPlayerLogs: TextChannel,
@@ -147,6 +150,7 @@ export async function initChannels(client: Client<boolean>) {
     _channels = {
         logs: await fetchChannel(client, _config.logsChannel, "logs"),
         publicLogs: await fetchChannel(client, _config.publicLogsChannel, "publicLogs"),
+        publicSelfLogs: await fetchChannel(client, _config.publicSelfLogsChannel, "publicSelfLogs"),
         packOwnersLogs: await fetchChannel(client, _config.packOwnersLogsChannel, "packOwnersLogs"),
         crashReport: await fetchChannel(client, _config.crashReportChannel, "crashReport"),
         newPlayerLogs: await fetchChannel(client, _config.newPlayerLogsChannel, "newPlayerLogs"),
