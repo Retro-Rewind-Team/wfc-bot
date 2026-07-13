@@ -10,7 +10,7 @@ export default {
         .setName("mii")
         .setDescription("Fetch the Mii for a pid or fc")
         .addStringOption(option => option.setName("id")
-            .setDescription("friend code or pid to kick")
+            .setDescription("friend code or pid to fetch the mii of")
             .setRequired(true)),
 
     exec: async function(interaction: ChatInputCommandInteraction<CacheType>) {
