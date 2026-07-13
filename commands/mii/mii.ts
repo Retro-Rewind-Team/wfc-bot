@@ -18,8 +18,12 @@ export default {
         id = id.trim();
 
         const [valid, err] = validateID(id);
-        if (!valid)
-            return [null, `Error retrieving Mii for friend code or pid "${id}": ${err}`];
+        if (!valid) {
+            await interaction.reply({
+                content: `Error retrieving Mii for friend code or pid "${id}": ${err}`
+            });
+            return;
+        }
 
         const pid = resolvePidFromString(id);
         const fc = pidToFc(pid);
@@ -28,7 +32,7 @@ export default {
         const [miiBuf, miiErr] = await getMiiBuf(id, true);
 
         if (miiErr != null || miiBuf == null) {
-            interaction.reply({ content: err ?? "unknown error", flags: MessageFlags.Ephemeral });
+            interaction.reply({ content: miiErr ?? "unknown error", flags: MessageFlags.Ephemeral });
             return;
         }
 
