@@ -11,6 +11,8 @@ export interface MiiData {
     fileName: string | null,
     name: string,
     creatorName: string,
+    birthDay: number,
+    birthMonth: number,
     miiID: number,
     sysID: number,
     idStyleBits: number,
@@ -33,6 +35,10 @@ export function processMiiBuf(fileName: string | null, buffer: Buffer): MiiData 
     const miiName = readNameFromBuf(buffer, 0x02);
     const creatorName = readNameFromBuf(buffer, 0x36);
 
+    const info = buffer.readUint16BE(0x00);
+    const birthMonth = info >>> 10 & 0b1111;
+    const birthDay = info >>> 5 & 0b11111;
+
     const miiID = buffer.readUint32BE(0x18);
     const miiDate = new Date(START_DATE);
     // Timestamp is stored as 4 second intervals since 2006/0/1,
@@ -45,6 +51,8 @@ export function processMiiBuf(fileName: string | null, buffer: Buffer): MiiData 
         fileName: fileName,
         name: miiName,
         creatorName: creatorName,
+        birthDay: birthDay,
+        birthMonth: birthMonth,
         miiID: miiID,
         sysID: sysID,
         creationDate: miiDate,
@@ -62,7 +70,7 @@ export async function getMiiBuf(pidOrFC: string, sanitized: boolean): Promise<[B
 
     const pid = resolvePidFromString(id);
     const [success, res] = await makeRequest("/api/mii", "POST", {
-        secret: sanitized ? null: config.wfcSecret,
+        secret: sanitized ? null : config.wfcSecret,
         pid: pid
     });
 
@@ -86,6 +94,9 @@ export function formatMiiData(mii: MiiData): string {
 
     if (mii.creatorName != "")
         ret += `Creator: ${mii.creatorName}\n`;
+
+    if (mii.birthMonth != 0 && mii.birthDay != 0)
+        ret += `Birth Date: ${mii.birthMonth}/${mii.birthDay}\n`;
 
     if (((mii.miiID) >> 3) > 0)
         ret += `MiiID: ${mii.miiID.toString(16)}\n`;
