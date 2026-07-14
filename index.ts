@@ -4,6 +4,12 @@ import { Dictionary } from "./dictionary.js";
 import * as fs from "fs";
 import * as path from "path";
 
+// https://stackoverflow.com/questions/43834559/how-to-find-which-promises-are-unhandled-in-node-js-unhandledpromiserejectionwar
+// Better logging of unhandled promises
+process.on("unhandledRejection", (reason, p) => {
+    console.log("Unhandled Rejection at: Promise", p, "reason:", reason);
+});
+
 export const client = new Client({
     intents: [IntentsBitField.Flags.Guilds, IntentsBitField.Flags.GuildMessages, IntentsBitField.Flags.GuildModeration]
 });
