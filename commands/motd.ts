@@ -35,7 +35,7 @@ export default {
                 return;
             }
 
-            await interaction.reply({ content: `Set message of the day to: "${realMotd}"` });
+            await interaction.reply({ content: `Set message of the day to:\n${realMotd}` });
             // Serialize the original motd
             state.motd = motd;
             state.save();

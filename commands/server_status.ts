@@ -69,7 +69,7 @@ export default {
         if (!success)
             await interaction.followUp({ content: `Failed to set message of the day, error: ${res.Error ?? "no error message provided"}` });
         else
-            interaction.followUp({ content: `Set message of the day to: "${motd}".` });
+            interaction.followUp({ content: `Set message of the day to:\n${motd}` });
 
         let channelEditSuccess = false;
 
