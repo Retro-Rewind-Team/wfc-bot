@@ -5,7 +5,7 @@ import * as fs from "fs";
 import * as path from "path";
 
 export const client = new Client({
-    intents: [IntentsBitField.Flags.Guilds, IntentsBitField.Flags.GuildMessages]
+    intents: [IntentsBitField.Flags.Guilds, IntentsBitField.Flags.GuildMessages, IntentsBitField.Flags.GuildModeration]
 });
 
 let refresh = false;

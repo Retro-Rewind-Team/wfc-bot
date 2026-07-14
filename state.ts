@@ -4,6 +4,7 @@ import { existsSync, readFileSync, writeFileSync } from "fs";
 import { exit } from "process";
 import { getChannels } from "./config.js";
 import { Group } from "./services/groups.js";
+import { Status, StatusColor } from "./commands/server_status_types.js";
 
 const channels = getChannels();
 
@@ -12,10 +13,14 @@ const STATE_PATH: string = "./state.json";
 export class State {
     public messages: Dictionary<Message>;
     public pingedRooms: Group[];
+    public status: Status;
+    public motd: string;
 
-    constructor(messages: Dictionary<Message>, pingedRooms: Group[]) {
+    constructor(messages: Dictionary<Message>, pingedRooms: Group[], status: Status, motd: string) {
         this.messages = messages;
         this.pingedRooms = pingedRooms;
+        this.status = status;
+        this.motd = motd;
     }
 
     toSerialized(): StateSerialized {
@@ -24,7 +29,12 @@ export class State {
         for (const key of Object.keys(this.messages))
             messages[key] = this.messages[key].id;
 
-        return { messages: messages, pingedRooms: this.pingedRooms };
+        return {
+            messages: messages,
+            pingedRooms: this.pingedRooms,
+            status: this.status,
+            motd: this.motd,
+        };
     }
 
     static async fromSerialized(stateSerialized: StateSerialized): Promise<State> {
@@ -39,7 +49,7 @@ export class State {
                 console.error(`Message for ID ${key}:${stateSerialized.messages[key]} could not be found!`);
         }
 
-        return new State(messages, stateSerialized.pingedRooms);
+        return new State(messages, stateSerialized.pingedRooms, stateSerialized.status, stateSerialized.motd);
     }
 
     save() {
@@ -52,24 +62,33 @@ export class State {
 interface StateSerialized {
     messages: Dictionary<string>;
     pingedRooms: Group[];
+    status: Status;
+    motd: string;
 }
 
+const defaultState: State = new State({}, [], { color: StatusColor.GREEN, message: "ONLINE" }, "");
+let _state: State | null = null;
+
 export async function loadState(): Promise<State> {
+    if (_state != null)
+        return _state;
+
     try {
         if (!existsSync(STATE_PATH)) {
-            const state = new State({}, []);
-            state.save();
-            return state;
+            _state = defaultState;
+            _state.save();
+            return _state;
         }
 
         const buf = readFileSync(STATE_PATH, { encoding: "utf8" });
         if (buf == null || buf.length == 0) {
-            const state = new State({}, []);
-            state.save();
-            return state;
+            _state = defaultState;
+            _state.save();
+            return _state;
         }
 
-        return State.fromSerialized(JSON.parse(buf));
+        _state = await State.fromSerialized(JSON.parse(buf));
+        return _state;
     }
     catch (e) {
         console.error(e);

@@ -1,4 +1,4 @@
-import { Client, PermissionFlagsBits, TextChannel } from "discord.js";
+import { Client, GuildChannel, PermissionFlagsBits, TextChannel, VoiceChannel } from "discord.js";
 import { Dictionary } from "./dictionary.js";
 import { existsSync, readFileSync, writeFileSync } from "fs";
 import { exit } from "process";
@@ -19,6 +19,7 @@ export interface Config {
     packOwnersLogsChannel: string
     crashReportChannel: string
     newPlayerLogsChannel: string,
+    statusChannel: string,
     roomPingChannel: string,
     roomTypeNameMap: Dictionary<string>,
     roomPingRoles: Dictionary<string>,
@@ -92,6 +93,7 @@ export function initConfig(path: string) {
                 packOwnersLogsChannel: "Channel id to send the hash logs to.",
                 crashReportChannel: "Channel id to send crash reports to.",
                 newPlayerLogsChannel: "Channel id to send new players to.",
+                statusChannel: "Channel to update with status messages.",
                 roomPingChannel: "Channel id to send room openings to.",
                 roomTypeNameMap: {},
                 roomPingRoles: {},
@@ -139,18 +141,20 @@ interface Channels {
     crashReport: TextChannel,
     newPlayerLogs: TextChannel,
     roomPing: TextChannel,
+    status: VoiceChannel,
 }
 
 let _channels: Channels;
 
 export async function initChannels(client: Client<boolean>) {
     _channels = {
-        logs: await fetchChannel(client, _config.logsChannel, "logs"),
-        publicLogs: await fetchChannel(client, _config.publicLogsChannel, "publicLogs"),
-        packOwnersLogs: await fetchChannel(client, _config.packOwnersLogsChannel, "packOwnersLogs"),
-        crashReport: await fetchChannel(client, _config.crashReportChannel, "crashReport"),
-        newPlayerLogs: await fetchChannel(client, _config.newPlayerLogsChannel, "newPlayerLogs"),
-        roomPing: await fetchChannel(client, _config.roomPingChannel, "roomPing"),
+        logs: await fetchChannel<TextChannel>(client, _config.logsChannel, "logs"),
+        publicLogs: await fetchChannel<TextChannel>(client, _config.publicLogsChannel, "publicLogs"),
+        packOwnersLogs: await fetchChannel<TextChannel>(client, _config.packOwnersLogsChannel, "packOwnersLogs"),
+        crashReport: await fetchChannel<TextChannel>(client, _config.crashReportChannel, "crashReport"),
+        newPlayerLogs: await fetchChannel<TextChannel>(client, _config.newPlayerLogsChannel, "newPlayerLogs"),
+        roomPing: await fetchChannel<TextChannel>(client, _config.roomPingChannel, "roomPing"),
+        status: await fetchChannel<VoiceChannel>(client, _config.statusChannel, "status"),
     };
 }
 
@@ -161,13 +165,13 @@ export function getChannels(): Channels {
     return _channels;
 }
 
-async function fetchChannel(client: Client<boolean>, channelID: string, fieldName: string): Promise<TextChannel> {
+async function fetchChannel<T>(client: Client<boolean>, channelID: string, fieldName: string): Promise<T> {
     const ret = await client.channels.fetch(channelID);
 
     if (!ret)
         throw new Error(`Failed to fetch channelID ${channelID} for field ${fieldName}`);
     else
-        console.log(`${fieldName} set to channel ${(ret as TextChannel).name}`);
+        console.log(`${fieldName} set to channel ${(ret as GuildChannel).name}`);
 
-    return ret as TextChannel;
+    return ret as T;
 }
