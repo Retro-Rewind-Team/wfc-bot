@@ -44,24 +44,9 @@ function verifyConfig(config: Config) {
         || config.allowedAdmins.length == 0)
         throw "No admins set! Please set one to continue.";
 
-    if (!config.logsChannel || config.logsChannel.length == 0)
-        throw "No logs channel is set! Please set one to continue.";
-
-    if (!config.publicLogsChannel || config.publicLogsChannel.length == 0)
-        throw "No public logs channel is set! Please set one to continue.";
-
-    if (!config.packOwnersLogsChannel || config.packOwnersLogsChannel.length == 0)
-        throw "No pack owners logs channel is set! Please set one to continue.";
-
-    if (!config.crashReportChannel || config.crashReportChannel.length == 0)
-        throw "No crash report channel is set! Please set one to continue.";
-
     if (!config.modRestrictPerm
         || !(PermissionFlagsBits as Dictionary<bigint>)[config.modRestrictPerm])
         throw "No modRestrictPerm is set or it is incorrect! Please set one to continue.";
-
-    if (!config.roomPingChannel)
-        throw "No roomPingChannel is set! Please set one to continue";
 }
 
 export function initConfig(path: string) {
@@ -166,6 +151,9 @@ export function getChannels(): Channels {
 }
 
 async function fetchChannel<T>(client: Client<boolean>, channelID: string, fieldName: string): Promise<T> {
+    if (!channelID || channelID.length == 0)
+        throw `channelID is null or empty for channel ${fieldName}. Please set one to continue.`;
+
     const ret = await client.channels.fetch(channelID);
 
     if (!ret)
