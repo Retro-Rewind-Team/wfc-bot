@@ -1,6 +1,6 @@
 import { CacheType, ChatInputCommandInteraction, PermissionFlagsBits, SlashCommandBuilder } from "discord.js";
 import { getConfig } from "../config.js";
-import { makeRequest } from "../utils.js";
+import { makeWFCRequest } from "../utils.js";
 import { loadState, State } from "../state.js";
 import { getStatusText } from "./server_status.js";
 
@@ -29,7 +29,7 @@ export default {
             if (state.status && state.status.color && state.status.message)
                 realMotd = `${motd}\n\n${getStatusText(state.status)}`;
 
-            const [success, res] = await makeRequest("/api/motd", "POST", { secret: config.wfcSecret, motd: realMotd });
+            const [success, res] = await makeWFCRequest("/motd", "POST", { secret: config.wfcSecret, motd: realMotd });
             if (!success) {
                 await interaction.reply({ content: `Failed to set message of the day, error: ${res.Error ?? "no error message provided"}` });
                 return;
@@ -41,7 +41,7 @@ export default {
             state.save();
         }
         else {
-            const [success, res] = await makeRequest("/api/motd", "GET");
+            const [success, res] = await makeWFCRequest("/motd", "GET");
 
             if (success) {
                 await interaction.reply({ content: `Current message of the day is:\n${res.Motd}` });

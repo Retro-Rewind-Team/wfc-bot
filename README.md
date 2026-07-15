@@ -2,6 +2,10 @@
 
 Simple discord bot with WiiLink WFC integration. See config.example.json, and put your real config in `config.json`.
 
+Note that this will only run with Retro Rewind's [fork of
+wfc-server](https://github.com/Retro-Rewind-Team/wfc-server), as it exposes
+additional endpoints used by this bot.
+
 ### Running
 1. `npm i`
 2. `npm run build`

@@ -1,5 +1,5 @@
 import { CacheType, ChatInputCommandInteraction, InteractionReplyOptions, MessageFlags, } from "discord.js";
-import { createUserEmbed, makeRequest, pidToFc, resolvePidFromString, validateID } from "../utils.js";
+import { createUserEmbed, makeWFCRequest, pidToFc, resolvePidFromString, validateID } from "../utils.js";
 import { getConfig } from "../config.js";
 
 const config = getConfig();
@@ -32,7 +32,7 @@ export async function pinfo(interaction: ChatInputCommandInteraction<CacheType>,
     const pid = resolvePidFromString(id);
 
     const fc = pidToFc(pid);
-    const [success, res] = await makeRequest("/api/pinfo", "POST", {
+    const [success, res] = await makeWFCRequest("/pinfo", "POST", {
         pid: pid,
         secret: priv ? config.wfcSecret : null
     });

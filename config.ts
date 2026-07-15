@@ -7,8 +7,7 @@ export interface Config {
     token: string
     applicationID: string
     miiEndPoint: string
-    wfcServer: string
-    wfcPort: number
+    wfcAPIBase: string
     wfcSecret: string
     adminServers: string[]
     allowedAdmins: string[]
@@ -47,6 +46,9 @@ function verifyConfig(config: Config) {
     if (!config.modRestrictPerm
         || !(PermissionFlagsBits as Dictionary<bigint>)[config.modRestrictPerm])
         throw "No modRestrictPerm is set or it is incorrect! Please set one to continue.";
+
+    if (!config.wfcAPIBase || config.wfcAPIBase.length == 0)
+        throw "No wfcAPIBase is set! Please set one to continue.";
 }
 
 export function initConfig(path: string) {
@@ -58,8 +60,7 @@ export function initConfig(path: string) {
                 token: "your bot's token",
                 applicationID: "your application id",
                 miiEndPoint: "https://rwfc.net/api/leaderboard/player/{fc}/mii",
-                wfcServer: "the wfc server to connect to, such as 'ppeb.me' or 'localhost'",
-                wfcPort: 8080,
+                wfcAPIBase: "base route for wfc apis. Something like http://rwfc.net/api",
                 wfcSecret: "your wfc secret key",
                 adminServers: [
                     "Allow guild ids here."

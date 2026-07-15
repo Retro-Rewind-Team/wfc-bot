@@ -1,5 +1,5 @@
 import { CacheType, ChatInputCommandInteraction, MessageFlags, SlashCommandBuilder } from "discord.js";
-import { makeRequest, pidToFc, resolvePidFromString, validateID } from "../utils.js";
+import { makeWFCRequest, pidToFc, resolvePidFromString, validateID } from "../utils.js";
 import { getConfig } from "../config.js";
 
 const config = getConfig();
@@ -51,7 +51,7 @@ export default {
 
 async function beginLink(interaction: ChatInputCommandInteraction<CacheType>, pid: number, fc: string, discordID: string) {
     currentlyVerifying.add(pid);
-    const [success, res] = await makeRequest("/api/link", "POST", {
+    const [success, res] = await makeWFCRequest("/link", "POST", {
         secret: config.wfcSecret,
         pid: pid,
         discordID: discordID,
@@ -81,7 +81,7 @@ async function waitForLinkSuccess(interaction: ChatInputCommandInteraction<Cache
     const timeOut = (Date.now() + 600_000); // 10 minutes
     while (Date.now() < timeOut) {
         await new Promise(resolve => setTimeout(resolve, 30_000)); // Try every 30 seconds
-        const [success, res] = await makeRequest("/api/link", "POST", {
+        const [success, res] = await makeWFCRequest("/link", "POST", {
             secret: config.wfcSecret,
             pid: pid,
             discordId: discordID,
@@ -106,7 +106,7 @@ async function waitForLinkSuccess(interaction: ChatInputCommandInteraction<Cache
 async function timeoutLink(interaction: ChatInputCommandInteraction<CacheType>, pid: number, fc: string, discordID: string) {
     currentlyVerifying.delete(pid);
     await interaction.editReply({ content: `Profile linking for "${fc}" timed out!` });
-    const [success, res] = await makeRequest("/api/link", "POST", {
+    const [success, res] = await makeWFCRequest("/link", "POST", {
         secret: config.wfcSecret,
         pid: pid,
         discordId: discordID,

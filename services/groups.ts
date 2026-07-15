@@ -51,7 +51,7 @@ export function getGroups() {
     return groups;
 }
 
-const fetchGroupsUrl = `http://${config.wfcServer}:${config.wfcPort}/api/groups`;
+const fetchGroupsUrl = `${config.wfcAPIBase}/groups`;
 
 async function fetchGroups() {
     const groupsJson = (await utils.queryJson(fetchGroupsUrl)) ?? utils.throwInline("Empty or no json response from groups api.");

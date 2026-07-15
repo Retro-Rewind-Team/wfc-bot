@@ -1,5 +1,5 @@
 import { CacheType, ChatInputCommandInteraction, EmbedBuilder, MessageFlags, SlashCommandBuilder } from "discord.js";
-import { getColor, makeRequest, pidToFc, resolvePidFromString, validateID } from "../utils.js";
+import { getColor, makeWFCRequest, pidToFc, resolvePidFromString, validateID } from "../utils.js";
 import { getChannels, getConfig } from "../config.js";
 import { currentlyVerifying } from "./link.js";
 
@@ -44,7 +44,7 @@ export default {
             return;
         }
 
-        const [success, res] = await makeRequest("/api/link", "POST", {
+        const [success, res] = await makeWFCRequest("/link", "POST", {
             secret: config.wfcSecret,
             pid: pid,
             discordID: user.id,

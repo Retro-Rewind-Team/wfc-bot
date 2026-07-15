@@ -1,6 +1,6 @@
 import { CacheType, ChatInputCommandInteraction, SlashCommandBuilder } from "discord.js";
 import { getConfig } from "../config.js";
-import { makeRequest, pidToFc, resolveModRestrictPermission, resolvePidFromString, sendEmbedLog, validateID } from "../utils.js";
+import { makeWFCRequest, pidToFc, resolveModRestrictPermission, resolvePidFromString, sendEmbedLog, validateID } from "../utils.js";
 
 const config = getConfig();
 
@@ -42,7 +42,7 @@ export default {
         const hidePublic = interaction.options.getBoolean("hide-public") ?? false;
 
         const fc = pidToFc(pid);
-        const [success, res] = await makeRequest("/api/unban", "POST", { secret: config.wfcSecret, pid: pid });
+        const [success, res] = await makeWFCRequest("/unban", "POST", { secret: config.wfcSecret, pid: pid });
         if (success) {
             await sendEmbedLog(interaction, "unban", fc, res.User, [
                 { name: "Reason", value: reason },

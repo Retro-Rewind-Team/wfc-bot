@@ -1,6 +1,6 @@
 import { CacheType, ChatInputCommandInteraction, SlashCommandBuilder } from "discord.js";
 import { getConfig } from "../config.js";
-import { makeRequest, pidToFc, resolveModRestrictPermission, resolvePidFromString, sendEmbedLog, validateID } from "../utils.js";
+import { makeWFCRequest, pidToFc, resolveModRestrictPermission, resolvePidFromString, sendEmbedLog, validateID } from "../utils.js";
 
 const config = getConfig();
 
@@ -42,7 +42,7 @@ export default {
         const hidePublic = interaction.options.getBoolean("hide-public") ?? false;
 
         const fc = pidToFc(pid);
-        const [success, res] = await makeRequest("/api/kick", "POST", { secret: config.wfcSecret, pid: pid, reason: reason });
+        const [success, res] = await makeWFCRequest("/kick", "POST", { secret: config.wfcSecret, pid: pid, reason: reason });
         if (success) {
             await sendEmbedLog(interaction, "kick", fc, res.User, [
                 { name: "Reason", value: reason },

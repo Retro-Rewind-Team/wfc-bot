@@ -6,7 +6,6 @@ import { Dictionary } from "./dictionary.js";
 const fcRegex = new RegExp(/[0-9]{4}-[0-9]{4}-[0-9]{4}/);
 const pidRegex = new RegExp(/^\d+$/);
 const config = getConfig();
-const urlBase = `http://${config.wfcServer}:${config.wfcPort}`;
 
 let currentColor = 0;
 const colors = [
@@ -96,8 +95,8 @@ export function plural(count: number, text: string) {
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export async function makeRequest(route: string, method: string, data?: object): Promise<[boolean, any]> {
-    const url = urlBase + route;
+export async function makeWFCRequest(route: string, method: string, data?: object): Promise<[boolean, any]> {
+    const url = config.wfcAPIBase + route;
 
     try {
         const response = await fetch(url, {

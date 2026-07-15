@@ -1,5 +1,5 @@
 import { CacheType, ChatInputCommandInteraction, SlashCommandBuilder } from "discord.js";
-import { makeRequest, pidToFc, resolveModRestrictPermission, resolvePidFromString, sendEmbedLog, validateID } from "../utils.js";
+import { makeWFCRequest, pidToFc, resolveModRestrictPermission, resolvePidFromString, sendEmbedLog, validateID } from "../utils.js";
 import { getConfig } from "../config.js";
 
 const config = getConfig();
@@ -70,7 +70,7 @@ export default {
         }
 
         const fc = pidToFc(pid);
-        const [success, res] = await makeRequest("/api/ban", "POST", {
+        const [success, res] = await makeWFCRequest("/ban", "POST", {
             secret: config.wfcSecret,
             pid: pid,
             days: days,

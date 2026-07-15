@@ -1,7 +1,7 @@
 import { CacheType, ChatInputCommandInteraction, EmbedBuilder, GuildMember, MessageFlags, SlashCommandBuilder } from "discord.js";
 import { getChannels, getConfig } from "../config.js";
 import crypto from "crypto";
-import { fmtHex, getColor, makeRequest, resolveModRestrictPermission } from "../utils.js";
+import { fmtHex, getColor, makeWFCRequest, resolveModRestrictPermission } from "../utils.js";
 
 const config = getConfig();
 const channels = getChannels();
@@ -176,7 +176,7 @@ async function set(interaction: ChatInputCommandInteraction<CacheType>) {
             console.log(`Region: ${regionIdxToName(i)}, None`);
     }
 
-    const [success, res] = await makeRequest("/api/set_hash", "POST", {
+    const [success, res] = await makeWFCRequest("/set_hash", "POST", {
         secret: config.wfcSecret,
         pack_id: packID,
         version: version,
@@ -215,7 +215,7 @@ async function set(interaction: ChatInputCommandInteraction<CacheType>) {
 }
 
 async function list(interaction: ChatInputCommandInteraction<CacheType>) {
-    const [success, res] = await makeRequest("/api/get_hash", "POST", {
+    const [success, res] = await makeWFCRequest("/get_hash", "POST", {
         secret: config.wfcSecret
     });
 
@@ -290,7 +290,7 @@ async function del(interaction: ChatInputCommandInteraction<CacheType>) {
 
     const version = interaction.options.getInteger("version", true);
 
-    const [success, res] = await makeRequest("/api/remove_hash", "POST", {
+    const [success, res] = await makeWFCRequest("/remove_hash", "POST", {
         secret: config.wfcSecret,
         pack_id: packID,
         version: version,

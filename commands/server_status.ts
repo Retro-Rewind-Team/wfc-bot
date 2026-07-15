@@ -2,7 +2,7 @@ import { CacheType, ChatInputCommandInteraction, SlashCommandBuilder } from "dis
 import { getChannels, getConfig } from "../config.js";
 import { Status, StatusColor } from "./server_status_types.js";
 import { loadState, State } from "../state.js";
-import { makeRequest } from "../utils.js";
+import { makeWFCRequest } from "../utils.js";
 
 const config = getConfig();
 const state: State = await loadState();
@@ -65,7 +65,7 @@ export default {
         if (state.motd)
             motd = `${state.motd}\n\n${motd}`;
 
-        const [success, res] = await makeRequest("/api/motd", "POST", { secret: config.wfcSecret, motd: motd});
+        const [success, res] = await makeWFCRequest("/motd", "POST", { secret: config.wfcSecret, motd: motd});
         if (!success)
             await interaction.followUp({ content: `Failed to set message of the day, error: ${res.Error ?? "no error message provided"}` });
         else

@@ -1,5 +1,5 @@
 import { CacheType, ChatInputCommandInteraction, PermissionFlagsBits, SlashCommandBuilder } from "discord.js";
-import { makeRequest, pidToFc, resolvePidFromString, sendEmbedLog, validateID } from "../utils.js";
+import { makeWFCRequest, pidToFc, resolvePidFromString, sendEmbedLog, validateID } from "../utils.js";
 import { getConfig } from "../config.js";
 
 const config = getConfig();
@@ -39,7 +39,7 @@ export default {
         const hide = interaction.options.getBoolean("hide-name") ?? false;
 
         const fc = pidToFc(pid);
-        const [success, res] = await makeRequest("/api/clear", "POST", { secret: config.wfcSecret, pid: pid });
+        const [success, res] = await makeWFCRequest("/clear", "POST", { secret: config.wfcSecret, pid: pid });
         if (success) {
             await sendEmbedLog(interaction, "clear", fc, res.User, [
                 { name: "Reason", value: reason },

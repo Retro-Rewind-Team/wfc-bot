@@ -2,7 +2,7 @@ import { ActionRowBuilder, APIMessageTopLevelComponent, ButtonBuilder, ButtonInt
 import { getConfig } from "../config.js";
 import { Dictionary } from "../dictionary.js";
 import { registerButtonHandlerByMessageID } from "../index.js";
-import { createUserEmbed, makeRequest, resolveModRestrictPermission, resolvePidFromString, validateID } from "../utils.js";
+import { createUserEmbed, makeWFCRequest, resolveModRestrictPermission, resolvePidFromString, validateID } from "../utils.js";
 
 const config = getConfig();
 
@@ -89,7 +89,7 @@ export default {
         else if (banned)
             hasban = 2;
 
-        const [success, res] = await makeRequest("/api/query", "POST", {
+        const [success, res] = await makeWFCRequest("/query", "POST", {
             secret: config.wfcSecret,
             ip: ip,
             deviceID: deviceID,

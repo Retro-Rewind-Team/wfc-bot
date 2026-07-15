@@ -1,12 +1,12 @@
 import { EmbedBuilder } from "discord.js";
 import { getChannels, getConfig } from "../config.js";
-import { createUserEmbed, makeRequest, WiiLinkUser, wrapTryCatch } from "../utils.js";
+import { createUserEmbed, makeWFCRequest as makeWFCRequest, WiiLinkUser, wrapTryCatch } from "../utils.js";
 
 const config = getConfig();
 const channels = getChannels();
 
 async function fetchNewPlayers() {
-    const [success, res] = await makeRequest("/api/new_players", "POST", {
+    const [success, res] = await makeWFCRequest("/new_players", "POST", {
         secret: config.wfcSecret,
     });
 

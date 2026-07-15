@@ -1,5 +1,5 @@
 import { CacheType, ChatInputCommandInteraction, MessageFlags, SlashCommandBuilder } from "discord.js";
-import { haste, makeRequest, pidToFc, resolveModRestrictPermission, resolvePidFromString, validateID } from "../utils.js";
+import { haste, makeWFCRequest, pidToFc, resolveModRestrictPermission, resolvePidFromString, validateID } from "../utils.js";
 import { getConfig } from "../config.js";
 
 const config = getConfig();
@@ -33,7 +33,7 @@ export default {
 
         const pid = resolvePidFromString(id);
         const fc = pidToFc(pid);
-        const [success, res] = await makeRequest("/api/investigate", "POST", {
+        const [success, res] = await makeWFCRequest("/investigate", "POST", {
             secret: config.wfcSecret,
             pid: pid,
         });

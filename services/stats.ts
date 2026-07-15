@@ -21,7 +21,7 @@ export function getStats() {
     return stats;
 }
 
-const fetchStatsUrl = `http://${config.wfcServer}:${config.wfcPort}/api/stats`;
+const fetchStatsUrl = `${config.wfcAPIBase}/stats`;
 
 async function fetchStats() {
     stats = await utils.queryJson(fetchStatsUrl)

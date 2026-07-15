@@ -1,5 +1,5 @@
 import { getConfig } from "../../config.js";
-import { makeRequest, resolvePidFromString, validateID } from "../../utils.js";
+import { makeWFCRequest, resolvePidFromString, validateID } from "../../utils.js";
 
 // Name lengths are 10, each char is 2 bytes
 const NAME_LEN = 10;
@@ -69,7 +69,7 @@ export async function getMiiBuf(pidOrFC: string, sanitized: boolean): Promise<[B
         return [null, `Error retrieving Mii for friend code or pid "${id}": ${err}`];
 
     const pid = resolvePidFromString(id);
-    const [success, res] = await makeRequest("/api/mii", "POST", {
+    const [success, res] = await makeWFCRequest("/mii", "POST", {
         secret: sanitized ? null : config.wfcSecret,
         pid: pid
     });
