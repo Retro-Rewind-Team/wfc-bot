@@ -172,7 +172,6 @@ export async function sendEmbedLog(interaction: ChatInputCommandInteraction<Cach
         .setTimestamp();
 
     privEmbed.setThumbnail(thumbnail);
-    console.log(thumbnail);
 
     if (opts)
         privEmbed.addFields(...opts);
@@ -287,8 +286,6 @@ export function createUserEmbed(user: WiiLinkUser, priv: boolean): EmbedBuilder 
         .setTitle(`Player info for friend code ${fc}`)
         .setThumbnail(getMiiImageURL(fc))
         .setTimestamp();
-
-    console.log(getMiiImageURL(fc));
 
     let issuedDate = Date.parse(user.BanIssued);
     let expiresDate = Date.parse(user.BanExpires);
