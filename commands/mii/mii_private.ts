@@ -10,7 +10,7 @@ export default {
         .setName("mii_private")
         .setDescription("Fetch the Mii for a pid or FC")
         .addStringOption(option => option.setName("id")
-            .setDescription("friend code or pid to kick")
+            .setDescription("friend code or pid to fetch the mii of")
             .setRequired(true)),
 
     exec: async function(interaction: ChatInputCommandInteraction<CacheType>) {
@@ -18,15 +18,19 @@ export default {
         id = id.trim();
 
         const [valid, err] = validateID(id);
-        if (!valid)
-            return [null, `Error retrieving Mii for friend code or pid "${id}": ${err}`];
+        if (!valid) {
+            await interaction.reply({
+                content: `Error retrieving Mii for friend code or pid "${id}": ${err}`
+            });
+            return;
+        }
 
         const pid = resolvePidFromString(id);
         const fc = pidToFc(pid);        // Private comand, sanitized is false
         const [miiBuf, miiErr] = await getMiiBuf(id, false);
 
         if (miiErr != null || miiBuf == null) {
-            interaction.reply({ content: err ?? "unknown error", flags: MessageFlags.Ephemeral });
+            interaction.reply({ content: miiErr ?? "unknown error", flags: MessageFlags.Ephemeral });
             return;
         }
 
