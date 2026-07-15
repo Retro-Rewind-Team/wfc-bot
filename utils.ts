@@ -40,8 +40,13 @@ export function validateID(fcOrPid: string): [boolean, string | null] {
     if (fcOrPid == "")
         return [false, "Empty fc or pid"];
 
-    if (fcOrPid.match(pidRegex))
+    if (fcOrPid.match(pidRegex)) {
+        const pidNum = parseInt(fcOrPid);
+        if (pidNum > 4294967295)
+            return [false, "This number is too large. Did you forget hyphens?"];
+
         return [true, null];
+    }
 
     if (!fcOrPid.match(fcRegex))
         return [false, "Invalid Format"];
