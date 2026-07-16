@@ -62,7 +62,7 @@ export default {
         const leaderboardUrl = `http://${config.leaderboardServer}:${config.leaderboardPort}`;
 
         try {
-            const response = await fetch(`${leaderboardUrl}/racestats/player/${pid}/full`, {
+            const response = await fetch(`${leaderboardUrl}/api/racestats/player/${pid}/full`, {
                 method: "GET",
             });
 
