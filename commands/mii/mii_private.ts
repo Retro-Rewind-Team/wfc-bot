@@ -1,6 +1,6 @@
 import { CacheType, ChatInputCommandInteraction, EmbedBuilder, MessageFlags, SlashCommandBuilder } from "discord.js";
 import { formatMiiData, getMiiBuf, processMiiBuf } from "./mii_shared.js";
-import { getMiiImageURL, pidToFc, resolvePidFromString, validateID } from "../../utils.js";
+import { getMiiImageURL, pidToFc, resolveModRestrictPermission, resolvePidFromString, validateID } from "../../utils.js";
 
 export default {
     modOnly: true,
@@ -11,7 +11,8 @@ export default {
         .setDescription("Fetch the Mii for a pid or FC")
         .addStringOption(option => option.setName("id")
             .setDescription("friend code or pid to fetch the mii of")
-            .setRequired(true)),
+            .setRequired(true))
+        .setDefaultMemberPermissions(resolveModRestrictPermission()),
 
     exec: async function(interaction: ChatInputCommandInteraction<CacheType>) {
         let id = interaction.options.getString("id", true);
@@ -26,7 +27,7 @@ export default {
         }
 
         const pid = resolvePidFromString(id);
-        const fc = pidToFc(pid);        // Private comand, sanitized is false
+        const fc = pidToFc(pid); // Private comand, sanitized is false
         const [miiBuf, miiErr] = await getMiiBuf(id, false);
 
         if (miiErr != null || miiBuf == null) {
