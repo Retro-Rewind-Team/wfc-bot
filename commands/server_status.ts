@@ -63,7 +63,7 @@ export default {
 
         let motd = getStatusText({ color: color, message: message });
         if (state.motd)
-            motd = `${state.motd}\n\n${motd}`;
+            motd = `${state.motd}\n${motd}`;
 
         const [success, res] = await makeWFCRequest("/motd", "POST", { secret: config.wfcSecret, motd: motd});
         if (!success)
