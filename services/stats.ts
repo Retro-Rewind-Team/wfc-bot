@@ -26,11 +26,12 @@ const fetchStatsUrl = `${config.wfcAPIBase}/stats`;
 async function fetchStats() {
     stats = await utils.queryJson(fetchStatsUrl)
         ?? utils.throwInline("Empty or no json response from stats api.");
-    const players = stats?.mariokartwii?.active ?? 0;
+    const playersInRooms = stats?.mariokartwii?.active ?? 0;
+    const playersOnline = stats?.mariokartwii?.online ?? 0;
     const rooms = stats?.mariokartwii?.groups ?? 0;
 
     const presenceText =
-        `${players} ${utils.plural(players, "player")} in ${rooms} ${utils.plural(rooms, "room")}!`;
+        `${playersInRooms}(${playersOnline}) ${utils.plural(playersInRooms, "player")} in ${rooms} ${utils.plural(rooms, "room")}!`;
 
     client.user?.setPresence({
         status: "online",
