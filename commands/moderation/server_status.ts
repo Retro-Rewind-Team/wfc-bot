@@ -1,4 +1,4 @@
-import { CacheType, ChatInputCommandInteraction, SlashCommandBuilder } from "discord.js";
+import { CacheType, ChatInputCommandInteraction, PermissionFlagsBits, SlashCommandBuilder } from "discord.js";
 import { getChannels, getConfig } from "../../config.js";
 import { getStatusColorEmoji, getStatusText, StatusColor } from "../shared/server_status.js";
 import { loadState, State } from "../../state.js";
@@ -27,7 +27,8 @@ export default {
             .setRequired(true))
         .addStringOption(option => option.setName("message")
             .setDescription("The status message")
-            .setRequired(true)),
+            .setRequired(true))
+        .setDefaultMemberPermissions(PermissionFlagsBits.Administrator),
 
     exec: async function(interaction: ChatInputCommandInteraction<CacheType>) {
         const color: StatusColor = interaction.options.getNumber("color", true);
