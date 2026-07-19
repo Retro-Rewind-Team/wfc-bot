@@ -4,7 +4,7 @@ import { existsSync, readFileSync, writeFileSync } from "fs";
 import { exit } from "process";
 import { getChannels } from "./config.js";
 import { Group } from "./services/groups.js";
-import { Status, StatusColor } from "./commands/server_status_types.js";
+import { Status, StatusColor } from "./commands/shared/server_status.js";
 
 const channels = getChannels();
 
