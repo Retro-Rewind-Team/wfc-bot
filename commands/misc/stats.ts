@@ -1,6 +1,7 @@
 import { CacheType, ChatInputCommandInteraction, EmbedBuilder, SlashCommandBuilder } from "discord.js";
-import { getColor, getMiiImageURL, pidToFc, resolvePidFromString, validateID } from "../../utils.js";
 import { getConfig } from "../../config.js";
+import { getColor, getMiiImageURL, pidToFc, resolvePidFromString, validateID } from "../../utils.js";
+import { BadgeType } from "../badge_types.js";
 
 const config = getConfig();
 
@@ -22,6 +23,7 @@ interface PlayerStatsResponse {
         topTracks: { trackName: string; raceCount: number }[];
         avgFramesIn1stPerRace: number;
     } | null;
+    badges: BadgeType[];
 }
 
 function formatVRChange(change: number): string {
@@ -153,6 +155,13 @@ export default {
                     },
                     { name: "\u200B", value: "\u200B", inline: true }
                 );
+            }
+
+            if (stats.badges && stats.badges.length != 0) {
+                embed.addFields({ name: "\u200B", value: "" });
+
+                const badgeNames = stats.badges.map(badge => BadgeType[badge]).join(", ");
+                embed.addFields({ name: "Badges", value: badgeNames });
             }
 
             embed
