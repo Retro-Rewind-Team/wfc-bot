@@ -9,6 +9,11 @@ export default tseslint.config({
         eslint.configs.recommended,
         tseslint.configs.recommended,
     ],
+    languageOptions: {
+        parserOptions: {
+            projectService: true,
+        }
+    },
     rules: {
         indent: ["error", 4, {
             "SwitchCase": 0,
@@ -25,5 +30,6 @@ export default tseslint.config({
         "brace-style": ["error", "stroustrup"],
         "no-trailing-spaces": "error",
         "nonblock-statement-body-position": ["error", "below"],
+        "@typescript-eslint/no-floating-promises": ["error"],
     },
 });

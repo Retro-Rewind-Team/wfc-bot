@@ -31,7 +31,7 @@ export default {
         const [miiBuf, miiErr] = await getMiiBuf(id, false);
 
         if (miiErr != null || miiBuf == null) {
-            interaction.reply({ content: miiErr ?? "unknown error", flags: MessageFlags.Ephemeral });
+            await interaction.reply({ content: miiErr ?? "unknown error", flags: MessageFlags.Ephemeral });
             return;
         }
 

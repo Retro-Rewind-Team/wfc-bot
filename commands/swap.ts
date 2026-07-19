@@ -23,8 +23,8 @@ export default {
         .setDefaultMemberPermissions(resolveModRestrictPermission()),
 
     exec: async function(interaction: ChatInputCommandInteraction<CacheType>) {
-        let sourceId = interaction.options.getString("source-id", true).trim();
-        let targetId = interaction.options.getString("target-id", true).trim();
+        const sourceId = interaction.options.getString("source-id", true).trim();
+        const targetId = interaction.options.getString("target-id", true).trim();
         const reason = interaction.options.getString("reason", true);
         const moderator = interaction.user.id;
 

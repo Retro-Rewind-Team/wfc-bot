@@ -194,7 +194,7 @@ async function handleButton(buttonInteraction: ButtonInteraction<CacheType>) {
             lastButton.setDisabled(newPage == state.totalPages - 1)
         );
 
-    buttonInteraction.update({
+    await buttonInteraction.update({
         embeds: [embed],
         components: [row as unknown as APIMessageTopLevelComponent]
     });

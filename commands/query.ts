@@ -212,7 +212,7 @@ async function handleButton(buttonInteraction: ButtonInteraction<CacheType>) {
             end.setDisabled(newidx == maxidx)
         );
 
-    buttonInteraction.update({
+    await buttonInteraction.update({
         embeds: [state.Embeds[newidx]],
         components: [row as unknown as APIMessageTopLevelComponent],
     });

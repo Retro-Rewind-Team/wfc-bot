@@ -65,33 +65,33 @@ function findCommadFiles(root: string): string[] {
 client.once(Events.ClientReady, async function(readyClient) {
     console.log(`Logged in as ${readyClient.user.tag}`);
 
-    initChannels(client);
+    await initChannels(client);
 
     const commandsRoot = path.join(import.meta.dirname ?? __dirname, "commands");
     const commandFiles = findCommadFiles(commandsRoot);
 
     // Because of really strange node behavior involving import and resolving
     // promises, commands cannot be awaited, so a callback is used instead.
-    resolveCommands(commandFiles, (commands) => {
+    await resolveCommands(commandFiles, async (commands) => {
         client.on(Events.InteractionCreate, async interaction => {
             if (interaction.isAutocomplete())
-                handleAutocomplete(interaction, commands);
+                await handleAutocomplete(interaction, commands);
             else if (interaction.isChatInputCommand())
-                handleCommand(interaction as ChatInputCommandInteraction<CacheType>, commands);
+                await handleCommand(interaction as ChatInputCommandInteraction<CacheType>, commands);
             else if (interaction.isButton())
-                handleButton(interaction);
+                await handleButton(interaction);
         });
 
         if (refresh)
-            refreshCommands(commands);
+            await refreshCommands(commands);
 
         const servicesRoot = path.join(import.meta.dirname ?? __dirname, "services");
         const serviceFiles = fs.readdirSync(servicesRoot).filter(file => file.endsWith(".js"));
-        startServices(servicesRoot, serviceFiles);
+        await startServices(servicesRoot, serviceFiles);
     });
 });
 
-client.login(config["token"]);
+await client.login(config["token"]);
 
 // TODO: Make this function not suck?
 function isAllowedInteraction(interaction: ChatInputCommandInteraction<CacheType>, command: Command) {
@@ -255,13 +255,13 @@ async function handleAutocomplete(interaction: AutocompleteInteraction<CacheType
             return;
         }
 
-        interaction.respond([]);
+        await interaction.respond([]);
     }
     catch (error) {
         console.error(error);
 
         if (!interaction.responded)
-            interaction.respond([]);
+            await interaction.respond([]);
     }
 }
 
@@ -288,7 +288,7 @@ async function handleButton(interaction: ButtonInteraction<CacheType>) {
     if (cb)
         await cb(interaction);
     else {
-        interaction.update({
+        await interaction.update({
             content: "This interaction has expired! Try resending your original command.",
             components: [],
             embeds: [],
