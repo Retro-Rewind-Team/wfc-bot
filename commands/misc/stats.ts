@@ -1,7 +1,7 @@
 import { CacheType, ChatInputCommandInteraction, EmbedBuilder, SlashCommandBuilder } from "discord.js";
 import { getConfig } from "../../config.js";
 import { getColor, getMiiImageURL, pidToFc, resolvePidFromString, validateID } from "../../utils.js";
-import { BadgeType } from "../badge_types.js";
+import { BadgeType } from "../shared/badges.js";
 
 const config = getConfig();
 

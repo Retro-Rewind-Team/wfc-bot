@@ -1,8 +1,8 @@
 import { CacheType, ChatInputCommandInteraction, SlashCommandBuilder } from "discord.js";
-import { pidToFc, resolveModRestrictPermission, resolvePidFromString, validateID } from "../utils.js";
-import { BadgeType } from "./badge_types.js";
-import { getConfig } from "../config.js";
-import { Dictionary } from "../dictionary.js";
+import { pidToFc, resolveModRestrictPermission, resolvePidFromString, validateID } from "../../utils.js";
+import { BadgeType } from "../shared/badges.js";
+import { getConfig } from "../../config.js";
+import { Dictionary } from "../../dictionary.js";
 
 const config = getConfig();
 const leaderboardUrl = `http://${config.leaderboardServer}:${config.leaderboardPort}`;
@@ -144,9 +144,9 @@ async function list(interaction: ChatInputCommandInteraction<CacheType>) {
 
     // Get all players' badges
     if (id == null || id.length == 0)
-        list_all(interaction);
+        await list_all(interaction);
     else
-        list_single(interaction, id);
+        await list_single(interaction, id);
 }
 
 // TODO: Paginate?
