@@ -43,11 +43,8 @@ export default {
         else {
             const [success, res] = await makeWFCRequest("/motd", "GET");
 
-            if (success) {
+            if (success)
                 await interaction.reply({ content: `Current message of the day is:\n${res.Motd}` });
-                state.motd = res.Motd;
-                state.save();
-            }
             else
                 await interaction.reply({ content: `Failed to fetch current message of the day, error: ${res.Error ?? "no error message provided"}` });
         }
