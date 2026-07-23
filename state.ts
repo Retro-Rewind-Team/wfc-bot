@@ -41,12 +41,18 @@ export class State {
         const messages: Dictionary<Message> = {};
 
         for (const key of Object.keys(stateSerialized.messages)) {
-            const message = await channels.roomPing.messages.fetch(stateSerialized.messages[key]);
+            try {
+                const message = await channels.roomPing.messages.fetch(stateSerialized.messages[key]);
 
-            if (message)
-                messages[key] = message;
-            else
-                console.error(`Message for ID ${key}:${stateSerialized.messages[key]} could not be found!`);
+                if (message)
+                    messages[key] = message;
+                else
+                    console.error(`Message for ID ${key}:${stateSerialized.messages[key]} could not be found!`);
+            }
+            catch (error) {
+                console.error(`Message for ID ${key}:${stateSerialized.messages[key]} could not be loaded! error: ${error}`);
+                continue;
+            }
         }
 
         return new State(messages, stateSerialized.pingedRooms, stateSerialized.status, stateSerialized.motd);
