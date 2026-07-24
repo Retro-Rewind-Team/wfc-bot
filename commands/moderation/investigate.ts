@@ -56,6 +56,11 @@ export default {
 
             output += `${key}:\n    `;
 
+            if (res[key] == null) {
+                output += "null\n";
+                continue;
+            }
+
             for (let i = 0; i < res[key].length; i++) {
                 if (i == res[key].length - 1)
                     output += `'${res[key][i]}'\n`;
