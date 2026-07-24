@@ -13,7 +13,7 @@ export default {
         .setName("investigate")
         .setDescription("Search all associated data for a user")
         .addStringOption(option => option.setName("id")
-            .setDescription("friend code or pid to ban")
+            .setDescription("friend code or pid to investigate")
             .setRequired(true))
         .setDefaultMemberPermissions(resolveModRestrictPermission()),
 
