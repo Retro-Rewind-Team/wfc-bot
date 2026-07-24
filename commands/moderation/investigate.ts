@@ -31,6 +31,8 @@ export default {
             return;
         }
 
+        await interaction.deferReply({ flags: MessageFlags.Ephemeral });
+
         const pid = resolvePidFromString(id);
         const fc = pidToFc(pid);
         const [success, res] = await makeWFCRequest("/investigate", "POST", {
@@ -39,9 +41,8 @@ export default {
         });
 
         if (!success) {
-            await interaction.reply({
+            await interaction.editReply({
                 content: `Failed to investigate friend code "${fc}": error ${res.Error ?? "no error message provided"}`,
-                flags: MessageFlags.Ephemeral,
             });
 
             return;
@@ -72,17 +73,15 @@ export default {
         const [hcode, hout, herr] = await haste(output);
 
         if (hcode != 200) {
-            await interaction.reply({
-                content: `Successfully investigated friend code "${fc}", but failed to upload the results: error ${herr ?? "no error message provided"}`,
-                flags: MessageFlags.Ephemeral,
+            await interaction.editReply({
+                content: `Successfully investigated friend code "${fc}", but failed to upload the results: error ${herr ?? "no error message provided"}`
             });
 
             return;
         }
 
-        await interaction.reply({
+        await interaction.editReply({
             content: hout,
-            flags: MessageFlags.Ephemeral,
         });
     }
 };
