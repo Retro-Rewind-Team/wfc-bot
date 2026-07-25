@@ -299,15 +299,10 @@ export default {
             if (lang == "")
                 continue;
 
-            if (!SheetLangToLocaleInfo[lang]) {
-                console.log(`Skipping column with language ${lang}!`);
+            if (!SheetLangToLocaleInfo[lang])
                 continue;
-            }
 
-            const perc = percs[i];
-            console.log(`Perc for language ${lang} is ${perc}`);
-
-            SheetLangToLocaleInfo[lang].PercComplete = perc;
+            SheetLangToLocaleInfo[lang].PercComplete = percs[i];
         }
 
         for (let i = 2; i < lines.length; i++) {
@@ -341,7 +336,7 @@ export default {
             }
         }
 
-        console.log(`Fetched track listing: ${SheetLangToLocaleInfo["Common/English"].Tracks.length} tracks!`);
+        console.log(`Fetched course listing: ${SheetLangToLocaleInfo["Common/English"].Tracks.length} courses!`);
     },
 
     autocomplete: async function(interaction: AutocompleteInteraction<CacheType>) {
