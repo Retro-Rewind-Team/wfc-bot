@@ -10,6 +10,7 @@ export interface Config {
     miiEndPoint: string
     wfcAPIBase: string
     wfcSecret: string
+    adminServers: string[]
     userPermissions: Dictionary<number>,
     logsChannel: string
     publicLogsChannel: string
@@ -68,6 +69,9 @@ export function initConfig(path: string): void {
                 miiEndPoint: "https://rwfc.net/api/leaderboard/player/{fc}/mii",
                 wfcAPIBase: "base route for wfc apis. Something like http://rwfc.net/api",
                 wfcSecret: "your wfc secret key",
+                adminServers: [
+                    "Allow guild ids here."
+                ],
                 userPermissions: {},
                 logsChannel: "Channel id to send successful moderative actions to.",
                 publicLogsChannel: "Channel id to send the public version of moderative actions to.",
@@ -173,9 +177,8 @@ function migrateConfig(config: Config): boolean {
     const m1 = migrateOldPermission(config, "allowedAdmins", PermissionBit.ADMIN);
     const m2 = migrateOldPermission(config, "allowedModerators", PermissionBit.MODERATOR);
     const m3 = migrateOldPermission(config, "allowedBKTUpdaters", PermissionBit.BKT_UPDATER);
-    const m4 = delete (config as unknown as Dictionary<unknown>)["adminServers"];
 
-    return m1 || m2 || m3 || m4;
+    return m1 || m2 || m3;
 }
 
 function migrateOldPermission(
