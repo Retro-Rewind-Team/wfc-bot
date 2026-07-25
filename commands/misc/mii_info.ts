@@ -1,9 +1,9 @@
 import { CacheType, ChatInputCommandInteraction, MessageFlags, SlashCommandBuilder } from "discord.js";
 import { formatMiiData, processMiiBuf } from "../shared/mii.js";
+import { PermissionBit } from "../shared/roles.js";
 
 export default {
-    modOnly: false,
-    adminOnly: false,
+    permissions: PermissionBit.NONE,
 
     data: new SlashCommandBuilder()
         .setName("mii_info")

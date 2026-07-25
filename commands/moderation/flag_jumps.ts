@@ -1,12 +1,12 @@
 import { CacheType, ChatInputCommandInteraction, EmbedBuilder, MessageFlags, SlashCommandBuilder } from "discord.js";
 import { getColor, pidToFc, resolveModRestrictPermission, resolvePidFromString, validateID } from "../../utils.js";
 import { getConfig } from "../../config.js";
+import { PermissionBit } from "../shared/roles.js";
 
 const config = getConfig();
 
 export default {
-    modOnly: true,
-    adminOnly: false,
+    permissions: PermissionBit.MODERATOR,
 
     data: new SlashCommandBuilder()
         .setName("flag_jumps")

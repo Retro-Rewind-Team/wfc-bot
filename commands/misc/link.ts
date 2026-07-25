@@ -2,12 +2,12 @@ import { CacheType, ChatInputCommandInteraction, MessageFlags, SlashCommandBuild
 import { makeWFCRequest, pidToFc, resolvePidFromString, validateID } from "../../utils.js";
 import { getConfig } from "../../config.js";
 import { currentlyVerifying } from "../shared/link.js";
+import { PermissionBit } from "../shared/roles.js";
 
 const config = getConfig();
 
 export default {
-    modOnly: false,
-    adminOnly: false,
+    permissions: PermissionBit.NONE,
 
     data: new SlashCommandBuilder()
         .setName("link")

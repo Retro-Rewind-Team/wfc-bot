@@ -3,6 +3,7 @@ import { getChannels, getConfig } from "../../config.js";
 import { getStatusColorEmoji, getStatusText, StatusColor } from "../shared/server_status.js";
 import { loadState, State } from "../../state.js";
 import { makeWFCRequest } from "../../utils.js";
+import { PermissionBit } from "../shared/roles.js";
 
 const config = getConfig();
 const state: State = await loadState();
@@ -15,8 +16,7 @@ const ColorOpts = [
 ];
 
 export default {
-    modOnly: false,
-    adminOnly: true,
+    permissions: PermissionBit.ADMIN,
 
     data: new SlashCommandBuilder()
         .setName("server_status")

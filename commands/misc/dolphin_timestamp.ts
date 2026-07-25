@@ -1,10 +1,10 @@
 import { CacheType, ChatInputCommandInteraction, MessageFlags, SlashCommandBuilder } from "discord.js";
+import { PermissionBit } from "../shared/roles.js";
 
 const serialRegexp = /([0-9]*)/;
 
 export default {
-    modOnly: false,
-    adminOnly: false,
+    permissions: PermissionBit.NONE,
 
     data: new SlashCommandBuilder()
         .setName("dolphin_timestamp")

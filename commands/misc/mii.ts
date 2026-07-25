@@ -1,10 +1,10 @@
 import { CacheType, ChatInputCommandInteraction, EmbedBuilder, MessageFlags, SlashCommandBuilder } from "discord.js";
 import { formatMiiData, getMiiBuf, processMiiBuf } from "../shared/mii.js";
 import { getMiiImageURL, pidToFc, resolvePidFromString, validateID } from "../../utils.js";
+import { PermissionBit } from "../shared/roles.js";
 
 export default {
-    modOnly: false,
-    adminOnly: false,
+    permissions: PermissionBit.NONE,
 
     data: new SlashCommandBuilder()
         .setName("mii")

@@ -1,8 +1,10 @@
-import { AutocompleteInteraction, ButtonInteraction, CacheType, ChatInputCommandInteraction, Client, Events, IntentsBitField, MessageFlags, REST, RESTPostAPIChatInputApplicationCommandsJSONBody, RESTPutAPIApplicationCommandsResult, Routes, SlashCommandOptionsOnlyBuilder } from "discord.js";
+import { AutocompleteInteraction, ButtonInteraction, CacheType, ChatInputCommandInteraction, Client, Events, IntentsBitField, MessageFlags, REST, RESTPostAPIChatInputApplicationCommandsJSONBody, RESTPutAPIApplicationCommandsResult, Routes } from "discord.js";
 import { getConfig, initChannels, initConfig } from "./config.js";
 import { Dictionary } from "./dictionary.js";
 import * as fs from "fs";
 import * as path from "path";
+import { Command } from "./commands/shared/command.js";
+import { isAllowedInteraction, PermissionBit as PermissionBit } from "./commands/shared/roles.js";
 
 // https://stackoverflow.com/questions/43834559/how-to-find-which-promises-are-unhandled-in-node-js-unhandledpromiserejectionwar
 // Better logging of unhandled promises
@@ -41,7 +43,7 @@ for (let i = 2; i < process.argv.length; i++) {
 }
 
 initConfig(configPath.length > 0 ? configPath : path.join(process.cwd(), "config.json"));
-let config = getConfig();
+const config = getConfig();
 
 function findCommadFiles(root: string): string[] {
     let ret: string[] = [];
@@ -93,42 +95,6 @@ client.once(Events.ClientReady, async function(readyClient) {
 
 await client.login(config["token"]);
 
-// TODO: Make this function not suck?
-function isAllowedInteraction(interaction: ChatInputCommandInteraction<CacheType>, command: Command) {
-    config = getConfig();
-
-    const err: string[] = [];
-
-    let allowed = true;
-
-    if (command.adminOnly && !config.allowedAdmins.includes(interaction.user.id)) {
-        err.push("not an admin");
-        allowed = false;
-    }
-
-    if (command.modOnly && !config.allowedModerators.includes(interaction.user.id)) {
-        err.push("not a moderator");
-        allowed = false;
-    }
-
-    if (command.bktOnly && !config.allowedBKTUpdaters.includes(interaction.user.id)) {
-        err.push("not a bkt updater");
-        allowed = false;
-    }
-
-    return [allowed, err.join(", ")];
-}
-
-interface Command {
-    bktOnly: boolean,
-    modOnly: boolean,
-    adminOnly: boolean,
-    data: SlashCommandOptionsOnlyBuilder,
-    init?: () => Promise<void>,
-    autocomplete?: (_: AutocompleteInteraction<CacheType>) => Promise<void>,
-    exec: (_: ChatInputCommandInteraction<CacheType>) => Promise<void>,
-}
-
 async function resolveCommands(files: string[], callback: (_: Dictionary<Command>) => void) {
     const ret: Dictionary<Command> = {};
 
@@ -148,20 +114,17 @@ async function resolveCommands(files: string[], callback: (_: Dictionary<Command
             }
         }
 
-        // Set default permissions
-        if (!("adminOnly" in spec))
-            spec.adminOnly = true;
-
-        if (!("modOnly" in spec))
-            spec.modOnly = false;
-
-        if (!("bktOnly" in spec))
-            spec.bktOnly = false;
-
         if ("data" in spec && "exec" in spec) {
             const name = path.basename(file, ".js");
             console.log(`Registered command ${name} from file ${file}`);
             ret[name] = spec;
+
+            if (!("permissions" in spec))
+                throw `spec ${file} is missing permissions!`;
+
+            // Allow all admins and super admins to run any command not restricted to super admins
+            if (spec.permissions != PermissionBit.NONE && !(spec.permissions & PermissionBit.SUPER_ADMIN))
+                spec.permissions |= (PermissionBit.ADMIN | PermissionBit.SUPER_ADMIN);
         }
         else
             console.error(`The command at ${file} is missing a required data or exec property`);
@@ -196,23 +159,24 @@ async function handleCommand(interaction: ChatInputCommandInteraction<CacheType>
         return;
 
     try {
-        for (const cname in commands) {
-            if (cname != interaction.commandName)
-                continue;
+        const command = commands[interaction.commandName];
 
-            const command = commands[cname];
-            const [allowed, err] = isAllowedInteraction(interaction, command);
-            if (!allowed) {
-                await interaction.reply({ content: `Command ${cname} is not allowed! Error: ${err}` });
-                return;
-            }
-
-            await command.exec(interaction);
+        if (!command) {
+            await interaction.reply({
+                content: `No command exists by the name of ${interaction.commandName}`
+            });
             return;
         }
 
-        await interaction.reply({ content: `No command exists by the name of ${interaction.commandName}` });
-        return;
+        const [allowed, err] = isAllowedInteraction(interaction, command);
+        if (!allowed) {
+            await interaction.reply({
+                content: `Command ${interaction.commandName} is not allowed! Error: ${err}`
+            });
+            return;
+        }
+
+        await command.exec(interaction);
     }
     catch (error) {
         console.error(error);
@@ -301,7 +265,7 @@ async function refreshCommands(commands: Dictionary<Command>) {
     const adminCommands: RESTPostAPIChatInputApplicationCommandsJSONBody[] = [];
 
     for (const cname in commands) {
-        if (!commands[cname].adminOnly)
+        if (!(commands[cname].permissions & (PermissionBit.ADMIN | PermissionBit.SUPER_ADMIN)))
             globalCommands.push(commands[cname].data.toJSON());
         else
             adminCommands.push(commands[cname].data.toJSON());

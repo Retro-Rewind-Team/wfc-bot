@@ -4,6 +4,7 @@ import { getChannels } from "../../config.js";
 import { exit } from "process";
 import { getColor } from "../../utils.js";
 import { Dictionary } from "../../dictionary.js";
+import { PermissionBit } from "../shared/roles.js";
 
 const sheetsUrl = "https://docs.google.com/spreadsheets/d/1kas1J6RcIePcaRRxtTluPZm8C8kydpaoQBtRg15M-zM/export?format=tsv&gid=1003203252#gid=1003203252";
 
@@ -222,8 +223,7 @@ function a(b: string) {
 }
 
 export default {
-    modOnly: false,
-    adminOnly: false,
+    permissions: PermissionBit.NONE,
 
     data: new SlashCommandBuilder()
         .setName("crash_report")

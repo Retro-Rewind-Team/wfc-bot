@@ -1,5 +1,6 @@
 import { CacheType, ChatInputCommandInteraction, EmbedBuilder, SlashCommandBuilder } from "discord.js";
 import { getConfig } from "../../config.js";
+import { PermissionBit } from "../shared/roles.js";
 
 const config = getConfig();
 
@@ -8,9 +9,7 @@ interface DeleteResponse {
 }
 
 export default {
-    bktOnly: true,
-    modOnly: false,
-    adminOnly: false,
+    permissions: PermissionBit.BKT_UPDATER,
 
     data: new SlashCommandBuilder()
         .setName("tt_delete_submission")

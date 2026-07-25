@@ -1,6 +1,7 @@
 import { CacheType, ChatInputCommandInteraction, EmbedBuilder, SlashCommandBuilder } from "discord.js";
 import { getColor, getMiiImageURL, pidToFc, resolvePidFromString, validateID } from "../../utils.js";
 import { getConfig } from "../../config.js";
+import { PermissionBit } from "../shared/roles.js";
 
 const config = getConfig();
 
@@ -34,8 +35,7 @@ function formatVRChange(change: number): string {
 }
 
 export default {
-    modOnly: false,
-    adminOnly: false,
+    permissions: PermissionBit.NONE,
 
     data: new SlashCommandBuilder()
         .setName("stats")

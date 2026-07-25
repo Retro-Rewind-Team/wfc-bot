@@ -2,13 +2,13 @@ import { CacheType, ChatInputCommandInteraction, EmbedBuilder, MessageFlags, Sla
 import { getColor, makeWFCRequest, pidToFc, resolvePidFromString, validateID } from "../../utils.js";
 import { getChannels, getConfig } from "../../config.js";
 import { currentlyVerifying } from "../shared/link.js";
+import { PermissionBit } from "../shared/roles.js";
 
 const config = getConfig();
 const channels = getChannels();
 
 export default {
-    modOnly: true,
-    adminOnly: false,
+    permissions: PermissionBit.MODERATOR,
 
     data: new SlashCommandBuilder()
         .setName("force_link")

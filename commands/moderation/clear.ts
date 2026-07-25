@@ -1,12 +1,12 @@
 import { CacheType, ChatInputCommandInteraction, PermissionFlagsBits, SlashCommandBuilder } from "discord.js";
 import { makeWFCRequest, pidToFc, resolvePidFromString, sendEmbedLog, validateID } from "../../utils.js";
 import { getConfig } from "../../config.js";
+import { PermissionBit } from "../shared/roles.js";
 
 const config = getConfig();
 
 export default {
-    modOnly: false,
-    adminOnly: true,
+    permissions: PermissionBit.PROFILE_MODERATOR,
 
     data: new SlashCommandBuilder()
         .setName("clear")

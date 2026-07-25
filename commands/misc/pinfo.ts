@@ -1,9 +1,9 @@
 import { CacheType, ChatInputCommandInteraction, SlashCommandBuilder } from "discord.js";
 import { pinfo } from "../shared/pinfo.js";
+import { PermissionBit } from "../shared/roles.js";
 
 export default {
-    modOnly: false,
-    adminOnly: false,
+    permissions: PermissionBit.NONE,
 
     data: new SlashCommandBuilder()
         .setName("pinfo")

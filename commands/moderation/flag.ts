@@ -1,12 +1,12 @@
 import { CacheType, ChatInputCommandInteraction, EmbedBuilder, GuildMember, SlashCommandBuilder } from "discord.js";
 import { getChannels, getConfig } from "../../config.js";
 import { getColor, getMiiImageURL, pidToFc, resolveModRestrictPermission, resolvePidFromString, validateID } from "../../utils.js";
+import { PermissionBit } from "../shared/roles.js";
 
 const config = getConfig();
 
 export default {
-    modOnly: true,
-    adminOnly: false,
+    permissions: PermissionBit.MODERATOR,
 
     data: new SlashCommandBuilder()
         .setName("flag")

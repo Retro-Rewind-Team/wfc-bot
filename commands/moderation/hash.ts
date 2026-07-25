@@ -3,6 +3,7 @@ import { getChannels, getConfig } from "../../config.js";
 import crypto from "crypto";
 import { fmtHex, getColor, makeWFCRequest, resolveModRestrictPermission } from "../../utils.js";
 import { packIDToName, PackOpts } from "../shared/pack.js";
+import { PermissionBit } from "../shared/roles.js";
 
 const config = getConfig();
 const channels = getChannels();
@@ -280,8 +281,7 @@ async function del(interaction: ChatInputCommandInteraction<CacheType>) {
 }
 
 export default {
-    modOnly: true,
-    adminOnly: false,
+    permissions: PermissionBit.PACK_OWNER,
 
     data: new SlashCommandBuilder()
         .setName("hash")

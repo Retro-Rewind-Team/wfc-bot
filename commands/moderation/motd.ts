@@ -3,13 +3,13 @@ import { getConfig } from "../../config.js";
 import { makeWFCRequest } from "../../utils.js";
 import { loadState, State } from "../../state.js";
 import { getStatusText } from "../shared/server_status.js";
+import { PermissionBit } from "../shared/roles.js";
 
 const config = getConfig();
 const state: State = await loadState();
 
 export default {
-    modOnly: false,
-    adminOnly: true,
+    permissions: PermissionBit.ADMIN,
 
     data: new SlashCommandBuilder()
         .setName("motd")

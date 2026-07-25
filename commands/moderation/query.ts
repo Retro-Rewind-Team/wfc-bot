@@ -3,6 +3,7 @@ import { getConfig } from "../../config.js";
 import { Dictionary } from "../../dictionary.js";
 import { registerButtonHandlerByMessageID } from "../../index.js";
 import { createUserEmbed, makeWFCRequest, resolveModRestrictPermission, resolvePidFromString, validateID } from "../../utils.js";
+import { PermissionBit } from "../shared/roles.js";
 
 const config = getConfig();
 
@@ -34,8 +35,7 @@ const end = new ButtonBuilder()
     .setStyle(ButtonStyle.Primary);
 
 export default {
-    modOnly: true,
-    adminOnly: false,
+    permissions: PermissionBit.MODERATOR,
 
     data: new SlashCommandBuilder()
         .setName("query")

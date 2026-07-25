@@ -2,6 +2,7 @@ import { ActionRowBuilder, APIMessageTopLevelComponent, ButtonBuilder, ButtonInt
 import { getConfig } from "../../config.js";
 import { Dictionary } from "../../dictionary.js";
 import { registerButtonHandlerByMessageID } from "../../index.js";
+import { PermissionBit } from "../shared/roles.js";
 
 const config = getConfig();
 const PROFILES_PER_PAGE = 10;
@@ -47,8 +48,7 @@ const lastButton = new ButtonBuilder()
     .setStyle(ButtonStyle.Primary);
 
 export default {
-    modOnly: false,
-    adminOnly: false,
+    permissions: PermissionBit.NONE,
 
     data: new SlashCommandBuilder()
         .setName("tt_profile_list")

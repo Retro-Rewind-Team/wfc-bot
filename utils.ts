@@ -5,7 +5,6 @@ import { Dictionary } from "./dictionary.js";
 
 const fcRegex = new RegExp(/[0-9]{4}-[0-9]{4}-[0-9]{4}/);
 const pidRegex = new RegExp(/^\d+$/);
-const config = getConfig();
 
 let currentColor = 0;
 const colors = [
@@ -96,6 +95,7 @@ export function plural(count: number, text: string) {
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export async function makeWFCRequest(route: string, method: string, data?: object): Promise<[boolean, any]> {
+    const config = getConfig();
     const url = config.wfcAPIBase + route;
 
     try {
@@ -161,7 +161,7 @@ export async function sendEmbedLog(interaction: ChatInputCommandInteraction<Cach
 
     const privEmbed = new EmbedBuilder()
         .setColor(getColor())
-        .setTitle(`${action.charAt(0).toUpperCase() + action.slice(1)} performed by ${member?.displayName ?? "Unknown"}`)
+        .setTitle(`${capitalize(action)} performed by ${member?.displayName ?? "Unknown"}`)
         .addFields(
             { name: "Server", value: interaction.guild!.name },
             { name: "Moderator", value: `<@${member?.id ?? "Unknown"}>` },
@@ -184,7 +184,7 @@ export async function sendEmbedLog(interaction: ChatInputCommandInteraction<Cach
 
     const pubEmbed = new EmbedBuilder()
         .setColor(getColor())
-        .setTitle(`${action.charAt(0).toUpperCase() + action.slice(1)} performed by moderator`)
+        .setTitle(`${capitalize(action)} performed by moderator`)
         .addFields(
             { name: "Friend Code", value: fc },
             { name: "Mii Name", value: hideMiiName ? "\\*\\*\\*\\*\\*" : miiName }
@@ -231,7 +231,7 @@ export function fmtTimeSpan(diff: number): string {
 }
 
 export function resolveModRestrictPermission() {
-    return (PermissionFlagsBits as Dictionary<bigint>)[config.modRestrictPerm] as bigint;
+    return (PermissionFlagsBits as Dictionary<bigint>)[getConfig().modRestrictPerm] as bigint;
 }
 
 const idRegex = new RegExp(/^\d+$/);
@@ -410,5 +410,9 @@ export function wrapTryCatch(fn: () => void) {
 }
 
 export function getMiiImageURL(fc: string) {
-    return config.miiEndPoint.replace("{fc}", fc);
+    return getConfig().miiEndPoint.replace("{fc}", fc);
+}
+
+export function capitalize(str: string) {
+    return `${str.charAt(0).toUpperCase() + str.slice(1)}`;
 }

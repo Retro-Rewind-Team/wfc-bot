@@ -2,6 +2,7 @@ import { Client, GuildChannel, PermissionFlagsBits, TextChannel, VoiceChannel } 
 import { Dictionary } from "./dictionary.js";
 import { existsSync, readFileSync, writeFileSync } from "fs";
 import { exit } from "process";
+import { PermissionBit } from "./commands/shared/roles.js";
 
 export interface Config {
     token: string
@@ -10,9 +11,7 @@ export interface Config {
     wfcAPIBase: string
     wfcSecret: string
     adminServers: string[]
-    allowedAdmins: string[]
-    allowedModerators: string[]
-    allowedBKTUpdaters: string[]
+    userPermissions: Dictionary<number>,
     logsChannel: string
     publicLogsChannel: string
     packOwnersLogsChannel: string
@@ -38,10 +37,18 @@ let _config: Config;
 let _path: string;
 
 function verifyConfig(config: Config) {
-    if (!config.allowedAdmins
-        || !Array.isArray(config.allowedAdmins)
-        || config.allowedAdmins.length == 0)
-        throw "No admins set! Please set one to continue.";
+    if (!config.userPermissions || config.userPermissions.length == 0)
+        throw "At least one user must have the super admin permission (bit 1)!";
+
+    let foundSuperAdmin: boolean = false;
+
+    for (const user in config.userPermissions) {
+        const bits = config.userPermissions[user];
+        foundSuperAdmin ||= !!(bits & PermissionBit.SUPER_ADMIN);
+    }
+
+    if (!foundSuperAdmin)
+        throw "At least one user must have the super admin permission (bit 1)!";
 
     if (!config.modRestrictPerm
         || !(PermissionFlagsBits as Dictionary<bigint>)[config.modRestrictPerm])
@@ -65,15 +72,7 @@ export function initConfig(path: string) {
                 adminServers: [
                     "Allow guild ids here."
                 ],
-                allowedAdmins: [
-                    "Allow user ids here."
-                ],
-                allowedModerators: [
-                    "Allow user ids here."
-                ],
-                allowedBKTUpdaters: [
-                    "Allow user ids here."
-                ],
+                userPermissions: {},
                 logsChannel: "Channel id to send successful moderative actions to.",
                 publicLogsChannel: "Channel id to send the public version of moderative actions to.",
                 packOwnersLogsChannel: "Channel id to send the hash logs to.",
@@ -94,11 +93,18 @@ export function initConfig(path: string) {
                 leaderboardServer: "localhost",
                 logServices: false,
             });
+
+            throw "No config.json was provided. One has been generated for you, please adjust it before retrying!";
         }
 
         const buf = readFileSync(path, { encoding: "utf8" });
         _config = JSON.parse(buf);
 
+        if (migrateConfig(_config)) {
+            console.log("Config migrated, saving config");
+            setConfig(_config);
+            console.log("Config saved");
+        }
         verifyConfig(_config);
     }
     catch (e) {
@@ -163,4 +169,40 @@ async function fetchChannel<T>(client: Client<boolean>, channelID: string, field
         console.log(`${fieldName} set to channel ${(ret as GuildChannel).name}`);
 
     return ret as T;
+}
+
+function migrateConfig(config: Config): boolean {
+    console.log("Attempting to migrate config");
+
+    const m1 = migrateOldPermission(config, "allowedAdmins", PermissionBit.ADMIN);
+    const m2 = migrateOldPermission(config, "allowedModerators", PermissionBit.MODERATOR);
+    const m3 = migrateOldPermission(config, "allowedBKTUpdaters", PermissionBit.BKT_UPDATER);
+
+    return m1 || m2 || m3;
+}
+
+function migrateOldPermission(
+    config: Config,
+    field: string,
+    permissionBit: PermissionBit
+): boolean {
+    // Reference to config as a Dictionary so we can access old fields
+    const oldConfig = config as unknown as Dictionary<unknown>;
+
+    const allowedUsers = oldConfig[field] as string[];
+    if (allowedUsers && allowedUsers.length != 0) {
+        console.log(`Removing ${field} from config`);
+
+        for (const user of allowedUsers) {
+            const userBits = config.userPermissions[user] ?? 0;
+            config.userPermissions[user] = userBits | permissionBit;
+
+            console.log(`Adding bit ${PermissionBit[permissionBit]} to ID ${user}`);
+        }
+
+        delete (oldConfig)[field];
+        return true;
+    }
+
+    return false;
 }

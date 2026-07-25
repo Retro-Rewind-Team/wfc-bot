@@ -2,12 +2,12 @@ import { CacheType, ChatInputCommandInteraction, EmbedBuilder, MessageFlags, Sla
 import { getGroups, Group } from "../../services/groups.js";
 import { getConfig } from "../../config.js";
 import { getColor } from "../../utils.js";
+import { PermissionBit } from "../shared/roles.js";
 
 const config = getConfig();
 
 export default {
-    modOnly: false,
-    adminOnly: false,
+    permissions: PermissionBit.NONE,
 
     data: new SlashCommandBuilder()
         .setName("special_rooms")

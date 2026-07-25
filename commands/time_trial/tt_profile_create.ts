@@ -1,6 +1,7 @@
 import { AutocompleteInteraction, CacheType, ChatInputCommandInteraction, EmbedBuilder, SlashCommandBuilder } from "discord.js";
 import { getConfig } from "../../config.js";
 import { handleCountryAutocomplete } from "./tt_utils.js";
+import { PermissionBit } from "../shared/roles.js";
 
 const config = getConfig();
 
@@ -24,9 +25,7 @@ interface ErrorResponse {
 }
 
 export default {
-    bktOnly: true,
-    modOnly: false,
-    adminOnly: false,
+    permissions: PermissionBit.BKT_UPDATER,
 
     data: new SlashCommandBuilder()
         .setName("tt_profile_create")

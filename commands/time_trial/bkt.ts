@@ -1,6 +1,7 @@
 import { AutocompleteInteraction, CacheType, ChatInputCommandInteraction, EmbedBuilder, SlashCommandBuilder } from "discord.js";
 import { getConfig } from "../../config.js";
 import { handleTrackAutocomplete } from "./tt_utils.js";
+import { PermissionBit } from "../shared/roles.js";
 
 const config = getConfig();
 
@@ -34,8 +35,7 @@ interface ErrorResponse {
 }
 
 export default {
-    modOnly: false,
-    adminOnly: false,
+    permissions: PermissionBit.NONE,
 
     data: new SlashCommandBuilder()
         .setName("bkt")
