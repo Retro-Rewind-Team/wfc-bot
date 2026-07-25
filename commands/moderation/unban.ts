@@ -44,7 +44,7 @@ export default {
         const fc = pidToFc(pid);
         const [success, res] = await makeWFCRequest("/unban", "POST", { secret: config.wfcSecret, pid: pid });
         if (success) {
-            await sendEmbedLog(interaction, "unban", fc, res.User, [
+            await sendEmbedLog(interaction, "unban", res.User, [
                 { name: "Reason", value: reason },
                 { name: "Hidden Reason", value: reason_hidden ?? "None", hidden: true },
             ], hide, hidePublic);

@@ -154,24 +154,16 @@ export interface WiiLinkUser {
     BanExpires: string,
 }
 
-export async function sendEmbedLog(interaction: ChatInputCommandInteraction<CacheType>, action: string, fc: string, user: WiiLinkUser, opts: SendEmbedOpt[], hideMiiName = false, noPublicEmbed = false) {
-    const miiName = user.LastInGameSn != "" ? user.LastInGameSn : "Unknown";
+export async function sendEmbedLog(interaction: ChatInputCommandInteraction<CacheType>, action: string, user: WiiLinkUser, opts: SendEmbedOpt[], hideMiiName = false, noPublicEmbed = false) {
+    const fc = pidToFc(user.ProfileId);
     const member = interaction.member as GuildMember | null;
-    const thumbnail = getMiiImageURL(fc);
 
     const privEmbed = new EmbedBuilder()
         .setColor(getColor())
         .setTitle(`${capitalize(action)} performed by ${member?.displayName ?? "Unknown"}`)
-        .addFields(
-            { name: "Server", value: interaction.guild!.name },
-            { name: "Moderator", value: `<@${member?.id ?? "Unknown"}>` },
-            { name: "Friend Code", value: fc },
-            { name: "Mii Name", value: miiName },
-            { name: "IP", value: user.LastIPAddress != "" ? user.LastIPAddress : "Unknown" }
-        )
         .setTimestamp();
 
-    privEmbed.setThumbnail(thumbnail);
+    createUserEmbed(user, true, privEmbed);
 
     if (opts)
         privEmbed.addFields(...opts);
@@ -185,15 +177,9 @@ export async function sendEmbedLog(interaction: ChatInputCommandInteraction<Cach
     const pubEmbed = new EmbedBuilder()
         .setColor(getColor())
         .setTitle(`${capitalize(action)} performed by moderator`)
-        .addFields(
-            { name: "Friend Code", value: fc },
-            { name: "Mii Name", value: hideMiiName ? "\\*\\*\\*\\*\\*" : miiName }
-        )
         .setTimestamp();
 
-
-    if (!hideMiiName)
-        pubEmbed.setThumbnail(thumbnail);
+    createUserEmbed(user, false, pubEmbed, hideMiiName);
 
     if (opts) {
         const filtered = opts.filter((opt) => !opt["hidden"]);
@@ -278,14 +264,18 @@ function fmtDeviceID(deviceIDs: number[]) {
     return ret;
 }
 
-
-export function createUserEmbed(user: WiiLinkUser, priv: boolean): EmbedBuilder {
+export function createUserEmbed(user: WiiLinkUser, priv: boolean, templateEmbed: EmbedBuilder | null = null, hideMiiName: boolean = false): EmbedBuilder {
     const fc = pidToFc(user.ProfileId);
-    const embed = new EmbedBuilder()
-        .setColor(getColor())
-        .setTitle(`Player info for friend code ${fc}`)
-        .setThumbnail(getMiiImageURL(fc))
-        .setTimestamp();
+
+    const embed = templateEmbed
+        ? templateEmbed
+        : new EmbedBuilder()
+            .setColor(getColor())
+            .setTitle(`Player info for friend code ${fc}`)
+            .setTimestamp();
+
+    if (priv || !hideMiiName)
+        embed.setThumbnail(getMiiImageURL(fc));
 
     let issuedDate = Date.parse(user.BanIssued);
     let expiresDate = Date.parse(user.BanExpires);
@@ -304,9 +294,15 @@ export function createUserEmbed(user: WiiLinkUser, priv: boolean): EmbedBuilder 
         banLengthStr = fmtTimeSpan(expiresDate - issuedDate);
     }
 
+    const miiName = !priv && hideMiiName
+        ? "\\*\\*\\*\\*\\*"
+        : user.LastInGameSn != ""
+            ? user.LastInGameSn
+            : "Unknown";
+
     embed.addFields(
         { name: "Profile ID", value: `${user.ProfileId}` },
-        { name: "Mii Name", value: `${user.LastInGameSn}` },
+        { name: "Mii Name", value: miiName },
         { name: "Open Host", value: `${user.OpenHost}` },
         { name: "Banned", value: `${user.Restricted}${expiredBan ? " (Expired)" : ""}` },
         { name: "Discord ID", value: user.DiscordID.length != 0 ? `<@${user.DiscordID}>` : "None Linked" }

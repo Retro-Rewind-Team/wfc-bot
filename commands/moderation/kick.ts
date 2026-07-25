@@ -44,7 +44,7 @@ export default {
         const fc = pidToFc(pid);
         const [success, res] = await makeWFCRequest("/kick", "POST", { secret: config.wfcSecret, pid: pid, reason: reason });
         if (success) {
-            await sendEmbedLog(interaction, "kick", fc, res.User, [
+            await sendEmbedLog(interaction, "kick", res.User, [
                 { name: "Reason", value: reason },
                 { name: "Hidden Reason", value: reason_hidden ?? "None", hidden: true },
             ], hide, hidePublic);

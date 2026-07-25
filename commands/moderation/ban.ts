@@ -120,7 +120,7 @@ export default {
             console.error(`Error calling leaderboard API for player ${pid}:`, error);
         }
 
-        await sendEmbedLog(interaction, "ban", fc, res.User, [
+        await sendEmbedLog(interaction, "ban", res.User, [
             { name: "Ban Length", value: perm ? "Permanent" : `${days} ${p(days, "day")}, ${hours} ${p(hours, "hour")}, ${minutes} ${p(minutes, "minute")}` },
             { name: "Reason", value: reason },
             { name: "Hidden Reason", value: reasonHidden ?? "None", hidden: true },
