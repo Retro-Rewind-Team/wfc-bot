@@ -265,10 +265,12 @@ async function refreshCommands(commands: Dictionary<Command>): Promise<void> {
     const adminCommands: RESTPostAPIChatInputApplicationCommandsJSONBody[] = [];
 
     for (const cname in commands) {
-        if (!(commands[cname].permissions & (PermissionBit.ADMIN | PermissionBit.SUPER_ADMIN)))
-            globalCommands.push(commands[cname].data.toJSON());
-        else
+        const permissions = commands[cname].permissions;
+        if (permissions == (PermissionBit.ADMIN | PermissionBit.SUPER_ADMIN) ||
+            permissions == PermissionBit.SUPER_ADMIN)
             adminCommands.push(commands[cname].data.toJSON());
+        else
+            globalCommands.push(commands[cname].data.toJSON());
     }
 
     console.log("Refreshing global slash commands");
