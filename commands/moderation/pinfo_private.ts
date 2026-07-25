@@ -14,7 +14,7 @@ export default {
             .setRequired(true))
         .setDefaultMemberPermissions(resolveModRestrictPermission()),
 
-    exec: async function(interaction: ChatInputCommandInteraction<CacheType>) {
+    exec: async function(interaction: ChatInputCommandInteraction<CacheType>): Promise<void> {
         await pinfo(interaction, true);
     }
 };

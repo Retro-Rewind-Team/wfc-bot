@@ -8,11 +8,16 @@ import { PermissionBit } from "../shared/roles.js";
 const config = getConfig();
 const channels = getChannels();
 
-function isAllowed(packIDStr: string, userID: string) {
+function isAllowed(packIDStr: string, userID: string): boolean {
     return config.packOwners[packIDStr] && (config.packOwners[packIDStr]).findIndex(id => id == userID) != -1;
 }
 
-async function sendHashResponseEmbed(owner: GuildMember | null, packID: number, version: number, hashResponses: HashResponse[]) {
+async function sendHashResponseEmbed(
+    owner: GuildMember | null,
+    packID: number,
+    version: number,
+    hashResponses: HashResponse[]
+): Promise<void> {
     const embed = new EmbedBuilder()
         .setColor(getColor())
         .setTitle(`Hash update performed by ${owner?.displayName ?? "Unknown"}`)
@@ -97,7 +102,7 @@ function hash(buffer: Buffer): HashResponse[] {
     return hashes;
 }
 
-async function set(interaction: ChatInputCommandInteraction<CacheType>) {
+async function set(interaction: ChatInputCommandInteraction<CacheType>): Promise<void> {
     const packID = interaction.options.getInteger("packid", true);
     const packIDStr = packID.toString(16);
 
@@ -181,7 +186,7 @@ async function set(interaction: ChatInputCommandInteraction<CacheType>) {
     }
 }
 
-async function list(interaction: ChatInputCommandInteraction<CacheType>) {
+async function list(interaction: ChatInputCommandInteraction<CacheType>): Promise<void> {
     const [success, res] = await makeWFCRequest("/get_hash", "POST", {
         secret: config.wfcSecret
     });
@@ -231,7 +236,7 @@ async function list(interaction: ChatInputCommandInteraction<CacheType>) {
     });
 }
 
-async function sendDelEmbed(owner: GuildMember | null, packID: number, version: number) {
+async function sendDelEmbed(owner: GuildMember | null, packID: number, version: number): Promise<void> {
     const embed = new EmbedBuilder()
         .setColor(getColor())
         .setTitle(`Hash deletion performed by ${owner?.displayName ?? "Unknown"}`)
@@ -243,7 +248,7 @@ async function sendDelEmbed(owner: GuildMember | null, packID: number, version: 
     await channels.packOwnersLogs.send({ embeds: [embed] });
 }
 
-async function del(interaction: ChatInputCommandInteraction<CacheType>) {
+async function del(interaction: ChatInputCommandInteraction<CacheType>): Promise<void> {
     const packID = interaction.options.getInteger("packid", true);
     const packIDStr = packID.toString(16);
 
@@ -311,7 +316,7 @@ export default {
             .setDescription("list hashes for every pack and version"))
         .setDefaultMemberPermissions(resolveModRestrictPermission()),
 
-    exec: async function(interaction: ChatInputCommandInteraction<CacheType>) {
+    exec: async function(interaction: ChatInputCommandInteraction<CacheType>): Promise<void> {
         const subcommand = interaction.options.getSubcommand();
 
         switch (subcommand) {

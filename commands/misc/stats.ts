@@ -44,7 +44,7 @@ export default {
             .setDescription("friend code or pid to check")
             .setRequired(true)),
 
-    exec: async function(interaction: ChatInputCommandInteraction<CacheType>) {
+    exec: async function(interaction: ChatInputCommandInteraction<CacheType>): Promise<void> {
         let id = interaction.options.getString("id", true);
         id = id.trim();
 

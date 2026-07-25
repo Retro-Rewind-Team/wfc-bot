@@ -17,14 +17,14 @@ interface Stats {
 
 let stats: Stats | null = null;
 
-export function getStats() {
+export function getStats(): Stats | null {
     return stats;
 }
 
 const fetchStatsUrl = `${config.wfcAPIBase}/stats`;
 
-async function fetchStats() {
-    stats = await utils.queryJson(fetchStatsUrl)
+async function fetchStats(): Promise<void> {
+    stats = await utils.queryJson<Stats>(fetchStatsUrl)
         ?? utils.throwInline("Empty or no json response from stats api.");
     const playersInRooms = stats?.mariokartwii?.active ?? 0;
     const playersOnline = stats?.mariokartwii?.online ?? 0;
@@ -47,7 +47,7 @@ async function fetchStats() {
 }
 
 export default {
-    register: function() {
+    register: function(): void {
         setInterval(utils.wrapTryCatch(fetchStats), 60000);
 
         utils.wrapTryCatch(fetchStats)();

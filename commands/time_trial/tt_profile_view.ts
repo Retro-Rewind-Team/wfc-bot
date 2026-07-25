@@ -34,13 +34,13 @@ export default {
             .setRequired(true)
             .setAutocomplete(true)),
 
-    autocomplete: async function(interaction: AutocompleteInteraction) {
+    autocomplete: async function(interaction: AutocompleteInteraction): Promise<void> {
         const focusedOption = interaction.options.getFocused(true);
         if (focusedOption.name == "profile")
             await handleProfileAutocomplete(interaction);
     },
 
-    exec: async function(interaction: ChatInputCommandInteraction<CacheType>) {
+    exec: async function(interaction: ChatInputCommandInteraction<CacheType>): Promise<void> {
         const profileId = interaction.options.getString("profile", true);
 
         await interaction.deferReply();

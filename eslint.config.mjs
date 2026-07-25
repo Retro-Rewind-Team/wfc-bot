@@ -31,5 +31,6 @@ export default tseslint.config({
         "no-trailing-spaces": "error",
         "nonblock-statement-body-position": ["error", "below"],
         "@typescript-eslint/no-floating-promises": ["error"],
+        "@typescript-eslint/explicit-function-return-type": "error",
     },
 });

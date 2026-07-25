@@ -12,7 +12,7 @@ export default {
             .setDescription("friend code to retrieve")
             .setRequired(true)),
 
-    exec: async function(interaction: ChatInputCommandInteraction<CacheType>) {
+    exec: async function(interaction: ChatInputCommandInteraction<CacheType>): Promise<void> {
         await pinfo(interaction, false);
     }
 };

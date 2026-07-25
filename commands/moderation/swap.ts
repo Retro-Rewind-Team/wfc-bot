@@ -22,7 +22,7 @@ export default {
             .setRequired(true))
         .setDefaultMemberPermissions(resolveModRestrictPermission()),
 
-    exec: async function(interaction: ChatInputCommandInteraction<CacheType>) {
+    exec: async function(interaction: ChatInputCommandInteraction<CacheType>): Promise<void> {
         const sourceId = interaction.options.getString("source-id", true).trim();
         const targetId = interaction.options.getString("target-id", true).trim();
         const reason = interaction.options.getString("reason", true);

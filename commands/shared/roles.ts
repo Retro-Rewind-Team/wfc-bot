@@ -13,7 +13,10 @@ export enum PermissionBit {
     PACK_OWNER = 1 << 5, // Restricts the hash command
 }
 
-export function isAllowedInteraction(interaction: ChatInputCommandInteraction<CacheType>, command: Command) {
+export function isAllowedInteraction(
+    interaction: ChatInputCommandInteraction<CacheType>,
+    command: Command
+): [boolean, string | null] {
     const config = getConfig();
 
     if (command.permissions == PermissionBit.NONE)
@@ -75,7 +78,7 @@ export function makeRoleCommand(
             .setDefaultMemberPermissions(
                 PermissionFlagsBits.Administrator
             ) as SlashCommandBuilder,
-        exec: async function(interaction: ChatInputCommandInteraction<CacheType>) {
+        exec: async function(interaction: ChatInputCommandInteraction<CacheType>): Promise<void> {
             const subcommand = interaction.options.getSubcommand();
 
             switch(subcommand) {
@@ -97,7 +100,7 @@ async function listRole(
     interaction: ChatInputCommandInteraction<CacheType>,
     roleName: string,
     bit: PermissionBit
-) {
+): Promise<void> {
     const config = getConfig();
     const uids = Object.keys(config.userPermissions);
 
@@ -119,7 +122,7 @@ async function sendEmbed(
     interaction: ChatInputCommandInteraction<CacheType>,
     action: string,
     updatedUser: User
-) {
+): Promise<void> {
     const channels = getChannels();
     const member = interaction.member as GuildMember | null;
 
@@ -140,7 +143,7 @@ async function addRole(
     interaction: ChatInputCommandInteraction<CacheType>,
     roleName: string,
     bit: PermissionBit
-) {
+): Promise<void> {
     const user = interaction.options.getUser("user", true);
     const config = getConfig();
     const userBits = config.userPermissions[user.id] ?? 0;
@@ -161,7 +164,7 @@ async function removeRole(
     interaction: ChatInputCommandInteraction<CacheType>,
     roleName: string,
     bit: PermissionBit
-) {
+): Promise<void> {
     const user = interaction.options.getUser("user", true);
     const config = getConfig();
     const userBits = config.userPermissions[user.id] ?? 0;

@@ -4,7 +4,11 @@ import { getConfig } from "../../config.js";
 
 const config = getConfig();
 
-async function reply(interaction: ChatInputCommandInteraction<CacheType>, priv: boolean, options: InteractionReplyOptions) {
+async function reply(
+    interaction: ChatInputCommandInteraction<CacheType>,
+    priv: boolean,
+    options: InteractionReplyOptions
+): Promise<void> {
     if (priv) {
         if (typeof options.flags == "number")
             options.flags |= MessageFlags.Ephemeral;
@@ -15,7 +19,7 @@ async function reply(interaction: ChatInputCommandInteraction<CacheType>, priv: 
     await interaction.reply(options);
 }
 
-export async function pinfo(interaction: ChatInputCommandInteraction<CacheType>, priv: boolean) {
+export async function pinfo(interaction: ChatInputCommandInteraction<CacheType>, priv: boolean): Promise<void> {
     let id = interaction.options.getString("id", true);
     id = id.trim();
 

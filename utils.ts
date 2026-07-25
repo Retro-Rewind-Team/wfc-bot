@@ -16,7 +16,7 @@ const colors = [
     0xb4befe,
 ];
 
-export function getColor() {
+export function getColor(): number {
     currentColor++;
 
     if (currentColor >= colors.length)
@@ -26,7 +26,7 @@ export function getColor() {
 }
 
 // Takes a string that's either an fc or pid and returns a pid
-export function resolvePidFromString(fcOrPid: string) {
+export function resolvePidFromString(fcOrPid: string): number {
     if (fcOrPid.includes("-"))
         return parseInt(fcOrPid.replace(/-/g, ""), 10) >>> 0;
     else
@@ -57,7 +57,7 @@ export function validateID(fcOrPid: string): [boolean, string | null] {
     return [ret, ret ? null : `Valid Format, but the FC would have been mangled to ${mangled}`];
 }
 
-export function pidToFc(pid: number) {
+export function pidToFc(pid: number): string {
     if (pid == 0)
         return "0000-0000-0000";
     else {
@@ -89,7 +89,7 @@ export function pidToFc(pid: number) {
     }
 }
 
-export function plural(count: number, text: string) {
+export function plural(count: number, text: string): string {
     return count == 1 ? text : text + "s";
 }
 
@@ -154,7 +154,14 @@ export interface WiiLinkUser {
     BanExpires: string,
 }
 
-export async function sendEmbedLog(interaction: ChatInputCommandInteraction<CacheType>, action: string, user: WiiLinkUser, opts: SendEmbedOpt[], hideMiiName = false, noPublicEmbed = false) {
+export async function sendEmbedLog(
+    interaction: ChatInputCommandInteraction<CacheType>,
+    action: string,
+    user: WiiLinkUser,
+    opts: SendEmbedOpt[],
+    hideMiiName = false,
+    noPublicEmbed = false
+): Promise<void> {
     const fc = pidToFc(user.ProfileId);
     const member = interaction.member as GuildMember | null;
 
@@ -216,13 +223,13 @@ export function fmtTimeSpan(diff: number): string {
     return `${days} Days, ${hours} Hours, ${mins} Minutes, ${seconds} Seconds`;
 }
 
-export function resolveModRestrictPermission() {
+export function resolveModRestrictPermission(): bigint {
     return (PermissionFlagsBits as Dictionary<bigint>)[getConfig().modRestrictPerm] as bigint;
 }
 
 const idRegex = new RegExp(/^\d+$/);
 
-function fmtDeviceID(deviceIDs: number[]) {
+function fmtDeviceID(deviceIDs: number[]): string {
     if (!deviceIDs)
         return "null";
 
@@ -264,7 +271,12 @@ function fmtDeviceID(deviceIDs: number[]) {
     return ret;
 }
 
-export function createUserEmbed(user: WiiLinkUser, priv: boolean, templateEmbed: EmbedBuilder | null = null, hideMiiName: boolean = false): EmbedBuilder {
+export function createUserEmbed(
+    user: WiiLinkUser,
+    priv: boolean,
+    templateEmbed: EmbedBuilder | null = null,
+    hideMiiName: boolean = false
+): EmbedBuilder {
     const fc = pidToFc(user.ProfileId);
 
     const embed = templateEmbed
@@ -372,11 +384,11 @@ export async function haste(body: string): Promise<[number, string, string]> {
     return [200, `https://paste.ppeb.me/${key}`, ""];
 }
 
-export function throwInline(err: string) {
+export function throwInline(err: string): never {
     throw new Error(err);
 }
 
-export async function queryJson(url: string) {
+export async function queryJson<T>(url: string): Promise<T | null> {
     const response = await fetch(url);
 
     if (!response.ok) {
@@ -391,10 +403,10 @@ export async function queryJson(url: string) {
         return null;
     }
 
-    return json;
+    return json as T;
 }
 
-export function wrapTryCatch(fn: () => void) {
+export function wrapTryCatch(fn: () => void): () => void {
     return () => {
         try {
             fn();
@@ -405,10 +417,10 @@ export function wrapTryCatch(fn: () => void) {
     };
 }
 
-export function getMiiImageURL(fc: string) {
+export function getMiiImageURL(fc: string): string {
     return getConfig().miiEndPoint.replace("{fc}", fc);
 }
 
-export function capitalize(str: string) {
+export function capitalize(str: string): string {
     return `${str.charAt(0).toUpperCase() + str.slice(1)}`;
 }

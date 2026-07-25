@@ -56,7 +56,7 @@ export default {
             .setDescription("friend code to retrieve"))
         .setDefaultMemberPermissions(resolveModRestrictPermission()),
 
-    exec: async function(interaction: ChatInputCommandInteraction<CacheType>) {
+    exec: async function(interaction: ChatInputCommandInteraction<CacheType>): Promise<void> {
         const ip = interaction.options.getString("ip");
         const deviceID = interaction.options.getInteger("deviceid") ?? 0;
         const csnum = interaction.options.getString("csnum");
@@ -175,7 +175,7 @@ export default {
     },
 };
 
-async function handleButton(buttonInteraction: ButtonInteraction<CacheType>) {
+async function handleButton(buttonInteraction: ButtonInteraction<CacheType>): Promise<void> {
     const state = stateByMessageID[buttonInteraction.message.id];
 
     let newidx = -1;

@@ -10,7 +10,7 @@ export default {
         .setName("status")
         .setDescription("Display status information for the Retro Rewind servers."),
 
-    exec: async function(interaction: ChatInputCommandInteraction<CacheType>) {
+    exec: async function(interaction: ChatInputCommandInteraction<CacheType>): Promise<void> {
         const stats = getStats();
 
         if (!stats) {

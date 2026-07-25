@@ -71,7 +71,7 @@ export default {
             .setDescription("Tag this run as a dedicated flap run (will not appear on regular leaderboard)")
             .setRequired(false)),
 
-    autocomplete: async function(interaction: AutocompleteInteraction) {
+    autocomplete: async function(interaction: AutocompleteInteraction): Promise<void> {
         const focusedOption = interaction.options.getFocused(true);
         if (focusedOption.name == "track")
             await handleTrackAutocomplete(interaction);
@@ -79,7 +79,7 @@ export default {
             await handleProfileAutocomplete(interaction);
     },
 
-    exec: async function(interaction: ChatInputCommandInteraction<CacheType>) {
+    exec: async function(interaction: ChatInputCommandInteraction<CacheType>): Promise<void> {
         const ghostFile = interaction.options.getAttachment("ghost_file", true);
         const trackId = interaction.options.getString("track", true);
         const profileId = interaction.options.getString("profile", true);

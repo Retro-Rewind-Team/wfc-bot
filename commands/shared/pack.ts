@@ -14,7 +14,7 @@ export const PackOpts = [
     { name: "WTP", value: WTPID }
 ];
 
-export function packIDToName(packID: number) {
+export function packIDToName(packID: number): string {
     switch (packID) {
     case RRID:
         return "Retro Rewind";

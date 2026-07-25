@@ -47,14 +47,14 @@ interface Groups {
 let groups: Groups | null = null;
 const state: State = await loadState();
 
-export function getGroups() {
+export function getGroups(): Groups | null {
     return groups;
 }
 
 const fetchGroupsUrl = `${config.wfcAPIBase}/groups`;
 
-async function fetchGroups() {
-    const groupsJson = (await utils.queryJson(fetchGroupsUrl)) ?? utils.throwInline("Empty or no json response from groups api.");
+async function fetchGroups(): Promise<void> {
+    const groupsJson = (await utils.queryJson<Group[]>(fetchGroupsUrl)) ?? utils.throwInline("Empty or no json response from groups api.");
     groups = { timestamp: Date.now(), rooms: groupsJson };
 
     if (config.logServices)
@@ -75,7 +75,7 @@ async function fetchGroups() {
     return;
 }
 
-async function sendPings() {
+async function sendPings(): Promise<void> {
     // Replace old groups in state.pingedRooms with the refreshed groups
     state.pingedRooms = updateRooms(state.pingedRooms);
 
@@ -86,7 +86,7 @@ async function sendPings() {
     state.save();
 }
 
-async function pingExistingRooms() {
+async function pingExistingRooms(): Promise<void> {
     // Update existing logged rooms
     for (const group of state.pingedRooms) {
         const roomMessage = state.messages[group.id];
@@ -160,7 +160,7 @@ async function pingExistingRooms() {
     }
 }
 
-async function pingNewRooms() {
+async function pingNewRooms(): Promise<void> {
     // Send out alerts for subscribed users
     // This handles new rooms
     for (const group of groups!.rooms) {
@@ -253,7 +253,7 @@ function groupsContains(groups: Group[], group: Group): boolean {
     return false;
 }
 
-function groupsIndexOf(groups: Group[], group: Group) {
+function groupsIndexOf(groups: Group[], group: Group): number {
     for (let i = 0; i < groups.length; i++) {
         if (groups[i].id == group.id)
             return i;
@@ -262,7 +262,7 @@ function groupsIndexOf(groups: Group[], group: Group) {
     return -1;
 }
 
-function aOrAn(following: string) {
+function aOrAn(following: string): string {
     if (!following)
         return "a";
 
@@ -273,7 +273,7 @@ function aOrAn(following: string) {
 }
 
 export default {
-    register: function() {
+    register: function(): void {
         setInterval(utils.wrapTryCatch(fetchGroups), 60000);
 
         utils.wrapTryCatch(fetchGroups)();

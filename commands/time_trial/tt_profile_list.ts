@@ -54,7 +54,7 @@ export default {
         .setName("tt_profile_list")
         .setDescription("List all Time Trial profiles"),
 
-    exec: async function(interaction: ChatInputCommandInteraction<CacheType>) {
+    exec: async function(interaction: ChatInputCommandInteraction<CacheType>): Promise<void> {
         await interaction.deferReply();
 
         const leaderboardUrl = `http://${config.leaderboardServer}:${config.leaderboardPort}`;
@@ -75,7 +75,7 @@ export default {
             const totalPages = Math.ceil(profiles.length / PROFILES_PER_PAGE);
 
             // Function to create embed for a specific page
-            const createEmbed = (page: number) => {
+            const createEmbed = (page: number): EmbedBuilder => {
                 const start = page * PROFILES_PER_PAGE;
                 const end = start + PROFILES_PER_PAGE;
                 const pageProfiles = profiles.slice(start, end);
@@ -144,7 +144,7 @@ export default {
     }
 };
 
-async function handleButton(buttonInteraction: ButtonInteraction<CacheType>) {
+async function handleButton(buttonInteraction: ButtonInteraction<CacheType>): Promise<void> {
     const state = stateByMessageID[buttonInteraction.message.id];
 
     let newPage = state.currentPage;

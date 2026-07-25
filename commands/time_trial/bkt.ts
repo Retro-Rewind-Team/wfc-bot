@@ -98,13 +98,13 @@ export default {
                 { name: "Outside drift only", value: "outside" }
             )),
 
-    autocomplete: async function(interaction: AutocompleteInteraction) {
+    autocomplete: async function(interaction: AutocompleteInteraction): Promise<void> {
         const focusedOption = interaction.options.getFocused(true);
         if (focusedOption.name == "track")
             await handleTrackAutocomplete(interaction);
     },
 
-    exec: async function(interaction: ChatInputCommandInteraction<CacheType>) {
+    exec: async function(interaction: ChatInputCommandInteraction<CacheType>): Promise<void> {
         const trackId = parseInt(interaction.options.getString("track", true));
         const cc = interaction.options.getInteger("cc", true);
         const nonGlitchOnly = interaction.options.getBoolean("no_glitch") ?? false;

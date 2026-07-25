@@ -13,7 +13,7 @@ export default {
             .setDescription("The serial")
             .setRequired(true)),
 
-    exec: async function(interaction: ChatInputCommandInteraction<CacheType>) {
+    exec: async function(interaction: ChatInputCommandInteraction<CacheType>): Promise<void> {
         const serialRaw = interaction.options.getString("serial", true);
 
         const matches = serialRaw.match(serialRegexp);
@@ -68,14 +68,14 @@ function parseLegacy(serial: string): IntermediateDate | null {
 
     return { day: doy, hour, minute: min, second: sec };
 }
-function buildLegacyDate(year: number, p: IntermediateDate) {
+function buildLegacyDate(year: number, p: IntermediateDate): Date | null {
     const d = new Date(year, 0, 1, p.hour, p.minute, p.second);
     d.setDate(d.getDate() + p.day - 1);
 
     return d.getFullYear() == year ? d : null; // reject overflow on non‑leap years
 }
 
-function enumerateLegacy(serial: string, yFrom: number, yTo: number) {
+function enumerateLegacy(serial: string, yFrom: number, yTo: number): Date[] {
     const parts = parseLegacy(serial);
     if (!parts)
         return [];
@@ -93,7 +93,7 @@ function enumerateLegacy(serial: string, yFrom: number, yTo: number) {
 }
 
 /* ---------- Current decoder (tail‑of‑Unix‑time) ---------- */
-function enumerateCurrent(serial: string, yFrom: number, yTo: number) {
+function enumerateCurrent(serial: string, yFrom: number, yTo: number): Date[] {
     const n = Number(serial.replace(/^0+/, ""));
 
     if (!Number.isFinite(n) || n >= BILLION)

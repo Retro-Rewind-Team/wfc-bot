@@ -23,7 +23,7 @@ export default {
             .setDescription("hide mii name in logs"))
         .setDefaultMemberPermissions(PermissionFlagsBits.Administrator),
 
-    exec: async function(interaction: ChatInputCommandInteraction<CacheType>) {
+    exec: async function(interaction: ChatInputCommandInteraction<CacheType>): Promise<void> {
         let id = interaction.options.getString("id", true);
         id = id.trim();
 

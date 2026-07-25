@@ -36,7 +36,7 @@ export interface Config {
 let _config: Config;
 let _path: string;
 
-function verifyConfig(config: Config) {
+function verifyConfig(config: Config): void {
     if (!config.userPermissions || config.userPermissions.length == 0)
         throw "At least one user must have the super admin permission (bit 1)!";
 
@@ -58,7 +58,7 @@ function verifyConfig(config: Config) {
         throw "No wfcAPIBase is set! Please set one to continue.";
 }
 
-export function initConfig(path: string) {
+export function initConfig(path: string): void {
     _path = path;
 
     try {
@@ -120,7 +120,7 @@ export function getConfig(): Config {
     return _config;
 }
 
-export function setConfig(config: Config) {
+export function setConfig(config: Config): void {
     _config = config;
 
     writeFileSync(_path, JSON.stringify(_config, null, 4), { encoding: "utf8" });
@@ -138,7 +138,7 @@ interface Channels {
 
 let _channels: Channels;
 
-export async function initChannels(client: Client<boolean>) {
+export async function initChannels(client: Client<boolean>): Promise<void> {
     _channels = {
         logs: await fetchChannel<TextChannel>(client, _config.logsChannel, "logs"),
         publicLogs: await fetchChannel<TextChannel>(client, _config.publicLogsChannel, "publicLogs"),

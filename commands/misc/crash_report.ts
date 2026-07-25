@@ -218,7 +218,7 @@ const SheetLangToLocaleInfo: Dictionary<LocaleInfo> = {
     },
 };
 
-function a(b: string) {
+function a(b: string): { name: string, value: string } {
     return { name: b, value: b };
 }
 
@@ -274,7 +274,7 @@ export default {
             .setDescription("An explanation of the crash. Please include the events leading up to the crash.")
             .setRequired(true)),
 
-    init: async function() {
+    init: async function(): Promise<void> {
         console.log("Fetching course listing...");
 
         const res = await fetch(sheetsUrl);
@@ -339,7 +339,7 @@ export default {
         console.log(`Fetched course listing: ${SheetLangToLocaleInfo["Common/English"].Tracks.length} courses!`);
     },
 
-    autocomplete: async function(interaction: AutocompleteInteraction<CacheType>) {
+    autocomplete: async function(interaction: AutocompleteInteraction<CacheType>): Promise<void> {
         const focused = interaction.options.getFocused(true);
         let choices: string[] = [];
 
@@ -422,7 +422,7 @@ export default {
         await interaction.respond(mapped);
     },
 
-    exec: async function(interaction: ChatInputCommandInteraction<CacheType>) {
+    exec: async function(interaction: ChatInputCommandInteraction<CacheType>): Promise<void> {
         const binaryAttachment = interaction.options.getAttachment(Options.File, true);
         const binaryResponse = await fetch(binaryAttachment.url);
 

@@ -95,7 +95,7 @@ client.once(Events.ClientReady, async function(readyClient) {
 
 await client.login(config["token"]);
 
-async function resolveCommands(files: string[], callback: (_: Dictionary<Command>) => void) {
+async function resolveCommands(files: string[], callback: (_: Dictionary<Command>) => void): Promise<void> {
     const ret: Dictionary<Command> = {};
 
     for (const file of files) {
@@ -133,7 +133,7 @@ async function resolveCommands(files: string[], callback: (_: Dictionary<Command
     callback(ret);
 }
 
-async function startServices(root: string, files: string[]) {
+async function startServices(root: string, files: string[]): Promise<void> {
     for (const file of files) {
         let spec = await import(path.join(root, file));
         spec = spec.default;
@@ -154,7 +154,7 @@ async function startServices(root: string, files: string[]) {
     }
 }
 
-async function handleCommand(interaction: ChatInputCommandInteraction<CacheType>, commands: Dictionary<Command>) {
+async function handleCommand(interaction: ChatInputCommandInteraction<CacheType>, commands: Dictionary<Command>): Promise<void> {
     if (!interaction.isChatInputCommand())
         return;
 
@@ -200,7 +200,7 @@ async function handleCommand(interaction: ChatInputCommandInteraction<CacheType>
     }
 }
 
-async function handleAutocomplete(interaction: AutocompleteInteraction<CacheType>, commands: Dictionary<Command>) {
+async function handleAutocomplete(interaction: AutocompleteInteraction<CacheType>, commands: Dictionary<Command>): Promise<void> {
     if (!interaction.isAutocomplete())
         return;
 
@@ -234,7 +234,7 @@ type ButtonCallback = (interaction: ButtonInteraction<CacheType>) => Promise<voi
 
 const buttonHandlers: Dictionary<ButtonCallback> = {};
 
-export function registerButtonHandlerByMessageID(messageID: string, timeout: number, timeoutcb: TimeoutCallback, clickcb: ButtonCallback) {
+export function registerButtonHandlerByMessageID(messageID: string, timeout: number, timeoutcb: TimeoutCallback, clickcb: ButtonCallback): void {
     buttonHandlers[messageID] = clickcb;
 
     setTimeout(() => {
@@ -243,7 +243,7 @@ export function registerButtonHandlerByMessageID(messageID: string, timeout: num
     }, timeout);
 }
 
-async function handleButton(interaction: ButtonInteraction<CacheType>) {
+async function handleButton(interaction: ButtonInteraction<CacheType>): Promise<void> {
     if (!interaction.isButton())
         return;
 
@@ -260,7 +260,7 @@ async function handleButton(interaction: ButtonInteraction<CacheType>) {
     }
 }
 
-async function refreshCommands(commands: Dictionary<Command>) {
+async function refreshCommands(commands: Dictionary<Command>): Promise<void> {
     const globalCommands: RESTPostAPIChatInputApplicationCommandsJSONBody[] = [];
     const adminCommands: RESTPostAPIChatInputApplicationCommandsJSONBody[] = [];
 

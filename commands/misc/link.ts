@@ -16,7 +16,7 @@ export default {
             .setDescription("friend code or pid to link")
             .setRequired(true)),
 
-    exec: async function(interaction: ChatInputCommandInteraction<CacheType>) {
+    exec: async function(interaction: ChatInputCommandInteraction<CacheType>): Promise<void> {
         let id = interaction.options.getString("id", true);
         id = id.trim();
 
@@ -49,7 +49,12 @@ export default {
     }
 };
 
-async function beginLink(interaction: ChatInputCommandInteraction<CacheType>, pid: number, fc: string, discordID: string) {
+async function beginLink(
+    interaction: ChatInputCommandInteraction<CacheType>,
+    pid: number,
+    fc: string,
+    discordID: string
+): Promise<boolean> {
     currentlyVerifying.add(pid);
     const [success, res] = await makeWFCRequest("/link", "POST", {
         secret: config.wfcSecret,
@@ -77,7 +82,12 @@ async function beginLink(interaction: ChatInputCommandInteraction<CacheType>, pi
     return success;
 }
 
-async function waitForLinkSuccess(interaction: ChatInputCommandInteraction<CacheType>, pid: number, fc: string, discordID: string) {
+async function waitForLinkSuccess(
+    interaction: ChatInputCommandInteraction<CacheType>,
+    pid: number,
+    fc: string,
+    discordID: string
+): Promise<boolean> {
     const timeOut = (Date.now() + 600_000); // 10 minutes
     while (Date.now() < timeOut) {
         await new Promise(resolve => setTimeout(resolve, 30_000)); // Try every 30 seconds
@@ -103,7 +113,12 @@ async function waitForLinkSuccess(interaction: ChatInputCommandInteraction<Cache
     return false;
 }
 
-async function timeoutLink(interaction: ChatInputCommandInteraction<CacheType>, pid: number, fc: string, discordID: string) {
+async function timeoutLink(
+    interaction: ChatInputCommandInteraction<CacheType>,
+    pid: number,
+    fc: string,
+    discordID: string
+): Promise<void> {
     currentlyVerifying.delete(pid);
     await interaction.editReply({ content: `Profile linking for "${fc}" timed out!` });
     const [success, res] = await makeWFCRequest("/link", "POST", {

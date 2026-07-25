@@ -5,7 +5,7 @@ import { PermissionBit } from "../shared/roles.js";
 
 const config = getConfig();
 
-function p(count: number, str: string) {
+function p(count: number, str: string): string {
     if (count == 1)
         return str;
 
@@ -40,7 +40,7 @@ export default {
             .setDescription("hide public log message"))
         .setDefaultMemberPermissions(resolveModRestrictPermission()),
 
-    exec: async function(interaction: ChatInputCommandInteraction<CacheType>) {
+    exec: async function(interaction: ChatInputCommandInteraction<CacheType>): Promise<void> {
         let id = interaction.options.getString("id", true);
         id = id.trim();
 

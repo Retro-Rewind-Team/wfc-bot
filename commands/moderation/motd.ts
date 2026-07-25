@@ -18,7 +18,7 @@ export default {
             .setDescription("message of the day to set"))
         .setDefaultMemberPermissions(PermissionFlagsBits.Administrator),
 
-    exec: async function(interaction: ChatInputCommandInteraction<CacheType>) {
+    exec: async function(interaction: ChatInputCommandInteraction<CacheType>): Promise<void> {
         let motd = interaction.options.getString("message");
 
         if (motd) {

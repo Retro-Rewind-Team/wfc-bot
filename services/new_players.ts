@@ -5,7 +5,7 @@ import { createUserEmbed, makeWFCRequest as makeWFCRequest, WiiLinkUser, wrapTry
 const config = getConfig();
 const channels = getChannels();
 
-async function fetchNewPlayers() {
+async function fetchNewPlayers(): Promise<void> {
     const [success, res] = await makeWFCRequest("/new_players", "POST", {
         secret: config.wfcSecret,
     });
@@ -37,7 +37,7 @@ async function fetchNewPlayers() {
 }
 
 export default {
-    register: function() {
+    register: function(): void {
         setInterval(wrapTryCatch(fetchNewPlayers), 60000);
 
         wrapTryCatch(fetchNewPlayers)();

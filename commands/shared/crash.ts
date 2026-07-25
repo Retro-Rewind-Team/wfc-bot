@@ -50,7 +50,7 @@ async function processCrashdumpInner(buf: Buffer): Promise<[code: number | null,
 }
 
 export default {
-    init: async function() {
+    init: async function(): Promise<void> {
         config = getConfig();
         switch (os.platform()) {
         case "linux":

@@ -30,7 +30,7 @@ export default {
             .setRequired(true))
         .setDefaultMemberPermissions(PermissionFlagsBits.Administrator),
 
-    exec: async function(interaction: ChatInputCommandInteraction<CacheType>) {
+    exec: async function(interaction: ChatInputCommandInteraction<CacheType>): Promise<void> {
         const color: StatusColor = interaction.options.getNumber("color", true);
         const message = interaction.options.getString("message", true);
 

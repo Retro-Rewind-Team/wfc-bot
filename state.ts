@@ -58,7 +58,7 @@ export class State {
         return new State(messages, stateSerialized.pingedRooms, stateSerialized.status, stateSerialized.motd);
     }
 
-    save() {
+    save(): void {
         const stateSerialized = this.toSerialized();
 
         writeFileSync(STATE_PATH, JSON.stringify(stateSerialized));

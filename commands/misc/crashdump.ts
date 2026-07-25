@@ -12,7 +12,7 @@ export default {
             .setDescription("The crash.pul file")
             .setRequired(true)),
 
-    exec: async function(interaction: ChatInputCommandInteraction<CacheType>) {
+    exec: async function(interaction: ChatInputCommandInteraction<CacheType>): Promise<void> {
         const binaryAttachment = interaction.options.getAttachment("file", true);
         const binaryResponse = await fetch(binaryAttachment.url);
 

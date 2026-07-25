@@ -13,7 +13,7 @@ export default {
         .setName("special_rooms")
         .setDescription("Show open special mode rooms"),
 
-    exec: async function(interaction: ChatInputCommandInteraction<CacheType>) {
+    exec: async function(interaction: ChatInputCommandInteraction<CacheType>): Promise<void> {
         const groups = getGroups();
 
         if (!groups) {
@@ -65,7 +65,7 @@ export default {
     }
 };
 
-function pad(num: number, size: number) {
+function pad(num: number, size: number): string {
     let _num = num.toString();
     while (_num.length < size)
         _num = "0" + _num;
@@ -73,7 +73,7 @@ function pad(num: number, size: number) {
     return _num;
 }
 
-function formatUptime(startDate: Date, endDate: Date) {
+function formatUptime(startDate: Date, endDate: Date): string {
     let timeDiff = endDate.getTime() - startDate.getTime();
     const hours = Math.floor(timeDiff / (1000 * 60 * 60));
     timeDiff -= hours * (1000 * 60 * 60);
