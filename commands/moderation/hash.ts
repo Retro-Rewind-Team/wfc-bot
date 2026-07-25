@@ -106,7 +106,7 @@ async function set(interaction: ChatInputCommandInteraction<CacheType>): Promise
     const packID = interaction.options.getInteger("packid", true);
     const packIDStr = packID.toString(16);
 
-    if (interaction.member && !isAllowed(packIDStr, interaction.member.user.id)) {
+    if (!interaction.member || !isAllowed(packIDStr, interaction.member.user.id)) {
         await interaction.reply({
             content: `Insufficient permissions to update hash for pack: ${packIDToName(packID)}`,
             flags: MessageFlags.Ephemeral,
@@ -286,7 +286,7 @@ async function del(interaction: ChatInputCommandInteraction<CacheType>): Promise
 }
 
 export default {
-    permissions: PermissionBit.PACK_OWNER,
+    permissions: PermissionBit.NONE,
 
     data: new SlashCommandBuilder()
         .setName("hash")

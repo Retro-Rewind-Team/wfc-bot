@@ -10,7 +10,6 @@ export enum PermissionBit {
     MODERATOR = 1 << 2,
     BKT_UPDATER = 1 << 3,
     PROFILE_MODERATOR = 1 << 4, // Restricts the clear command
-    PACK_OWNER = 1 << 5, // Restricts the hash command
 }
 
 export function isAllowedInteraction(
@@ -118,7 +117,7 @@ async function listRole(
     });
 }
 
-async function sendEmbed(
+export async function sendEmbed(
     interaction: ChatInputCommandInteraction<CacheType>,
     action: string,
     updatedUser: User
