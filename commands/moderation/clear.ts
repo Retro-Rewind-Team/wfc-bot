@@ -1,5 +1,5 @@
-import { CacheType, ChatInputCommandInteraction, PermissionFlagsBits, SlashCommandBuilder } from "discord.js";
-import { makeWFCRequest, pidToFc, resolvePidFromString, sendEmbedLog, validateID } from "../../utils.js";
+import { CacheType, ChatInputCommandInteraction, SlashCommandBuilder } from "discord.js";
+import { makeWFCRequest, pidToFc, resolveModRestrictPermission, resolvePidFromString, sendEmbedLog, validateID } from "../../utils.js";
 import { getConfig } from "../../config.js";
 import { PermissionBit } from "../shared/roles.js";
 
@@ -21,7 +21,7 @@ export default {
             .setDescription("clear reason only visible to moderators"))
         .addBooleanOption(option => option.setName("hide-name")
             .setDescription("hide mii name in logs"))
-        .setDefaultMemberPermissions(PermissionFlagsBits.Administrator),
+        .setDefaultMemberPermissions(resolveModRestrictPermission()),
 
     exec: async function(interaction: ChatInputCommandInteraction<CacheType>): Promise<void> {
         let id = interaction.options.getString("id", true);
