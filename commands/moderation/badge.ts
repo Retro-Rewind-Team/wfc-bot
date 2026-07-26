@@ -1,9 +1,12 @@
-import { CacheType, ChatInputCommandInteraction, SlashCommandBuilder } from "discord.js";
+import { ActionRowBuilder, APIMessageTopLevelComponent, ButtonInteraction, CacheType, ChatInputCommandInteraction, EmbedBuilder, SlashCommandBuilder } from "discord.js";
 import { pidToFc, resolveModRestrictPermission, resolvePidFromString, validateID } from "../../utils.js";
 import { BadgeType } from "../shared/badges.js";
 import { getConfig } from "../../config.js";
 import { Dictionary } from "../../dictionary.js";
 import { PermissionBit } from "../shared/roles.js";
+import { Buttons } from "../shared/buttons.js";
+import { registerButtonHandlerByMessageID } from "../../index.js";
+import { fetchStatsEmbed, StatsSectionFlag } from "../shared/stats_embed.js";
 
 const config = getConfig();
 const leaderboardUrl = `http://${config.leaderboardServer}:${config.leaderboardPort}`;
@@ -147,11 +150,20 @@ async function list(interaction: ChatInputCommandInteraction<CacheType>): Promis
     if (id == null || id.length == 0)
         await list_all(interaction);
     else
-        await list_single(interaction, id);
+        await listSingle(interaction, id);
 }
 
-// TODO: Paginate?
+interface BadgeListState {
+    Badges: Dictionary<BadgeType[]>,
+    Idx: number;
+    Embeds: EmbedBuilder[],
+}
+
+const stateByMessageID: Dictionary<BadgeListState> = {};
+
 async function list_all(interaction: ChatInputCommandInteraction<CacheType>): Promise<void> {
+    // await interaction.deferReply({ flags: MessageFlags.Ephemeral });
+
     const response = await fetch(`${leaderboardUrl}/api/badges/all`);
 
     if (!response.ok) {
@@ -163,20 +175,114 @@ async function list_all(interaction: ChatInputCommandInteraction<CacheType>): Pr
 
     const batchResponse: BatchBadgeResponse = await response.json();
     const keys = Object.keys(batchResponse.badges);
-    let content: string;
 
     if (keys.length == 0)
-        content = "No badges exist for any players";
-    else {
-        content = Object.keys(batchResponse.badges)
-            .map(key => `${key}: ${batchResponse.badges[key].map(badge => BadgeType[badge]).join(", ")}`)
-            .join("\n");
+        await interaction.reply({content: "No badges exist for any players"});
+
+    const row = new ActionRowBuilder()
+        .addComponents(
+            Buttons.start.setDisabled(true),
+            Buttons.back.setDisabled(true),
+            Buttons.forward.setDisabled(false),
+            Buttons.end.setDisabled(false)
+        );
+
+    const [embed, err] = await fetchStatsEmbed(keys[0], StatsSectionFlag.BADGES);
+    if (err) {
+        const fc = pidToFc(parseInt(keys[0]));
+        await interaction.reply({
+            content: `Failed to fetch embed for player ${fc}: ${err}`
+        });
+
+        return;
     }
 
-    await interaction.reply({ content: content });
+    const res = await interaction.reply({
+        embeds: [embed!],
+        components: [row as unknown as APIMessageTopLevelComponent],
+    });
+
+    const message = await res.fetch();
+
+    registerButtonHandlerByMessageID(
+        message.id,
+        300000, // 5 minutes
+        (messageID) => {
+            delete stateByMessageID[messageID];
+        },
+        handleButton,
+    );
+
+    stateByMessageID[message.id] = {
+        Badges: batchResponse.badges,
+        Idx: 0,
+        Embeds: [embed!],
+    };
 }
 
-async function list_single(interaction: ChatInputCommandInteraction<CacheType>, id: string): Promise<void> {
+async function handleButton(buttonInteraction: ButtonInteraction<CacheType>): Promise<void> {
+    const state = stateByMessageID[buttonInteraction.message.id];
+    const keys = Object.keys(state.Badges);
+
+    let newidx = -1;
+    const maxidx = keys.length - 1;
+
+    switch (buttonInteraction.customId) {
+    case "start":
+        newidx = 0;
+        break;
+    case "forward":
+        newidx = state.Idx + 1;
+        break;
+    case "end":
+        newidx = maxidx;
+        break;
+    case "back":
+        newidx = state.Idx - 1;
+        break;
+    }
+
+    if (newidx > maxidx)
+        newidx = maxidx;
+
+    if (newidx < 0)
+        newidx = 0;
+
+    state.Idx = newidx;
+
+    const row = new ActionRowBuilder()
+        .addComponents(
+            Buttons.start.setDisabled(newidx == 0),
+            Buttons.back.setDisabled(newidx == 0),
+            Buttons.forward.setDisabled(newidx == maxidx),
+            Buttons.end.setDisabled(newidx == maxidx)
+        );
+
+    let embed = state.Embeds[state.Idx];
+
+    if (!embed) {
+        const [newEmbed, err] = await fetchStatsEmbed(keys[state.Idx], StatsSectionFlag.BADGES);
+
+        if (err) {
+            const fc = pidToFc(parseInt(keys[state.Idx]));
+            await buttonInteraction.update({
+                content: `Failed to fetch embed for player ${fc}: ${err}`,
+                components: [row as unknown as APIMessageTopLevelComponent]
+            });
+            return;
+        }
+
+        embed = newEmbed!;
+        state.Embeds[state.Idx] = embed;
+    }
+
+    await buttonInteraction.update({
+        embeds: [embed],
+        components: [row as unknown as APIMessageTopLevelComponent],
+    });
+}
+
+async function listSingle(interaction: ChatInputCommandInteraction<CacheType>, id: string): Promise<void> {
     // Get only a single player's badge
     id = id.trim();
     const [valid, err] = validateID(id);
