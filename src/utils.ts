@@ -126,6 +126,19 @@ export async function makeWFCRequest(route: string, method: string, data?: objec
     }
 }
 
+export interface MKWRatingsResponse {
+    vr: number;
+    br: number;
+    mmr_rt: number;
+    mmr_ct: number;
+    mmr_vanilla: number;
+}
+
+export async function getMKWRatings(pid: number): Promise<[boolean, MKWRatingsResponse | null]> {
+    const [success, response] = await makeWFCRequest(`/mkw_rr_ratings?pid=${pid}`, "GET");
+    return success ? [true, response as MKWRatingsResponse] : [false, null];
+}
+
 export interface WiiLinkUser {
     ProfileId: number;
     UserId: number;
@@ -147,6 +160,11 @@ export interface WiiLinkUser {
     BanReasonHidden: string;
     BanIssued: string;
     BanExpires: string;
+    VR?: number | null;
+    BR?: number | null;
+    MMRRT?: number | null;
+    MMRCT?: number | null;
+    MMRVanilla?: number | null;
 }
 
 interface SendEmbedLogField {
@@ -352,6 +370,8 @@ export function createUserEmbed(
     opts: CreateUserEmbedOpts,
 ): EmbedBuilder {
     const fc = pidToFc(user.ProfileId);
+    const rating = (value: number | null | undefined): string =>
+        value == null ? "Unknown" : value.toLocaleString();
 
     if (opts.showPII == undefined)
         opts.showPII = true;
@@ -393,6 +413,14 @@ export function createUserEmbed(
         { name: "Profile ID", value: `${user.ProfileId}` },
         { name: "Friend Code", value: fc },
         { name: "Mii Name", value: miiName },
+        { name: "VR", value: rating(user.VR) },
+        { name: "BR", value: rating(user.BR) },
+        { name: "MMR (RT)", value: rating(user.MMRRT) },
+        { name: "MMR (CT)", value: rating(user.MMRCT) },
+        { name: "MMR (Vanilla)", value: rating(user.MMRVanilla) },
+        { name: "Open Host", value: `${user.OpenHost}` },
+        { name: "Banned", value: `${user.Restricted}${expiredBan ? " (Expired)" : ""}` },
+        { name: "Discord ID", value: user.DiscordID.length != 0 ? `<@${user.DiscordID}>` : "None Linked" },
     );
 
     if (opts.verbose)

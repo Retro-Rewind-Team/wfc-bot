@@ -1,5 +1,5 @@
 import { CacheType, ChatInputCommandInteraction, InteractionReplyOptions, MessageFlags } from "discord.js";
-import { createUserEmbed, makeWFCRequest, pidToFc, resolvePidFromString, validateID, WiiLinkUser } from "#src/utils.js";
+import { createUserEmbed, getMKWRatings, makeWFCRequest, pidToFc, resolvePidFromString, validateID, WiiLinkUser } from "#src/utils.js";
 import { getConfig } from "#src/config.js";
 
 const config = getConfig();
@@ -45,6 +45,15 @@ export async function pinfo(interaction: ChatInputCommandInteraction<CacheType>,
             { content: `Failed to fetch info for friend code "${fc}": error ${err}` },
         );
         return;
+    }
+
+    const [ratingsSuccess, ratings] = await getMKWRatings(pid);
+    if (ratingsSuccess && ratings) {
+        user.VR = ratings.vr;
+        user.BR = ratings.br;
+        user.MMRRT = ratings.mmr_rt;
+        user.MMRCT = ratings.mmr_ct;
+        user.MMRVanilla = ratings.mmr_vanilla;
     }
 
     await reply(
