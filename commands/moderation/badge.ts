@@ -33,7 +33,7 @@ interface BatchBadgeResponse {
     badges: Dictionary<BadgeType[]>
 }
 
-async function add(interaction: ChatInputCommandInteraction<CacheType>) {
+async function add(interaction: ChatInputCommandInteraction<CacheType>): Promise<void> {
     let id = interaction.options.getString("id", true);
     id = id.trim();
 
@@ -82,7 +82,7 @@ async function add(interaction: ChatInputCommandInteraction<CacheType>) {
     }
 }
 
-async function remove(interaction: ChatInputCommandInteraction<CacheType>) {
+async function remove(interaction: ChatInputCommandInteraction<CacheType>): Promise<void> {
     let id = interaction.options.getString("id", true);
     id = id.trim();
 
@@ -140,7 +140,7 @@ async function remove(interaction: ChatInputCommandInteraction<CacheType>) {
     }
 }
 
-async function list(interaction: ChatInputCommandInteraction<CacheType>) {
+async function list(interaction: ChatInputCommandInteraction<CacheType>): Promise<void> {
     const id = interaction.options.getString("id");
 
     // Get all players' badges
@@ -151,7 +151,7 @@ async function list(interaction: ChatInputCommandInteraction<CacheType>) {
 }
 
 // TODO: Paginate?
-async function list_all(interaction: ChatInputCommandInteraction<CacheType>) {
+async function list_all(interaction: ChatInputCommandInteraction<CacheType>): Promise<void> {
     const response = await fetch(`${leaderboardUrl}/api/badges/all`);
 
     if (!response.ok) {
@@ -176,7 +176,7 @@ async function list_all(interaction: ChatInputCommandInteraction<CacheType>) {
     await interaction.reply({ content: content });
 }
 
-async function list_single(interaction: ChatInputCommandInteraction<CacheType>, id: string) {
+async function list_single(interaction: ChatInputCommandInteraction<CacheType>, id: string): Promise<void> {
     // Get only a single player's badge
     id = id.trim();
     const [valid, err] = validateID(id);
@@ -239,7 +239,7 @@ export default {
                 .setDescription("friend code or pid to list badges of")))
         .setDefaultMemberPermissions(resolveModRestrictPermission()),
 
-    exec: async function(interaction: ChatInputCommandInteraction<CacheType>) {
+    exec: async function(interaction: ChatInputCommandInteraction<CacheType>): Promise<void> {
         const subcommand = interaction.options.getSubcommand();
 
         switch (subcommand) {
