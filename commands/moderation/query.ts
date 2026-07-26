@@ -1,9 +1,10 @@
-import { ActionRowBuilder, APIMessageTopLevelComponent, ButtonBuilder, ButtonInteraction, ButtonStyle, CacheType, ChatInputCommandInteraction, EmbedBuilder, MessageFlags, SlashCommandBuilder } from "discord.js";
+import { ActionRowBuilder, APIMessageTopLevelComponent, ButtonInteraction, CacheType, ChatInputCommandInteraction, EmbedBuilder, MessageFlags, SlashCommandBuilder } from "discord.js";
 import { getConfig } from "../../config.js";
 import { Dictionary } from "../../dictionary.js";
 import { registerButtonHandlerByMessageID } from "../../index.js";
 import { createUserEmbed, makeWFCRequest, resolveModRestrictPermission, resolvePidFromString, validateID } from "../../utils.js";
 import { PermissionBit } from "../shared/roles.js";
+import { Buttons } from "../shared/buttons.js";
 
 const config = getConfig();
 
@@ -13,26 +14,6 @@ interface QueryState {
 }
 
 const stateByMessageID: Dictionary<QueryState> = {};
-
-const start = new ButtonBuilder()
-    .setCustomId("start")
-    .setLabel("<<")
-    .setStyle(ButtonStyle.Primary);
-
-const back = new ButtonBuilder()
-    .setCustomId("back")
-    .setLabel("<")
-    .setStyle(ButtonStyle.Primary);
-
-const forward = new ButtonBuilder()
-    .setCustomId("forward")
-    .setLabel(">")
-    .setStyle(ButtonStyle.Primary);
-
-const end = new ButtonBuilder()
-    .setCustomId("end")
-    .setLabel(">>")
-    .setStyle(ButtonStyle.Primary);
 
 export default {
     permissions: PermissionBit.MODERATOR,
@@ -133,10 +114,10 @@ export default {
         if (embeds.length > 1) {
             const row = new ActionRowBuilder()
                 .addComponents(
-                    start.setDisabled(true),
-                    back.setDisabled(true),
-                    forward.setDisabled(false),
-                    end.setDisabled(false)
+                    Buttons.start.setDisabled(true),
+                    Buttons.back.setDisabled(true),
+                    Buttons.forward.setDisabled(false),
+                    Buttons.end.setDisabled(false)
                 );
 
             const res = await interaction.reply({
@@ -206,10 +187,10 @@ async function handleButton(buttonInteraction: ButtonInteraction<CacheType>): Pr
 
     const row = new ActionRowBuilder()
         .addComponents(
-            start.setDisabled(newidx == 0),
-            back.setDisabled(newidx == 0),
-            forward.setDisabled(newidx == maxidx),
-            end.setDisabled(newidx == maxidx)
+            Buttons.start.setDisabled(newidx == 0),
+            Buttons.back.setDisabled(newidx == 0),
+            Buttons.forward.setDisabled(newidx == maxidx),
+            Buttons.end.setDisabled(newidx == maxidx)
         );
 
     await buttonInteraction.update({
