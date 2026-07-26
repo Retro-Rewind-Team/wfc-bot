@@ -89,6 +89,12 @@ export default {
             return;
         }
 
+        user.VR = response.VR ?? response.vr;
+        user.BR = response.BR ?? response.br;
+        user.MMRRT = response.MMRRT ?? response.mmr_rt;
+        user.MMRCT = response.MMRCT ?? response.mmr_ct;
+        user.MMRVanilla = response.MMRVanilla ?? response.mmr_vanilla;
+
         await sendEmbedLog(interaction, `set ${label}`, user, [
             { name: `Previous ${label}`, value: Number(previous).toLocaleString() },
             { name: `New ${label}`, value: value.toLocaleString() },
