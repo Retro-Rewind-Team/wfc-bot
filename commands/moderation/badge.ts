@@ -42,9 +42,13 @@ async function add(interaction: ChatInputCommandInteraction<CacheType>): Promise
 
     const [valid, err] = validateID(id);
     if (!valid) {
-        await interaction.reply({ content: `Error adding badge to friend code or pid "${id}": ${err}` });
+        await interaction.reply({
+            content: `Error adding badge to friend code or pid "${id}": ${err}`
+        });
         return;
     }
+
+    await interaction.deferReply();
 
     const pid = resolvePidFromString(id);
     const fc = pidToFc(pid);
@@ -64,7 +68,7 @@ async function add(interaction: ChatInputCommandInteraction<CacheType>): Promise
     });
 
     if (!response.ok) {
-        await interaction.reply({
+        await interaction.editReply({
             content: `Failed to add badge ${badgeName} to friend code "${fc}": error ${response.status}`
         });
         return;
@@ -73,13 +77,13 @@ async function add(interaction: ChatInputCommandInteraction<CacheType>): Promise
         const badgeResponse: BadgeManageResponse = await response.json();
 
         if (!badgeResponse.success) {
-            await interaction.reply({
+            await interaction.editReply({
                 content: `Failed to add badge ${badgeName} to friend code "${fc}": error ${badgeResponse.message}`
             });
             return;
         }
 
-        await interaction.reply({
+        await interaction.editReply({
             content: `Successfully added badge ${badgeName} to friend code "${fc}"\nThis player's badges are: ${badgeResponse.badges.map(badge => BadgeType[badge]).join(", ")}`
         });
     }
@@ -91,9 +95,13 @@ async function remove(interaction: ChatInputCommandInteraction<CacheType>): Prom
 
     const [valid, err] = validateID(id);
     if (!valid) {
-        await interaction.reply({ content: `Error removing badge from friend code or pid "${id}": ${err}` });
+        await interaction.reply({
+            content: `Error removing badge from friend code or pid "${id}": ${err}`
+        });
         return;
     }
+
+    await interaction.deferReply();
 
     const pid = resolvePidFromString(id);
     const fc = pidToFc(pid);
@@ -113,7 +121,7 @@ async function remove(interaction: ChatInputCommandInteraction<CacheType>): Prom
     });
 
     if (!response.ok) {
-        await interaction.reply({
+        await interaction.editReply({
             content: `Failed to remove badge ${badgeName} from friend code "${fc}": error ${response.status}`
         });
         return;
@@ -122,7 +130,7 @@ async function remove(interaction: ChatInputCommandInteraction<CacheType>): Prom
         const badgeResponse: BadgeManageResponse = await response.json();
 
         if (!badgeResponse.success) {
-            await interaction.reply({
+            await interaction.editReply({
                 content: `Failed to remove badge ${badgeName} from friend code "${fc}": error ${badgeResponse.message}`
             });
             return;
@@ -137,7 +145,7 @@ async function remove(interaction: ChatInputCommandInteraction<CacheType>): Prom
                 .join(", ");
         }
 
-        await interaction.reply({
+        await interaction.editReply({
             content: `Successfully removed badge ${badgeName} from friend code "${fc}"\nThis player's badges are: ${badgeString}`
         });
     }
@@ -148,7 +156,7 @@ async function list(interaction: ChatInputCommandInteraction<CacheType>): Promis
 
     // Get all players' badges
     if (id == null || id.length == 0)
-        await list_all(interaction);
+        await listAll(interaction);
     else
         await listSingle(interaction, id);
 }
@@ -161,13 +169,13 @@ interface BadgeListState {
 
 const stateByMessageID: Dictionary<BadgeListState> = {};
 
-async function list_all(interaction: ChatInputCommandInteraction<CacheType>): Promise<void> {
-    // await interaction.deferReply({ flags: MessageFlags.Ephemeral });
+async function listAll(interaction: ChatInputCommandInteraction<CacheType>): Promise<void> {
+    await interaction.deferReply();
 
     const response = await fetch(`${leaderboardUrl}/api/badges/all`);
 
     if (!response.ok) {
-        await interaction.reply({
+        await interaction.editReply({
             content: `Failed to fetch all badges: error ${response.status}`
         });
         return;
@@ -177,7 +185,7 @@ async function list_all(interaction: ChatInputCommandInteraction<CacheType>): Pr
     const keys = Object.keys(batchResponse.badges);
 
     if (keys.length == 0)
-        await interaction.reply({content: "No badges exist for any players"});
+        await interaction.editReply({content: "No badges exist for any players"});
 
     const row = new ActionRowBuilder()
         .addComponents(
@@ -190,14 +198,14 @@ async function list_all(interaction: ChatInputCommandInteraction<CacheType>): Pr
     const [embed, err] = await fetchStatsEmbed(keys[0], StatsSectionFlag.BADGES);
     if (err) {
         const fc = pidToFc(parseInt(keys[0]));
-        await interaction.reply({
+        await interaction.editReply({
             content: `Failed to fetch embed for player ${fc}: ${err}`
         });
 
         return;
     }
 
-    const res = await interaction.reply({
+    const res = await interaction.editReply({
         embeds: [embed!],
         components: [row as unknown as APIMessageTopLevelComponent],
     });
@@ -287,9 +295,13 @@ async function listSingle(interaction: ChatInputCommandInteraction<CacheType>, i
     id = id.trim();
     const [valid, err] = validateID(id);
     if (!valid) {
-        await interaction.reply({ content: `Error retrieving badges for friend code or pid "${id}": ${err}` });
+        await interaction.reply({
+            content: `Error retrieving badges for friend code or pid "${id}": ${err}`
+        });
         return;
     }
+
+    await interaction.deferReply();
 
     const pid = resolvePidFromString(id);
     const fc = pidToFc(pid);
@@ -297,7 +309,7 @@ async function listSingle(interaction: ChatInputCommandInteraction<CacheType>, i
     const response = await fetch(`${leaderboardUrl}/api/badges/by_pid/${pid}`);
 
     if (!response.ok) {
-        await interaction.reply({
+        await interaction.editReply({
             content: `Failed to fetch badges for friend code ${fc}: error ${response.status}`
         });
         return;
@@ -310,7 +322,7 @@ async function listSingle(interaction: ChatInputCommandInteraction<CacheType>, i
     else
         badgesString = badges.map(badge => BadgeType[badge]).join(", ");
 
-    await interaction.reply({
+    await interaction.editReply({
         content: `${fc}: ${badgesString}`
     });
 }
