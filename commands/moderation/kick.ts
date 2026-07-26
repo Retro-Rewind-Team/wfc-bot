@@ -19,8 +19,8 @@ export default {
             .setRequired(true))
         .addStringOption(option => option.setName("hidden-reason")
             .setDescription("kick reason only visible to moderators"))
-        .addBooleanOption(option => option.setName("hide-name")
-            .setDescription("hide mii name in logs"))
+        .addBooleanOption(option => option.setName("hide-mii")
+            .setDescription("hide mii and mii name in logs"))
         .addBooleanOption(option => option.setName("hide-public")
             .setDescription("hide public log message"))
         .setDefaultMemberPermissions(resolveModRestrictPermission()),
@@ -38,7 +38,7 @@ export default {
         const pid = resolvePidFromString(id);
         const reason = interaction.options.getString("reason", true);
         const reason_hidden = interaction.options.getString("hidden-reason");
-        const hide = interaction.options.getBoolean("hide-name") ?? false;
+        const hideMii = interaction.options.getBoolean("hide-mii") ?? false;
         const hidePublic = interaction.options.getBoolean("hide-public") ?? false;
 
         const fc = pidToFc(pid);
@@ -47,7 +47,7 @@ export default {
             await sendEmbedLog(interaction, "kick", res.User, [
                 { name: "Reason", value: reason },
                 { name: "Hidden Reason", value: reason_hidden ?? "None", hidden: true },
-            ], hide, hidePublic);
+            ], hideMii, hidePublic);
         }
         else
             await interaction.reply({ content: `Failed to kick friend code "${fc}": error ${res.Error ?? "no error message provided"}` });

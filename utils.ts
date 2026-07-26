@@ -158,8 +158,8 @@ export async function sendEmbedLog(
     interaction: ChatInputCommandInteraction<CacheType>,
     action: string,
     user: WiiLinkUser,
-    opts: SendEmbedOpt[],
-    hideMiiName = false,
+    opts: SendEmbedOpt[] | null = null,
+    hideMii = false,
     noPublicEmbed = false
 ): Promise<void> {
     const fc = pidToFc(user.ProfileId);
@@ -186,7 +186,7 @@ export async function sendEmbedLog(
         .setTitle(`${capitalize(action)} performed by moderator`)
         .setTimestamp();
 
-    createUserEmbed(user, false, pubEmbed, hideMiiName);
+    createUserEmbed(user, false, pubEmbed, hideMii);
 
     if (opts) {
         const filtered = opts.filter((opt) => !opt["hidden"]);

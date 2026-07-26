@@ -19,8 +19,8 @@ export default {
             .setRequired(true))
         .addStringOption(option => option.setName("hidden-reason")
             .setDescription("clear reason only visible to moderators"))
-        .addBooleanOption(option => option.setName("hide-name")
-            .setDescription("hide mii name in logs"))
+        .addBooleanOption(option => option.setName("hide-mii")
+            .setDescription("hide mii and mii name in logs"))
         .setDefaultMemberPermissions(resolveModRestrictPermission()),
 
     exec: async function(interaction: ChatInputCommandInteraction<CacheType>): Promise<void> {
@@ -36,7 +36,7 @@ export default {
         const pid = resolvePidFromString(id);
         const reason = interaction.options.getString("reason", true);
         const reason_hidden = interaction.options.getString("hidden-reason");
-        const hide = interaction.options.getBoolean("hide-name") ?? false;
+        const hideMii = interaction.options.getBoolean("hide-mii") ?? false;
 
         const fc = pidToFc(pid);
         const [success, res] = await makeWFCRequest("/clear", "POST", { secret: config.wfcSecret, pid: pid });
@@ -44,7 +44,7 @@ export default {
             await sendEmbedLog(interaction, "clear", res.User, [
                 { name: "Reason", value: reason },
                 { name: "Hidden Reason", value: reason_hidden ?? "None", hidden: true },
-            ], hide, true);
+            ], hideMii, true);
         }
         else
             await interaction.reply({ content: `Failed to clear friend code "${fc}": error ${res.Error ?? "no error message provided"}` });

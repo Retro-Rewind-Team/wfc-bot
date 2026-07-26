@@ -5,13 +5,6 @@ import { PermissionBit } from "../shared/roles.js";
 
 const config = getConfig();
 
-function p(count: number, str: string): string {
-    if (count == 1)
-        return str;
-
-    return str + "s";
-};
-
 export default {
     permissions: PermissionBit.MODERATOR,
 
@@ -34,8 +27,8 @@ export default {
             .setDescription("ban minutes length"))
         .addBooleanOption(option => option.setName("tos")
             .setDescription("tos violation (ban from entire service), default true"))
-        .addBooleanOption(option => option.setName("hide-name")
-            .setDescription("hide mii name in logs"))
+        .addBooleanOption(option => option.setName("hide-mii")
+            .setDescription("hide mii and mii name in logs"))
         .addBooleanOption(option => option.setName("hide-public")
             .setDescription("hide public log message"))
         .setDefaultMemberPermissions(resolveModRestrictPermission()),
@@ -57,14 +50,12 @@ export default {
         const hours = interaction.options.getNumber("hours") ?? 0;
         const minutes = interaction.options.getNumber("minutes") ?? 0;
         const tos = interaction.options.getBoolean("tos") ?? true;
-        const hide = interaction.options.getBoolean("hide-name") ?? false;
+        const hideMii = interaction.options.getBoolean("hide-mii") ?? false;
         const hidePublic = interaction.options.getBoolean("hide-public") ?? false;
         const moderator = interaction.user.id;
 
-        let perm = false;
         if (hours + minutes + days == 0) {
             // Perm ban lol
-            perm = true;
             // A normal person lives about 31000 days
             days = 100000;
         }
@@ -120,11 +111,6 @@ export default {
             console.error(`Error calling leaderboard API for player ${pid}:`, error);
         }
 
-        await sendEmbedLog(interaction, "ban", res.User, [
-            { name: "Ban Length", value: perm ? "Permanent" : `${days} ${p(days, "day")}, ${hours} ${p(hours, "hour")}, ${minutes} ${p(minutes, "minute")}` },
-            { name: "Reason", value: reason },
-            { name: "Hidden Reason", value: reasonHidden ?? "None", hidden: true },
-            { name: "TOS", value: tos.toString() },
-        ], hide, hidePublic);
+        await sendEmbedLog(interaction, "ban", res.User, null, hideMii, hidePublic);
     }
 };
