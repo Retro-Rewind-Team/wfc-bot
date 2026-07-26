@@ -328,7 +328,7 @@ async function listSingle(interaction: ChatInputCommandInteraction<CacheType>, i
 }
 
 export default {
-    permissions: PermissionBit.ADMIN,
+    permissions: PermissionBit.PROFILE_MODERATOR,
 
     data: new SlashCommandBuilder()
         .setName("badge")
