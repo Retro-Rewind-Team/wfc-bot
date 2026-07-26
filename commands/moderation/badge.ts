@@ -3,6 +3,7 @@ import { pidToFc, resolveModRestrictPermission, resolvePidFromString, validateID
 import { BadgeType } from "../shared/badges.js";
 import { getConfig } from "../../config.js";
 import { Dictionary } from "../../dictionary.js";
+import { PermissionBit } from "../shared/roles.js";
 
 const config = getConfig();
 const leaderboardUrl = `http://${config.leaderboardServer}:${config.leaderboardPort}`;
@@ -209,8 +210,7 @@ async function list_single(interaction: ChatInputCommandInteraction<CacheType>, 
 }
 
 export default {
-    modOnly: false,
-    adminOnly: true,
+    permissions: PermissionBit.ADMIN,
 
     data: new SlashCommandBuilder()
         .setName("badge")
