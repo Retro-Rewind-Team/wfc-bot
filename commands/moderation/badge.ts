@@ -184,8 +184,10 @@ async function listAll(interaction: ChatInputCommandInteraction<CacheType>): Pro
     const batchResponse: BatchBadgeResponse = await response.json();
     const keys = Object.keys(batchResponse.badges);
 
-    if (keys.length == 0)
+    if (keys.length == 0) {
         await interaction.editReply({content: "No badges exist for any players"});
+        return;
+    }
 
     const row = new ActionRowBuilder()
         .addComponents(getNavigationButtons(interaction.user.id));
