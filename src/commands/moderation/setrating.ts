@@ -27,7 +27,7 @@ export default {
     data: new SlashCommandBuilder()
         .setName("setrating")
         .setDescription("Set one of a player's Mario Kart Wii ratings")
-        .addStringOption(option => option.setName("friend-code")
+        .addStringOption(option => option.setName("id")
             .setDescription("friend code or pid to update")
             .setRequired(true))
         .addStringOption(option => option.setName("rating-type")
@@ -45,7 +45,7 @@ export default {
         .setDefaultMemberPermissions(resolveModRestrictPermission()),
 
     exec: async function(interaction: ChatInputCommandInteraction<CacheType>): Promise<void> {
-        const id = interaction.options.getString("friend-code", true).trim();
+        const id = interaction.options.getString("id", true).trim();
         const ratingType = interaction.options.getString("rating-type", true);
         const value = interaction.options.getInteger("rating", true);
         const reason = interaction.options.getString("reason", true).trim();
