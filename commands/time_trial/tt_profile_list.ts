@@ -1,8 +1,9 @@
-import { ActionRowBuilder, APIMessageTopLevelComponent, ButtonBuilder, ButtonInteraction, ButtonStyle, CacheType, ChatInputCommandInteraction, EmbedBuilder, SlashCommandBuilder } from "discord.js";
+import { ActionRowBuilder, APIMessageTopLevelComponent, ButtonInteraction, CacheType, ChatInputCommandInteraction, EmbedBuilder, SlashCommandBuilder } from "discord.js";
 import { getConfig } from "../../config.js";
 import { Dictionary } from "../../dictionary.js";
 import { registerButtonHandlerByMessageID } from "../../index.js";
 import { PermissionBit } from "../shared/roles.js";
+import { getNavigationButtons, newIndexFromButtonInteraction, validateButtonInteraction } from "../shared/buttons.js";
 
 const config = getConfig();
 const PROFILES_PER_PAGE = 10;
@@ -26,26 +27,6 @@ interface ProfileListState {
 }
 
 const stateByMessageID: Dictionary<ProfileListState> = {};
-
-const firstButton = new ButtonBuilder()
-    .setCustomId("tt_profile_first")
-    .setLabel("⏮️")
-    .setStyle(ButtonStyle.Primary);
-
-const prevButton = new ButtonBuilder()
-    .setCustomId("tt_profile_prev")
-    .setLabel("◀️")
-    .setStyle(ButtonStyle.Primary);
-
-const nextButton = new ButtonBuilder()
-    .setCustomId("tt_profile_next")
-    .setLabel("▶️")
-    .setStyle(ButtonStyle.Primary);
-
-const lastButton = new ButtonBuilder()
-    .setCustomId("tt_profile_last")
-    .setLabel("⏭️")
-    .setStyle(ButtonStyle.Primary);
 
 export default {
     permissions: PermissionBit.NONE,
@@ -101,12 +82,7 @@ export default {
 
             if (totalPages > 1) {
                 const row = new ActionRowBuilder()
-                    .addComponents(
-                        firstButton.setDisabled(true),
-                        prevButton.setDisabled(true),
-                        nextButton.setDisabled(false),
-                        lastButton.setDisabled(false)
-                    );
+                    .addComponents(getNavigationButtons(interaction.user.id));
 
                 const res = await interaction.editReply({
                     embeds: [createEmbed(0)],
@@ -145,24 +121,17 @@ export default {
 };
 
 async function handleButton(buttonInteraction: ButtonInteraction<CacheType>): Promise<void> {
+    if (!await validateButtonInteraction(buttonInteraction))
+        return;
+
     const state = stateByMessageID[buttonInteraction.message.id];
 
-    let newPage = state.currentPage;
-
-    switch (buttonInteraction.customId) {
-    case "tt_profile_first":
-        newPage = 0;
-        break;
-    case "tt_profile_prev":
-        newPage = Math.max(0, state.currentPage - 1);
-        break;
-    case "tt_profile_next":
-        newPage = Math.min(state.totalPages - 1, state.currentPage + 1);
-        break;
-    case "tt_profile_last":
-        newPage = state.totalPages - 1;
-        break;
-    }
+    const maxPage = state.totalPages - 1;
+    const newPage = newIndexFromButtonInteraction(
+        buttonInteraction,
+        state.currentPage,
+        maxPage,
+    );
 
     state.currentPage = newPage;
 
@@ -188,10 +157,11 @@ async function handleButton(buttonInteraction: ButtonInteraction<CacheType>): Pr
 
     const row = new ActionRowBuilder()
         .addComponents(
-            firstButton.setDisabled(newPage == 0),
-            prevButton.setDisabled(newPage == 0),
-            nextButton.setDisabled(newPage == state.totalPages - 1),
-            lastButton.setDisabled(newPage == state.totalPages - 1)
+            getNavigationButtons(
+                buttonInteraction.user.id,
+                state.currentPage,
+                maxPage
+            )
         );
 
     await buttonInteraction.update({

@@ -4,7 +4,7 @@ import { Dictionary } from "../../dictionary.js";
 import { registerButtonHandlerByMessageID } from "../../index.js";
 import { createUserEmbed, makeWFCRequest, resolveModRestrictPermission, resolvePidFromString, validateID } from "../../utils.js";
 import { PermissionBit } from "../shared/roles.js";
-import { Buttons } from "../shared/buttons.js";
+import { getNavigationButtons, newIndexFromButtonInteraction, validateButtonInteraction } from "../shared/buttons.js";
 
 const config = getConfig();
 
@@ -113,12 +113,7 @@ export default {
 
         if (embeds.length > 1) {
             const row = new ActionRowBuilder()
-                .addComponents(
-                    Buttons.start.setDisabled(true),
-                    Buttons.back.setDisabled(true),
-                    Buttons.forward.setDisabled(false),
-                    Buttons.end.setDisabled(false)
-                );
+                .addComponents(getNavigationButtons(interaction.user.id));
 
             const res = await interaction.reply({
                 embeds: [embeds[0]],
@@ -157,44 +152,29 @@ export default {
 };
 
 async function handleButton(buttonInteraction: ButtonInteraction<CacheType>): Promise<void> {
+    if (!await validateButtonInteraction(buttonInteraction))
+        return;
+
     const state = stateByMessageID[buttonInteraction.message.id];
 
-    let newidx = -1;
-    const maxidx = state.Embeds.length - 1;
-
-    switch (buttonInteraction.customId) {
-    case "start":
-        newidx = 0;
-        break;
-    case "forward":
-        newidx = state.Idx + 1;
-        break;
-    case "end":
-        newidx = maxidx;
-        break;
-    case "back":
-        newidx = state.Idx - 1;
-        break;
-    }
-
-    if (newidx > maxidx)
-        newidx = maxidx;
-
-    if (newidx < 0)
-        newidx = 0;
-
-    state.Idx = newidx;
+    const maxIdx = state.Embeds.length - 1;
+    state.Idx = newIndexFromButtonInteraction(
+        buttonInteraction,
+        state.Idx,
+        maxIdx,
+    );
 
     const row = new ActionRowBuilder()
         .addComponents(
-            Buttons.start.setDisabled(newidx == 0),
-            Buttons.back.setDisabled(newidx == 0),
-            Buttons.forward.setDisabled(newidx == maxidx),
-            Buttons.end.setDisabled(newidx == maxidx)
+            getNavigationButtons(
+                buttonInteraction.user.id,
+                state.Idx,
+                maxIdx
+            )
         );
 
     await buttonInteraction.update({
-        embeds: [state.Embeds[newidx]],
+        embeds: [state.Embeds[state.Idx]],
         components: [row as unknown as APIMessageTopLevelComponent],
     });
 }

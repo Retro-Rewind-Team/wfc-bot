@@ -4,9 +4,9 @@ import { BadgeType } from "../shared/badges.js";
 import { getConfig } from "../../config.js";
 import { Dictionary } from "../../dictionary.js";
 import { PermissionBit } from "../shared/roles.js";
-import { Buttons } from "../shared/buttons.js";
 import { registerButtonHandlerByMessageID } from "../../index.js";
 import { fetchStatsEmbed, StatsSectionFlag } from "../shared/stats_embed.js";
+import { getNavigationButtons, newIndexFromButtonInteraction, validateButtonInteraction } from "../shared/buttons.js";
 
 const config = getConfig();
 const leaderboardUrl = `http://${config.leaderboardServer}:${config.leaderboardPort}`;
@@ -188,12 +188,7 @@ async function listAll(interaction: ChatInputCommandInteraction<CacheType>): Pro
         await interaction.editReply({content: "No badges exist for any players"});
 
     const row = new ActionRowBuilder()
-        .addComponents(
-            Buttons.start.setDisabled(true),
-            Buttons.back.setDisabled(true),
-            Buttons.forward.setDisabled(false),
-            Buttons.end.setDisabled(false)
-        );
+        .addComponents(getNavigationButtons(interaction.user.id));
 
     const [embed, err] = await fetchStatsEmbed(keys[0], StatsSectionFlag.BADGES);
     if (err) {
@@ -229,41 +224,26 @@ async function listAll(interaction: ChatInputCommandInteraction<CacheType>): Pro
 }
 
 async function handleButton(buttonInteraction: ButtonInteraction<CacheType>): Promise<void> {
+    if (!await validateButtonInteraction(buttonInteraction))
+        return;
+
     const state = stateByMessageID[buttonInteraction.message.id];
     const keys = Object.keys(state.Badges);
 
-    let newidx = -1;
-    const maxidx = keys.length - 1;
-
-    switch (buttonInteraction.customId) {
-    case "start":
-        newidx = 0;
-        break;
-    case "forward":
-        newidx = state.Idx + 1;
-        break;
-    case "end":
-        newidx = maxidx;
-        break;
-    case "back":
-        newidx = state.Idx - 1;
-        break;
-    }
-
-    if (newidx > maxidx)
-        newidx = maxidx;
-
-    if (newidx < 0)
-        newidx = 0;
-
-    state.Idx = newidx;
+    const maxIdx = keys.length - 1;
+    state.Idx = newIndexFromButtonInteraction(
+        buttonInteraction,
+        state.Idx,
+        maxIdx
+    );
 
     const row = new ActionRowBuilder()
         .addComponents(
-            Buttons.start.setDisabled(newidx == 0),
-            Buttons.back.setDisabled(newidx == 0),
-            Buttons.forward.setDisabled(newidx == maxidx),
-            Buttons.end.setDisabled(newidx == maxidx)
+            getNavigationButtons(
+                buttonInteraction.user.id,
+                state.Idx,
+                maxIdx
+            ),
         );
 
     let embed = state.Embeds[state.Idx];
