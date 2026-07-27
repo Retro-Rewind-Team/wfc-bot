@@ -252,10 +252,11 @@ async function handleButton(interaction: ButtonInteraction<CacheType>): Promise<
     if (cb)
         await cb(interaction);
     else {
-        await interaction.update({
+        await interaction.reply({
             content: "This interaction has expired! Try resending your original command.",
             components: [],
             embeds: [],
+            flags: MessageFlags.Ephemeral,
         });
     }
 }
