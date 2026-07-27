@@ -217,6 +217,8 @@ async function listAll(interaction: ChatInputCommandInteraction<CacheType>): Pro
         return;
     }
 
+    embed!.setFooter({ text: `Page 1 of ${keys.length }` });
+
     const res = await interaction.editReply({
         embeds: [embed!],
         components: [row as unknown as APIMessageTopLevelComponent],
@@ -280,6 +282,8 @@ async function handleButton(buttonInteraction: ButtonInteraction<CacheType>): Pr
         embed = newEmbed!;
         state.Embeds[state.Idx] = embed;
     }
+
+    embed!.setFooter({ text: `Page ${state.Idx + 1} of ${keys.length }` });
 
     await buttonInteraction.update({
         embeds: [embed],
