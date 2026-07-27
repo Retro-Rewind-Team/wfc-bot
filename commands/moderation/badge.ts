@@ -170,6 +170,7 @@ interface BadgeListState {
 const stateByMessageID: Dictionary<BadgeListState> = {};
 
 async function listAll(interaction: ChatInputCommandInteraction<CacheType>): Promise<void> {
+    const restrictBadgeType = interaction.options.getInteger("badge");
     await interaction.deferReply();
 
     const response = await fetch(`${leaderboardUrl}/api/badges/all`);
@@ -182,6 +183,20 @@ async function listAll(interaction: ChatInputCommandInteraction<CacheType>): Pro
     }
 
     const batchResponse: BatchBadgeResponse = await response.json();
+
+    if (restrictBadgeType != null) {
+        const filteredBadges: Dictionary<BadgeType[]> = {};
+
+        for (const fc of Object.keys(batchResponse.badges)) {
+            const playerBadges = batchResponse.badges[fc];
+
+            if (playerBadges.includes(restrictBadgeType))
+                filteredBadges[fc] = playerBadges;
+        }
+
+        batchResponse.badges = filteredBadges;
+    }
+
     const keys = Object.keys(batchResponse.badges);
 
     if (keys.length == 0) {
@@ -335,6 +350,9 @@ export default {
                 .setRequired(true)))
         .addSubcommand(subcommand => subcommand.setName("list")
             .setDescription("List badges for one or all players")
+            .addIntegerOption(option => option.setName("badge")
+                .setDescription("the badge type to filter by")
+                .setChoices(BadgeOpts))
             .addStringOption(option => option.setName("id")
                 .setDescription("friend code or pid to list badges of")))
         .setDefaultMemberPermissions(resolveModRestrictPermission()),
