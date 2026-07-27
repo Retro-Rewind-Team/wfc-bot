@@ -99,19 +99,15 @@ async function resolveCommands(files: string[], callback: (_: Dictionary<Command
     const ret: Dictionary<Command> = {};
 
     for (const file of files) {
-        let spec = await import(file);
-        spec = spec.default;
+        const commandFile = await import(file);
+        const spec: Command  = commandFile.default;
 
         if (spec == undefined || spec == null)
             continue;
 
-        if ("init" in spec) {
-            try {
-                await spec.init();
-            }
-            catch (e) {
-                console.error(`Failed to run init for spec ${file}, ${e}`);
-            }
+        if ("init" in spec && spec.init) {
+            spec.init().catch(err =>
+                console.error(`Failed to run init for spec ${file}, ${err}`));
         }
 
         if ("data" in spec && "exec" in spec) {
