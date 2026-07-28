@@ -31,7 +31,7 @@ export function isAllowedInteraction(
     return [false, `Command requires one of: ${required.join(", ")}.\nUser has: ${has.join(", ")}.`];
 }
 
-function permissionBitsToList(permissionBits: number): string[] {
+export function permissionBitsToList(permissionBits: number): string[] {
     if (!permissionBits)
         return ["NONE"];
 
