@@ -22,7 +22,7 @@ const ratingLimits: Record<string, { min: number, max: number }> = {
 };
 
 export default {
-    permissions: PermissionBit.MODERATOR,
+    permissions: PermissionBit.PROFILE_MODERATOR,
 
     data: new SlashCommandBuilder()
         .setName("setrating")
