@@ -153,7 +153,7 @@ async function addRole(
     }
 
     config.userPermissions[user.id] = userBits | bit;
-    setConfig(config);
+    await setConfig(config);
 
     await interaction.reply({ content: `User ${user.tag} has been added as a(n) ${roleName}` });
     await sendEmbed(interaction, `${roleName} Addition`, user);
@@ -174,7 +174,7 @@ async function removeRole(
     }
 
     config.userPermissions[user.id] = userBits & ~bit;
-    setConfig(config);
+    await setConfig(config);
 
     await interaction.reply({ content: `User ${user.tag} has been removed as a(n) ${roleName}` });
     await sendEmbed(interaction, `${roleName} Removal`, user);

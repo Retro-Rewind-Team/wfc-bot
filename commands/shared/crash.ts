@@ -97,7 +97,7 @@ export default {
             console.log(`Downloaded ${pulsarToolsBin}, ${json.tag_name} successfully!`);
 
             config.pulsarToolsTag = json.tag_name;
-            setConfig(config);
+            await setConfig(config);
         }
         else
             console.log(`Using pulsar-tools ${json.tag_name}`);

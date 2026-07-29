@@ -1,10 +1,11 @@
 import { Message } from "discord.js";
 import { Dictionary } from "./dictionary.js";
-import { existsSync, readFileSync, writeFileSync } from "fs";
 import { exit } from "process";
 import { getChannels } from "./config.js";
 import { Group } from "./services/groups.js";
 import { Status, StatusColor } from "./commands/shared/server_status.js";
+import * as fs from "fs/promises";
+import { fileExists } from "./fs_helpers.js";
 
 const channels = getChannels();
 
@@ -58,10 +59,10 @@ export class State {
         return new State(messages, stateSerialized.pingedRooms, stateSerialized.status, stateSerialized.motd);
     }
 
-    save(): void {
+    async save(): Promise<void> {
         const stateSerialized = this.toSerialized();
 
-        writeFileSync(STATE_PATH, JSON.stringify(stateSerialized));
+        await fs.writeFile(STATE_PATH, JSON.stringify(stateSerialized));
     }
 }
 
@@ -80,16 +81,16 @@ export async function loadState(): Promise<State> {
         return _state;
 
     try {
-        if (!existsSync(STATE_PATH)) {
+        if (!fileExists(STATE_PATH)) {
             _state = defaultState;
-            _state.save();
+            await _state.save();
             return _state;
         }
 
-        const buf = readFileSync(STATE_PATH, { encoding: "utf8" });
+        const buf = await fs.readFile(STATE_PATH, { encoding: "utf8" });
         if (buf == null || buf.length == 0) {
             _state = defaultState;
-            _state.save();
+            await _state.save();
             return _state;
         }
 

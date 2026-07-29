@@ -1,8 +1,9 @@
 import { Client, GuildChannel, PermissionFlagsBits, TextChannel, VoiceChannel } from "discord.js";
 import { Dictionary } from "./dictionary.js";
-import { existsSync, readFileSync, writeFileSync } from "fs";
-import { exit } from "process";
 import { PermissionBit } from "./commands/shared/roles.js";
+import { fileExists } from "./fs_helpers.js";
+import * as fs from "fs/promises";
+import * as process from "process";
 
 export interface Config {
     token: string
@@ -58,12 +59,12 @@ function verifyConfig(config: Config): void {
         throw "No wfcAPIBase is set! Please set one to continue.";
 }
 
-export function initConfig(path: string): void {
+export async function initConfig(path: string): Promise<void> {
     _path = path;
 
     try {
-        if (!existsSync(path)) {
-            setConfig({
+        if (!fileExists(path)) {
+            await setConfig({
                 token: "your bot's token",
                 applicationID: "your application id",
                 miiEndPoint: "https://rwfc.net/api/leaderboard/player/{fc}/mii",
@@ -97,19 +98,19 @@ export function initConfig(path: string): void {
             throw "No config.json was provided. One has been generated for you, please adjust it before retrying!";
         }
 
-        const buf = readFileSync(path, { encoding: "utf8" });
+        const buf = await fs.readFile(path, { encoding: "utf8" });
         _config = JSON.parse(buf);
 
         if (migrateConfig(_config)) {
             console.log("Config migrated, saving config");
-            setConfig(_config);
+            await setConfig(_config);
             console.log("Config saved");
         }
         verifyConfig(_config);
     }
     catch (e) {
         console.error(e);
-        exit(1);
+        process.exit(1);
     }
 }
 
@@ -120,10 +121,10 @@ export function getConfig(): Config {
     return _config;
 }
 
-export function setConfig(config: Config): void {
+export async function setConfig(config: Config): Promise<void> {
     _config = config;
 
-    writeFileSync(_path, JSON.stringify(_config, null, 4), { encoding: "utf8" });
+    await fs.writeFile(_path, JSON.stringify(_config, null, 4), { encoding: "utf8" });
 }
 
 interface Channels {

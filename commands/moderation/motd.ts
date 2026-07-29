@@ -38,7 +38,7 @@ export default {
             await interaction.reply({ content: `Set message of the day to:\n${realMotd}` });
             // Serialize the original motd
             state.motd = motd;
-            state.save();
+            await state.save();
         }
         else {
             const [success, res] = await makeWFCRequest("/motd", "GET");

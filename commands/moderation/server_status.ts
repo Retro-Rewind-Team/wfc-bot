@@ -72,7 +72,7 @@ export default {
         }
 
         state.status = { color: color, message: message };
-        state.save();
+        await state.save();
 
         await interaction.followUp({
             content: `Successfully updated the server status to "${channelName}"`

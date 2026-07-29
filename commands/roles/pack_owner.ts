@@ -54,7 +54,7 @@ export default {
 
                 config.packOwners[packIDStr].push(user.id);
 
-                setConfig(config);
+                await setConfig(config);
 
                 await interaction.reply({
                     content: `Added user ${user.username}, ${user.id} to pack ${packIDToName(packID)}`
@@ -75,7 +75,7 @@ export default {
                     config.packOwners[packIDStr].splice(idx, 1);
             }
 
-            setConfig(config);
+            await setConfig(config);
 
             await interaction.reply({
                 content: `Removed user ${user.username}, ${user.id} from pack ${packIDToName(packID)}`

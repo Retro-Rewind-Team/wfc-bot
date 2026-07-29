@@ -83,7 +83,7 @@ async function sendPings(): Promise<void> {
 
     await pingNewRooms();
 
-    state.save();
+    await state.save();
 }
 
 async function pingExistingRooms(): Promise<void> {

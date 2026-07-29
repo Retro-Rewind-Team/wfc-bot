@@ -42,7 +42,7 @@ for (let i = 2; i < process.argv.length; i++) {
     }
 }
 
-initConfig(configPath.length > 0 ? configPath : path.join(process.cwd(), "config.json"));
+await initConfig(configPath.length > 0 ? configPath : path.join(process.cwd(), "config.json"));
 const config = getConfig();
 
 function findCommadFiles(root: string): string[] {
