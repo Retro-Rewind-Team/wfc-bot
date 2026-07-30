@@ -14,7 +14,7 @@ export enum BadgeType {
     DiscordStaff,
     TranslatorLead,
     Translator,
-    Donator,
+    Supporter,
     BetaTester,
     Heart,
     // Tourney Badges
