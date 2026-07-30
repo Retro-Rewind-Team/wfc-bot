@@ -307,7 +307,7 @@ async function listSingle(interaction: ChatInputCommandInteraction<CacheType>, i
     const pid = resolvePidFromString(id);
     const fc = pidToFc(pid);
 
-    const response = await fetch(`${leaderboardUrl}/api/badges/by_pid/${pid}`);
+    const response = await fetch(`${leaderboardUrl}/api/badges/by-pid/${pid}`);
 
     if (!response.ok) {
         await interaction.editReply({
