@@ -1,4 +1,4 @@
-import { ActionRowBuilder, APIMessageTopLevelComponent, ButtonInteraction, CacheType, ChatInputCommandInteraction, EmbedBuilder, SlashCommandBuilder } from "discord.js";
+import { ActionRowBuilder, APIMessageTopLevelComponent, AutocompleteInteraction, ButtonInteraction, CacheType, ChatInputCommandInteraction, EmbedBuilder, SlashCommandBuilder } from "discord.js";
 import { pidToFc, resolveModRestrictPermission, resolvePidFromString, validateID } from "../../utils.js";
 import { BadgeOpts, BadgeType, listBadges } from "../shared/badges.js";
 import { getConfig } from "../../config.js";
@@ -328,7 +328,7 @@ export default {
                 .setRequired(true))
             .addIntegerOption(option => option.setName("badge")
                 .setDescription("the badge to add")
-                .setChoices(BadgeOpts)
+                .setAutocomplete(true)
                 .setRequired(true)))
         .addSubcommand(subcommand => subcommand.setName("remove")
             .setDescription("Remove a badge from a user")
@@ -337,13 +337,13 @@ export default {
                 .setRequired(true))
             .addIntegerOption(option => option.setName("badge")
                 .setDescription("the badge to remove")
-                .setChoices(BadgeOpts)
+                .setAutocomplete(true)
                 .setRequired(true)))
         .addSubcommand(subcommand => subcommand.setName("list")
             .setDescription("List badges for one or all players")
             .addIntegerOption(option => option.setName("badge")
                 .setDescription("the badge type to filter by")
-                .setChoices(BadgeOpts))
+                .setAutocomplete(true))
             .addStringOption(option => option.setName("id")
                 .setDescription("friend code or pid to list badges of")))
         .setDefaultMemberPermissions(resolveModRestrictPermission()),
@@ -362,5 +362,20 @@ export default {
             await list(interaction);
             break;
         }
+    },
+
+    autocomplete: async function(interaction: AutocompleteInteraction<CacheType>): Promise<void> {
+        const focused = interaction.options.getFocused(true);
+
+        if (focused.name != "badge")
+            return;
+
+        const filtered = focused.value.length == 0
+            ? BadgeOpts
+            : BadgeOpts.filter(
+                opt => opt.name.toLowerCase().includes(focused.value.toLowerCase())
+            );
+
+        await interaction.respond(filtered.slice(0, Math.min(filtered.length, 25)));
     }
 };
