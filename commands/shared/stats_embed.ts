@@ -1,6 +1,6 @@
 import { EmbedBuilder } from "discord.js";
 import { getConfig } from "../../config.js";
-import { BadgeType } from "./badges.js";
+import { BadgeType, listBadges } from "./badges.js";
 import { getColor, getMiiImageURL, pidToFc } from "../../utils.js";
 
 const config = getConfig();
@@ -146,7 +146,7 @@ export async function fetchStatsEmbed(
             if (flags != StatsSectionFlag.BADGES)
                 embed.addFields({ name: "\u200B", value: "" });
 
-            const badgeNames = stats.badges.map(badge => BadgeType[badge]).join(", ");
+            const badgeNames = listBadges(stats.badges);
             embed.addFields({
                 name: "Badges",
                 value: badgeNames,

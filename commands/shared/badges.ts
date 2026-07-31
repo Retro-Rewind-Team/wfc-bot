@@ -1,24 +1,29 @@
 // NOTE: The order of these should not be modified. Badges should only be added
-// onto the end
+// onto the end of each section. Expunged badges should be labeled "UnusedX"
 export enum BadgeType {
     // Core Devs for Retro Rewind or RWFC Services (projects under the Retro
     // Rewind Team Org)
-    RetroRewindDeveloper,
+    RetroRewindDeveloper = 0,
     // Core Devs for Wheel Wizard
     WheelWizardDeveloper,
-    // Contributor to any relevant project
-    Contributor,
+    // Significant Contributor to any relevant projects. Major PRs/Features,
+    // extensive community management, major asset contributions, etc.
+    MajorContributor,
+
     // Moderators/Admins for RWFC servers
-    RWFCModerator,
+    RWFCModerator = 100,
     // Discord Moderators/Admins
     DiscordStaff,
-    TranslatorLead,
+
+    // Minor contributor. Gecko codes, small assets or features, one-off changes.
+    Contributor = 1000,
     Translator,
     Supporter,
     BetaTester,
     Heart,
+
     // Tourney Badges
-    FireStarterGold,
+    FireStarterGold = 2000,
     FireStarterSilver,
     FireStarterBronze,
     LeafStruckGold,
@@ -27,4 +32,33 @@ export enum BadgeType {
     SummitShowdownGold,
     SummitShowdownSilver,
     SummitShowdownBronze,
+    HorizonGold,
+    HorizonSilver,
+    HorizonBronze,
+    SunblossomGold,
+    SunblossomSilver,
+    SunblossomBronze,
+    EarthboundGold,
+    EarthboundSilver,
+    EarthboundBronze,
+}
+
+export const BadgeOpts: { name: string, value: BadgeType }[] = [];
+
+Object.entries(BadgeType).forEach(entry => {
+    if (typeof entry[0] == "string"
+        && typeof entry[1] == "number"
+        && !entry[0].startsWith("Unused")) {
+        BadgeOpts.push({
+            name: entry[0],
+            value: entry[1],
+        });
+    }
+});
+
+export function listBadges(badges: BadgeType[]): string {
+    return badges
+        .map(badge => BadgeType[badge])
+        .filter(badgeName => !badgeName.startsWith("Unused"))
+        .join(", ");
 }

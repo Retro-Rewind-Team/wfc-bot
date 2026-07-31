@@ -1,6 +1,6 @@
 import { ActionRowBuilder, APIMessageTopLevelComponent, ButtonInteraction, CacheType, ChatInputCommandInteraction, EmbedBuilder, SlashCommandBuilder } from "discord.js";
 import { pidToFc, resolveModRestrictPermission, resolvePidFromString, validateID } from "../../utils.js";
-import { BadgeType } from "../shared/badges.js";
+import { BadgeOpts, BadgeType, listBadges } from "../shared/badges.js";
 import { getConfig } from "../../config.js";
 import { Dictionary } from "../../dictionary.js";
 import { PermissionBit } from "../shared/roles.js";
@@ -10,17 +10,6 @@ import { getNavigationButtons, newIndexFromButtonInteraction, validateButtonInte
 
 const config = getConfig();
 const leaderboardUrl = `http://${config.leaderboardServer}:${config.leaderboardPort}`;
-
-const BadgeOpts: { name: string, value: BadgeType }[] = [];
-
-Object.entries(BadgeType).forEach(entry => {
-    if (typeof entry[0] == "string" && typeof entry[1] == "number") {
-        BadgeOpts.push({
-            name: entry[0],
-            value: entry[1],
-        });
-    }
-});
 
 interface BadgeManageResponse {
     success: boolean;
@@ -84,7 +73,7 @@ async function add(interaction: ChatInputCommandInteraction<CacheType>): Promise
         }
 
         await interaction.editReply({
-            content: `Successfully added badge ${badgeName} to friend code "${fc}"\nThis player's badges are: ${badgeResponse.badges.map(badge => BadgeType[badge]).join(", ")}`
+            content: `Successfully added badge ${badgeName} to friend code "${fc}"\nThis player's badges are: ${listBadges(badgeResponse.badges)}`
         });
     }
 }
@@ -139,11 +128,9 @@ async function remove(interaction: ChatInputCommandInteraction<CacheType>): Prom
         let badgeString: string;
         if (!badgeResponse.badges || badgeResponse.badges.length == 0)
             badgeString = "None";
-        else {
-            badgeString = badgeResponse.badges
-                .map(badge => BadgeType[badge])
-                .join(", ");
-        }
+        else
+            badgeString = listBadges(badgeResponse.badges);
+
 
         await interaction.editReply({
             content: `Successfully removed badge ${badgeName} from friend code "${fc}"\nThis player's badges are: ${badgeString}`
@@ -321,7 +308,7 @@ async function listSingle(interaction: ChatInputCommandInteraction<CacheType>, i
     if (badges.length == 0)
         badgesString = "None";
     else
-        badgesString = badges.map(badge => BadgeType[badge]).join(", ");
+        badgesString = listBadges(badges);
 
     await interaction.editReply({
         content: `${fc}: ${badgesString}`
