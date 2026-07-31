@@ -160,7 +160,8 @@ export async function sendEmbedLog(
     user: WiiLinkUser,
     opts: SendEmbedOpt[] | null = null,
     hideMii = false,
-    noPublicEmbed = false
+    noPublicEmbed = false,
+    reduced = true,
 ): Promise<void> {
     const fc = pidToFc(user.ProfileId);
     const member = interaction.member as GuildMember | null;
@@ -170,7 +171,7 @@ export async function sendEmbedLog(
         .setTitle(`${capitalize(action)} performed by ${member?.displayName ?? "Unknown"}`)
         .setTimestamp();
 
-    createUserEmbed(user, true, privEmbed);
+    createUserEmbed(user, true, privEmbed, false, reduced);
 
     if (opts)
         privEmbed.addFields(...opts);
@@ -271,11 +272,17 @@ function fmtDeviceID(deviceIDs: number[]): string {
     return ret;
 }
 
+// Creates an embed based on a WiiLinkUser.
+// priv exposes private fields such as IP Address, Device ID, and serials
+// templateEmbed will prevent touching color, title, or timestamp
+// hideMii avoids showing the mii image or name
+// reduced will clear some of the clutter fields from private embeds.
 export function createUserEmbed(
     user: WiiLinkUser,
     priv: boolean,
     templateEmbed: EmbedBuilder | null = null,
-    hideMiiName: boolean = false
+    hideMii: boolean = false,
+    reduced: boolean = true,
 ): EmbedBuilder {
     const fc = pidToFc(user.ProfileId);
 
@@ -286,7 +293,7 @@ export function createUserEmbed(
             .setTitle(`Player info for friend code ${fc}`)
             .setTimestamp();
 
-    if (priv || !hideMiiName)
+    if (priv || !hideMii)
         embed.setThumbnail(getMiiImageURL(fc));
 
     let issuedDate = Date.parse(user.BanIssued);
@@ -306,7 +313,7 @@ export function createUserEmbed(
         banLengthStr = fmtTimeSpan(expiresDate - issuedDate);
     }
 
-    const miiName = !priv && hideMiiName
+    const miiName = !priv && hideMii
         ? "\\*\\*\\*\\*\\*"
         : user.LastInGameSn != ""
             ? user.LastInGameSn
@@ -353,14 +360,19 @@ export function createUserEmbed(
     if (priv) {
         const csnums = user.Csnum?.join(", ") ?? "null";
 
+        if (!reduced) {
+            embed.addFields(
+                { name: "User ID", value: `${user.UserId}` },
+                { name: "Gsbr Code", value: `${user.GsbrCode}` },
+                { name: "Email", value: `${user.Email}` },
+                { name: "Unique Nick", value: `${user.UniqueNick}` },
+                { name: "First Name", value: `${user.FirstName}` },
+                { name: "Last Name", value: `${user.LastName}` },
+            );
+        }
+
         embed.addFields(
-            { name: "User ID", value: `${user.UserId}` },
-            { name: "Gsbr Code", value: `${user.GsbrCode}` },
             { name: "NG Device IDs", value: `${fmtDeviceID(user.NgDeviceId)}` },
-            { name: "Email", value: `${user.Email}` },
-            { name: "Unique Nick", value: `${user.UniqueNick}` },
-            { name: "First Name", value: `${user.FirstName}` },
-            { name: "Last Name", value: `${user.LastName}` },
             { name: "Last IP Address", value: `${user.LastIPAddress}` },
             { name: "IP Info", value: `https://ipinfo.io/${user.LastIPAddress}` },
             { name: "Console Serial Numbers", value: `${csnums.length <= 1024 ? csnums : "Too many Serial Numbers!"}` },

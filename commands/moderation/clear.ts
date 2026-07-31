@@ -44,7 +44,7 @@ export default {
             await sendEmbedLog(interaction, "clear", res.User, [
                 { name: "Reason", value: reason },
                 { name: "Hidden Reason", value: reason_hidden ?? "None", hidden: true },
-            ], hideMii, true);
+            ], hideMii, true, false);
         }
         else
             await interaction.reply({ content: `Failed to clear friend code "${fc}": error ${res.Error ?? "no error message provided"}` });
