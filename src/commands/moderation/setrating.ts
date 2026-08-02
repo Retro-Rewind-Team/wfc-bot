@@ -95,10 +95,15 @@ export default {
         user.MMRCT = response.MMRCT ?? response.mmr_ct;
         user.MMRVanilla = response.MMRVanilla ?? response.mmr_vanilla;
 
-        await sendEmbedLog(interaction, `set ${label}`, user, [
-            { name: `Previous ${label}`, value: Number(previous).toLocaleString() },
-            { name: `New ${label}`, value: value.toLocaleString() },
-            { name: "Reason", value: reason },
-        ], false, true);
+        await sendEmbedLog(interaction, user, {
+            action: `set ${label}`,
+            extraFields: [
+                { name: `Previous ${label}`, value: previous.toLocaleString() },
+                { name: `New ${label}`, value: value.toLocaleString() },
+                { name: "Reason", value: reason },
+            ],
+            hideMii: false,
+            noPublicEmbed: true,
+        });
     },
 };
