@@ -59,11 +59,22 @@ export default {
             .setTitle(`Retro WFC Error ${ecode}: ${wiiLinkErrorDef.name}\n`);
 
         const addendum = getWiiLinkErrorAddendum(ecode);
-        const success = await addWiimmfiError(embed, response, verbose, addendum);
+        const status = await addWiimmfiError(embed, response, verbose, addendum);
 
-        let footer = success
-            ? "Using error definitions from wiimmfi.de."
-            : "Unable to query error from wiimmfi.de.";
+        let footer = "";
+
+        switch (status) {
+        case WiimmfiErrrorStatus.FAILED:
+            footer = "Failed to retrieve error definitions from wiimmfi.de.";
+            break;
+        case WiimmfiErrrorStatus.MISSING:
+        case WiimmfiErrrorStatus.UNUSED:
+            footer = "No relevant error definitions found from wiimmfi.de.";
+            break;
+        case WiimmfiErrrorStatus.USED:
+            footer = "Using error definitions from wiimmfi.de.";
+            break;
+        }
 
         embed.addFields({
             name: "WiiLink Description",
@@ -90,35 +101,39 @@ export default {
     }
 };
 
+enum WiimmfiErrrorStatus {
+    FAILED,
+    MISSING,
+    UNUSED,
+    USED,
+}
+
 // Returns false if there is an issue with the wiimmfi error response
 async function addWiimmfiError(
     embed: EmbedBuilder,
     response: Response,
     verbose: boolean,
     addendum: WiiLinkErrorAddendum,
-): Promise<boolean> {
+): Promise<WiimmfiErrrorStatus> {
     if (!response.ok)
-        return false;
+        return WiimmfiErrrorStatus.FAILED;
 
     const wiimmfiError = await response.json() as WiimmfiErrorResponse;
 
     if (wiimmfiError[0].found == 0)
-        return false;
+        return WiimmfiErrrorStatus.MISSING;
 
     const originalInfoList = Object.values(wiimmfiError[0].infolist);
 
     const filtered = originalInfoList.filter(info =>
         !wiimmfiVerboseTypes.includes(info.type.toLowerCase()));
 
-    const infolist = verbose ? filtered : originalInfoList;
+    const infolist = !verbose ? filtered : originalInfoList;
 
     if (infolist.length == 0)
-        return false;
+        return WiimmfiErrrorStatus.UNUSED;
 
     for (const info of infolist) {
-        if (wiimmfiVerboseTypes.includes(info.type.toLowerCase()) && !verbose)
-            continue;
-
         const override = addendum.overrides[info.type.toLowerCase()];
 
         if (override == "skip")
@@ -140,7 +155,7 @@ async function addWiimmfiError(
         });
     }
 
-    return true;
+    return WiimmfiErrrorStatus.USED;
 }
 
 const hrefRegex = /<a\shref="(?<link>.*?)">(?<display>.*?)<\/a>/;
