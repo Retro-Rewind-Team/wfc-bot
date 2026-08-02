@@ -259,13 +259,14 @@ async function handleButton(interaction: ButtonInteraction<CacheType>): Promise<
 
 async function refreshCommands(commands: Dictionary<Command>): Promise<void> {
     const globalCommands: RESTPostAPIChatInputApplicationCommandsJSONBody[] = [];
-    const adminCommands: RESTPostAPIChatInputApplicationCommandsJSONBody[] = [];
+    const privilegedCommands: RESTPostAPIChatInputApplicationCommandsJSONBody[] = [];
 
     for (const cname in commands) {
         const permissions = commands[cname].permissions;
-        if (permissions == (PermissionBit.ADMIN | PermissionBit.SUPER_ADMIN) ||
-            permissions == PermissionBit.SUPER_ADMIN)
-            adminCommands.push(commands[cname].data.toJSON());
+        // Any command with restricted permissions is registered as a prvileged
+        // command, and will only show on specified servers
+        if (permissions != PermissionBit.NONE)
+            privilegedCommands.push(commands[cname].data.toJSON());
         else
             globalCommands.push(commands[cname].data.toJSON());
     }
@@ -283,12 +284,12 @@ async function refreshCommands(commands: Dictionary<Command>): Promise<void> {
 
     console.log("Refreshing admin slash commands");
 
-    for (const j in config.adminServers) {
-        const guildId = config.adminServers[j];
+    for (const j in config.privilegedServers) {
+        const guildId = config.privilegedServers[j];
 
         const adminData = await rest.put(
             Routes.applicationGuildCommands(config.applicationID, guildId.toString()),
-            { body: adminCommands }
+            { body: privilegedCommands }
         ) as RESTPutAPIApplicationCommandsResult;
 
         console.log(`Successfully reloaded ${adminData.length} application (/) commands for guild ${guildId}`);

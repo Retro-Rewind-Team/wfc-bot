@@ -11,7 +11,7 @@ export interface Config {
     miiEndPoint: string
     wfcAPIBase: string
     wfcSecret: string
-    adminServers: string[]
+    privilegedServers: string[]
     userPermissions: Dictionary<number>,
     logsChannel: string
     publicLogsChannel: string
@@ -70,7 +70,7 @@ export async function initConfig(path: string): Promise<void> {
                 miiEndPoint: "https://rwfc.net/api/leaderboard/player/{fc}/mii",
                 wfcAPIBase: "base route for wfc apis. Something like http://rwfc.net/api",
                 wfcSecret: "your wfc secret key",
-                adminServers: [
+                privilegedServers: [
                     "Allow guild ids here."
                 ],
                 userPermissions: {},
@@ -179,7 +179,9 @@ function migrateConfig(config: Config): boolean {
     const m2 = migrateOldPermission(config, "allowedModerators", PermissionBit.MODERATOR);
     const m3 = migrateOldPermission(config, "allowedBKTUpdaters", PermissionBit.BKT_UPDATER);
 
-    return m1 || m2 || m3;
+    const m4 = migrateAdminServers(config);
+
+    return m1 || m2 || m3 || m4;
 }
 
 function migrateOldPermission(
@@ -202,6 +204,22 @@ function migrateOldPermission(
         }
 
         delete (oldConfig)[field];
+        return true;
+    }
+
+    return false;
+}
+
+function migrateAdminServers(config: Config): boolean {
+    const oldConfig = config as unknown as Dictionary<unknown>;
+
+    const adminServers = oldConfig["adminServers"] as string[];
+    if (adminServers && adminServers.length != 0) {
+        console.log("Removing adminServers from config");
+
+        config.privilegedServers = adminServers;
+
+        delete (oldConfig)["adminServers"];
         return true;
     }
 
