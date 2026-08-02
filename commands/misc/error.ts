@@ -119,8 +119,9 @@ async function addWiimmfiError(
         return WiimmfiErrrorStatus.FAILED;
 
     const wiimmfiError = await response.json() as WiimmfiErrorResponse;
+    const overrideKeys = Object.keys(addendum.overrides);
 
-    if (wiimmfiError[0].found == 0)
+    if (wiimmfiError[0].found == 0 && overrideKeys.length == 0)
         return WiimmfiErrrorStatus.MISSING;
 
     const originalInfoList = Object.values(wiimmfiError[0].infolist);
@@ -129,9 +130,6 @@ async function addWiimmfiError(
         !wiimmfiVerboseTypes.includes(info.type.toLowerCase()));
 
     const infolist = !verbose ? filtered : originalInfoList;
-
-    if (infolist.length == 0)
-        return WiimmfiErrrorStatus.UNUSED;
 
     for (const info of infolist) {
         const override = addendum.overrides[info.type.toLowerCase()];
@@ -145,7 +143,7 @@ async function addWiimmfiError(
         });
     }
 
-    for (const type of Object.keys(addendum.overrides)) {
+    for (const type of overrideKeys) {
         if (originalInfoList.find(info => info.type.toLowerCase() == type))
             continue;
 
@@ -154,6 +152,10 @@ async function addWiimmfiError(
             value: addendum.overrides[type]!,
         });
     }
+
+    // Wait to return until here so extra overrides can apply
+    if (infolist.length == 0)
+        return WiimmfiErrrorStatus.UNUSED;
 
     return WiimmfiErrrorStatus.USED;
 }
