@@ -1,0 +1,1403 @@
+export interface WiiLinkErrorDef {
+    name: string,
+    regex: string,
+    card: string,
+    description: string,
+}
+
+export const unknownWiiLinkError: WiiLinkErrorDef = {
+    name: "UNKNOWN_ERROR",
+    regex: ".*",
+    card: "xxxxx",
+    description: "Unknown error"
+};
+
+// Default error defs used to populate the json file used to store extra
+// descriptions
+export const wiiLinkErrorDefs: WiiLinkErrorDef[] = [
+    // Base error types / DWC sequence errors
+    {
+        name: "GAME_SPECIFIC_ERROR",
+        regex: "1....",
+        card: "1xxxx",
+        description: "Game specific error"
+    },
+    {
+        name: "DWC_NAS_ERROR",
+        regex: "2....",
+        card: "2xxxx",
+        description: "NAS (authentication) error"
+    },
+
+    // NAS (authentication) error codes
+    {
+        name: "DWC_NAS_RETURN_CODE",
+        regex: "20[1-8]..",
+        card: "20xxx",
+        description: "Error returned from NAS request"
+    },
+    {
+        name: "DWC_NAS_LOGIN_OK",
+        regex: "20001",
+        card: "20001",
+        description: "NAS login was successful",
+    },
+    {
+        name: "DWC_NAS_ACCTCREATE_OK",
+        regex: "20002",
+        card: "20002",
+        description: "NAS acctcreate was successful",
+    },
+    {
+        name: "DWC_NAS_SVCLOC_OK",
+        regex: "20007",
+        card: "20007",
+        description: "NAS svcloc was successful",
+    },
+    {
+        name: "DWC_NAS_PROFANE_INGAMESN",
+        regex: "20064",
+        card: "20064",
+        description: "NAS login returned a profanity error",
+    },
+    {
+        name: "DWC_NAS_CONNECT_ERROR",
+        regex: "20100",
+        card: "20100",
+        description: "Failed to connect to the WiiLink WFC server",
+    },
+    {
+        name: "DWC_NAS_GAMESPY_MAINTENANCE_ERROR",
+        regex: "20101",
+        card: "20101",
+        description: "GameSpy maintenance",
+    },
+    {
+        name: "DWC_NAS_DEVICE_BANNED_ERROR",
+        regex: "20102",
+        card: "20102",
+        description: "Device is banned from Nintendo WFC",
+    },
+    {
+        name: "DWC_NAS_INVALID_MAC_ERROR",
+        regex: "20103",
+        card: "20103",
+        description: "Incorrect MAC address provided",
+    },
+    {
+        name: "DWC_NAS_ACCOUNT_ALREADY_EXISTS_ERROR",
+        regex: "20104",
+        card: "20104",
+        description: "Provided authentication info is already in use",
+    },
+    {
+        name: "DWC_NAS_ACCOUNT_NOT_FOUND_ERROR",
+        regex: "20105",
+        card: "20105",
+        description: "Provided authentication info is already in use",
+    },
+    {
+        name: "DWC_NAS_MAX_PROFILE_COUNT_EXCEEDED_ERROR",
+        regex: "20106",
+        card: "20106",
+        description: "Reached maximum number of profiles for one account",
+    },
+    {
+        name: "DWC_NAS_UNSUPPORTED_GAME_ID_ERROR",
+        regex: "20107",
+        card: "20107",
+        description: "Game is not supported"
+    },
+    {
+        name: "DWC_NAS_USER_DELETED_ERROR",
+        regex: "20108",
+        card: "20108",
+        description: "Provided user account was deleted"
+    },
+    {
+        name: "DWC_NAS_INVALID_GAME_ID_ERROR",
+        regex: "20109",
+        card: "20109",
+        description: "Provided game code is invalid"
+    },
+    {
+        name: "DWC_NAS_INVALID_GAME_ID_ERROR",
+        regex: "20110",
+        card: "20110",
+        description: "Nintendo Wi-Fi Connection has been discontinued",
+    },
+    // WiiLink WFC payload errors
+    {
+        name: "WL_ERROR_PAYLOAD_STAGE0",
+        regex: "2090.",
+        card: "2090x",
+        description: "WiiLink WFC Stage0/patch error"
+    },
+    {
+        name: "WL_ERROR_PAYLOAD_STAGE0_MISSING_STAGE1",
+        regex: "20901",
+        card: "20901",
+        description: "NAS did not return a proper Stage1 payload",
+    },
+    {
+        name: "WL_ERROR_PAYLOAD_STAGE0_HASH_MISMATCH",
+        regex: "20902",
+        card: "20902",
+        description: "NAS returned an incorrect Stage1 payload",
+    },
+    {
+        name: "WL_ERROR_PAYLOAD_STAGE1",
+        regex: "209[12].",
+        card: "209?x",
+        description: "WiiLink WFC Stage1 error"
+    },
+    {
+        name: "WL_ERROR_PAYLOAD_STAGE1_ALLOC",
+        regex: "20910",
+        card: "20910",
+        description: "Failed to allocate memory for the payload (local error)",
+    },
+    {
+        name: "WL_ERROR_PAYLOAD_STAGE1_MAKE_REQUEST",
+        regex: "20911",
+        card: "20911",
+        description: "Failed to make the payload download request (local error)",
+    },
+    {
+        name: "WL_ERROR_PAYLOAD_STAGE1_RESPONSE",
+        regex: "20912",
+        card: "20912",
+        description: "An error occurred while downloading the payload",
+    },
+    {
+        name: "WL_ERROR_PAYLOAD_STAGE1_HEADER_CHECK",
+        regex: "20913",
+        card: "20913",
+        description: "The payload server returned an invalid payload",
+    },
+    {
+        name: "WL_ERROR_PAYLOAD_STAGE1_LENGTH_ERROR",
+        regex: "20914",
+        card: "20914",
+        description: "The downloaded payload exceeds the maximum length",
+    },
+    {
+        name: "WL_ERROR_PAYLOAD_STAGE1_SALT_MISMATCH",
+        regex: "20915",
+        card: "20915",
+        description: "The downloaded payload contains an incorrect salt",
+    },
+    {
+        name: "WL_ERROR_PAYLOAD_STAGE1_GAME_ID_MISMATCH",
+        regex: "20916",
+        card: "20916",
+        description: "The downloaded payload was built for a different game",
+    },
+    {
+        name: "WL_ERROR_PAYLOAD_STAGE1_SIGNATURE_INVALID",
+        regex: "20917",
+        card: "20917",
+        description: "The downloaded payload has an incorrect signature",
+    },
+    {
+        name: "WL_ERROR_PAYLOAD_STAGE1_WAITING",
+        regex: "20918",
+        card: "20918",
+        description: "Stage1 (DNS build) is waiting for a response from the payload server",
+    },
+    {
+        name: "WL_ERROR_PAYLOAD",
+        regex: "209[3-9].",
+        card: "209?x",
+        description: "WiiLink WFC payload error"
+    },
+    {
+        name: "WL_ERROR_PAYLOAD_GAME_MISMATCH",
+        regex: "20930",
+        card: "20930",
+        description: "This payload was built for a different game",
+    },
+    {
+        name: "DWC_WWFC_ERROR",
+        regex: "22...",
+        card: "22xxx",
+        description: "WiiLink WFC-specific error code"
+    },
+    {
+        name: "WWFC_UNKNOWN_LOGIN_ERROR",
+        regex: "22000",
+        card: "22000",
+        description: "A miscellaneous login error",
+    },
+    {
+        name: "WWFC_DOLPHIN_SETUP_REQUIRED_ERROR",
+        regex: "22001",
+        card: "22001",
+        description: "Attempt to login with generic console credentials",
+    },
+    {
+        name: "WWFC_PROFILE_BANNED_TOS_ERROR",
+        regex: "22002",
+        card: "22002",
+        description: "Console is banned due to a Terms of Service violation",
+    },
+    {
+        name: "WWFC_PROFILE_RESTRICTED_ERROR",
+        regex: "22003",
+        card: "22003",
+        description: "Console is restricted due to a WiiLink WFC Rules violation",
+    },
+    {
+        name: "WWFC_KICKED_ERROR",
+        regex: "22004",
+        card: "22004",
+        description: "Kicked from WiiLink WFC",
+    },
+    {
+        name: "WWFC_CONSOLE_MISMATCH_ERROR",
+        regex: "22005",
+        card: "22005",
+        description: "Login attempt from an unknown console",
+    },
+    {
+        name: "WWFC_PROFILE_ID_INVALID",
+        regex: "22006",
+        card: "22006",
+        description: "Profile ID is inside a reserved range",
+    },
+    {
+        name: "WWFC_PROFILE_ID_IN_USE",
+        regex: "22007",
+        card: "22007",
+        description: "Profile ID is already in use",
+    },
+    {
+        name: "WWFC_PAYLOAD_VERSION_INVALID",
+        regex: "22008",
+        card: "22008",
+        description: "The payload version is outdated or invalid",
+    },
+    {
+        name: "WWFC_INVALID_ELO_ERROR",
+        regex: "22009",
+        card: "22009",
+        description: "Save data contains an invalid ELO value",
+    },
+    {
+        name: "DWC_NAS_LOGIN_HTTP_ERROR",
+        regex: "23...",
+        card: "23xxx",
+        description: "HTTP error returned from NAS login request"
+    },
+    {
+        name: "DWC_NAS_SVCLOC_ERROR",
+        regex: "24...",
+        card: "24xxx",
+        description: "Error during SVCLOC request"
+    },
+    {
+        name: "DWC_NAS_SVCLOC_HTTP_ERROR",
+        regex: "25...",
+        card: "25xxx",
+        description: "HTTP error returned from NAS svcloc request"
+    },
+    {
+        name: "DWC_NAS_LOGIN_WIIMMFI_ERROR",
+        regex: "2[35]9..",
+        card: "2?9xx",
+        description: "Wiimmfi-specific HTTP error"
+    },
+    {
+        name: "DWC_WIFI_ID_ERROR",
+        regex: "29...",
+        card: "29xxx",
+        description: "DWC Wi-Fi ID error"
+    },
+    {
+        name: "DWC_WIFI_ID_NAND_FULL",
+        regex: "29000",
+        card: "29000",
+        description: "Cannot save Wi-Fi ID to NAND because it's full"
+    },
+    {
+        name: "DWC_WIFI_ID_NAND_CORRUPTED",
+        regex: "29001",
+        card: "29001",
+        description: "Cannot save Wi-Fi ID to NAND because it's damaged"
+    },
+    {
+        name: "DWC_EXTENDED_NAS_ERROR",
+        regex: "3....",
+        card: "3xxxx",
+        description: "Extended NAS (authentication) error"
+    },
+    {
+        name: "DWC_GDB_ERROR",
+        regex: "4....",
+        card: "4xxxx",
+        description: "GDB (game database)/SAKE error"
+    },
+    {
+        name: "NET_STARTUP_ERROR",
+        regex: "5....",
+        card: "5xxxx",
+        description: "Network initialization error"
+    },
+    {
+        name: "DWC_SEQ_LOGIN_ERROR",
+        regex: "6....",
+        card: "6xxxx",
+        description: "Error during login"
+    },
+    {
+        name: "DWC_SEQ_FRIEND_ERROR",
+        regex: "7....",
+        card: "7xxxx",
+        description: "Error during friend list operation"
+    },
+    {
+        name: "DWC_SEQ_MATCH_ERROR",
+        regex: "8....",
+        card: "8xxxx",
+        description: "Error during matchmaking operation"
+    },
+    {
+        name: "DWC_SEQ_GENERIC_ERROR",
+        regex: "9....",
+        card: "9xxxx",
+        description: "Error during gameplay or other operation"
+    },
+    // GDB (game database)/SAKE error types
+    {
+        name: "DWC_GDB_STARTUP_ERROR",
+        regex: "401..",
+        card: "401xx",
+        description: "SAKE startup error"
+    },
+    {
+        name: "DWC_GDB_START_REQUEST_ERROR",
+        regex: "402..",
+        card: "402xx",
+        description: "SAKE start request error"
+    },
+    {
+        name: "DWC_GDB_UPDATE_RECORD_ERROR",
+        regex: "404..",
+        card: "404xx",
+        description: "SAKE UpdateRecord error"
+    },
+    {
+        name: "DWC_GDB_DOWNLOAD_FILE_ERROR",
+        regex: "405..",
+        card: "405xx",
+        description: "SAKE download file error"
+    },
+    {
+        name: "DWC_GDB_UPLOAD_FILE_ERROR",
+        regex: "406..",
+        card: "406xx",
+        description: "SAKE upload file error"
+    },
+    {
+        name: "DWC_GDB_GET_MY_RECORDS_ERROR",
+        regex: "407..",
+        card: "407xx",
+        description: "SAKE GetMyRecords error"
+    },
+    {
+        name: "DWC_GDB_SEARCH_FOR_RECORDS_ERROR",
+        regex: "411..",
+        card: "411xx",
+        description: "SAKE SearchForRecords error"
+    },
+    // GDB (game database)/SAKE error codes
+    {
+        name: "DWC_GDB_NO_MEMORY",
+        regex: "4..01",
+        card: "4xx01",
+        description: "SAKE out of memory"
+    },
+    {
+        name: "DWC_GDB_NOT_AVAILABLE",
+        regex: "4..02",
+        card: "4xx02",
+        description: "SAKE not available"
+    },
+    {
+        name: "DWC_GDB_CORE_SHUTDOWN_ERROR",
+        regex: "4..03",
+        card: "4xx03",
+        description: "SAKE core shutdown error"
+    },
+    {
+        // DWCi_GetLoginTicket failed
+        name: "DWC_GDB_INVALID_LOGIN_TICKET",
+        regex: "4..04",
+        card: "4xx04",
+        description: "SAKE invalid login ticket"
+    },
+    {
+        name: "DWC_GDB_NOT_AUTHENTICATED",
+        regex: "4..05",
+        card: "4xx05",
+        description: "SAKE not authenticated"
+    },
+    {
+        name: "DWC_GDB_INVALID_INPUT",
+        regex: "4..06",
+        card: "4xx06",
+        description: "SAKE invalid input"
+    },
+    {
+        name: "DWC_GDB_INVALID_TABLEID",
+        regex: "4..07",
+        card: "4xx07",
+        description: "SAKE invalid table ID"
+    },
+    {
+        name: "DWC_GDB_INVALID_FIELDS",
+        regex: "4..08",
+        card: "4xx08",
+        description: "SAKE invalid fields"
+    },
+    {
+        name: "DWC_GDB_INVALID_NUM_FIELDS",
+        regex: "4..09",
+        card: "4xx09",
+        description: "SAKE invalid number of fields"
+    },
+    {
+        name: "DWC_GDB_INVALID_FIELD_NAME",
+        regex: "4..10",
+        card: "4xx10",
+        description: "SAKE invalid field name"
+    },
+    {
+        name: "DWC_GDB_INVALID_FIELD_TYPE",
+        regex: "4..11",
+        card: "4xx11",
+        description: "SAKE invalid field type"
+    },
+    {
+        name: "DWC_GDB_INVALID_FIELD_VALUE",
+        regex: "4..12",
+        card: "4xx12",
+        description: "SAKE invalid field value"
+    },
+    {
+        name: "DWC_GDB_INVALID_OFFSET",
+        regex: "4..13",
+        card: "4xx13",
+        description: "SAKE invalid offset"
+    },
+    {
+        name: "DWC_GDB_INVALID_MAX",
+        regex: "4..14",
+        card: "4xx14",
+        description: "SAKE invalid max"
+    },
+    {
+        name: "DWC_GDB_INVALID_RECORDIDS",
+        regex: "4..15",
+        card: "4xx15",
+        description: "SAKE invalid record IDs"
+    },
+    {
+        name: "DWC_GDB_INVALID_NUM_RECORDIDS",
+        regex: "4..16",
+        card: "4xx16",
+        description: "SAKE invalid number of record IDs"
+    },
+    {
+        name: "DWC_GDB_UNKNOWN_ERROR",
+        regex: "4..17",
+        card: "4xx17",
+        description: "SAKE unknown error"
+    },
+    // GDB (game database)/SAKE request error codes
+    {
+        name: "DWC_GDB_REQ_SUCCESS",
+        regex: "4..51",
+        card: "4xx51",
+        description: "SAKE request success"
+    },
+    {
+        name: "DWC_GDB_REQ_SECRET_KEY_INVALID",
+        regex: "4..52",
+        card: "4xx52",
+        description: "SAKE request secret key invalid"
+    },
+    {
+        name: "DWC_GDB_REQ_SERVICE_DISABLED",
+        regex: "4..53",
+        card: "4xx53",
+        description: "SAKE request service disabled"
+    },
+    {
+        name: "DWC_GDB_REQ_CONNECTION_TIMEOUT",
+        regex: "4..54",
+        card: "4xx54",
+        description: "SAKE request connection timeout"
+    },
+    {
+        name: "DWC_GDB_REQ_CONNECTION_ERROR",
+        regex: "4..55",
+        card: "4xx55",
+        description: "SAKE request connection error"
+    },
+    {
+        name: "DWC_GDB_REQ_MALFORMED_RESPONSE",
+        regex: "4..56",
+        card: "4xx56",
+        description: "SAKE request malformed response"
+    },
+    {
+        name: "DWC_GDB_REQ_OUT_OF_MEMORY",
+        regex: "4..57",
+        card: "4xx57",
+        description: "SAKE request out of memory"
+    },
+    {
+        name: "DWC_GDB_REQ_DATABASE_UNAVAILABLE",
+        regex: "4..58",
+        card: "4xx58",
+        description: "SAKE request database unavailable"
+    },
+    {
+        name: "DWC_GDB_REQ_LOGIN_TICKET_INVALID",
+        regex: "4..59",
+        card: "4xx59",
+        description: "SAKE request login ticket invalid"
+    },
+    {
+        name: "DWC_GDB_REQ_LOGIN_TICKET_EXPIRED",
+        regex: "4..60",
+        card: "4xx60",
+        description: "SAKE request login ticket expired"
+    },
+    {
+        name: "DWC_GDB_REQ_TABLE_NOT_FOUND",
+        regex: "4..61",
+        card: "4xx61",
+        description: "SAKE request table not found"
+    },
+    {
+        name: "DWC_GDB_REQ_RECORD_NOT_FOUND",
+        regex: "4..62",
+        card: "4xx62",
+        description: "SAKE request record not found"
+    },
+    {
+        name: "DWC_GDB_REQ_FIELD_NOT_FOUND",
+        regex: "4..63",
+        card: "4xx63",
+        description: "SAKE request field not found"
+    },
+    {
+        name: "DWC_GDB_REQ_FIELD_TYPE_INVALID",
+        regex: "4..64",
+        card: "4xx64",
+        description: "SAKE request field type invalid"
+    },
+    {
+        name: "DWC_GDB_REQ_NO_PERMISSION",
+        regex: "4..65",
+        card: "4xx65",
+        description: "SAKE request no permission"
+    },
+    {
+        name: "DWC_GDB_REQ_RECORD_LIMIT_REACHED",
+        regex: "4..66",
+        card: "4xx66",
+        description: "SAKE request record limit reached"
+    },
+    {
+        name: "DWC_GDB_REQ_ALREADY_RATED",
+        regex: "4..67",
+        card: "4xx67",
+        description: "SAKE request already rated"
+    },
+    {
+        name: "DWC_GDB_REQ_NOT_RATEABLE",
+        regex: "4..68",
+        card: "4xx68",
+        description: "SAKE request not rateable"
+    },
+    {
+        name: "DWC_GDB_REQ_NOT_OWNED",
+        regex: "4..69",
+        card: "4xx69",
+        description: "SAKE request not owned"
+    },
+    {
+        name: "DWC_GDB_REQ_FILTER_INVALID",
+        regex: "4..70",
+        card: "4xx70",
+        description: "SAKE request filter invalid"
+    },
+    {
+        name: "DWC_GDB_REQ_SORT_INVALID",
+        regex: "4..71",
+        card: "4xx71",
+        description: "SAKE request sort invalid"
+    },
+    {
+        name: "DWC_GDB_REQ_UNKNOWN_ERROR",
+        regex: "4..72",
+        card: "4xx72",
+        description: "SAKE request unknown error"
+    },
+    {
+        name: "DWC_GDB_REQ_TARGET_FILTER_INVALID",
+        regex: "4..80",
+        card: "4xx80",
+        description: "SAKE request target filter invalid"
+    },
+    // Error 60000
+    {
+        name: "DWC_GS_INVALID_PROFILE_ID",
+        regex: "60000",
+        card: "60000",
+        description: "Invalid profile ID",
+    },
+    // DWC GameSpy error 6-9 modules
+    {
+        name: "DWC_GS_GP_ERROR",
+        regex: "[6-9]1...",
+        card: "?1xxx",
+        description: "GameSpy profile (GPCM/GPSP) error"
+    },
+    {
+        name: "DWC_GS_PERS_ERROR",
+        regex: "[6-9]2...",
+        card: "?2xxx",
+        description: "GameSpy PERS error"
+    },
+    {
+        name: "DWC_GS_GSTATS_ERROR",
+        regex: "[6-9]3...",
+        card: "?3xxx",
+        description: "GameSpy GameStats error"
+    },
+    {
+        name: "DWC_GS_QR2_ERROR",
+        regex: "[6-9]4...",
+        card: "?4xxx",
+        description: "GameSpy QR2 (Query and Reporting) error"
+    },
+    {
+        name: "DWC_GS_SB_ERROR",
+        regex: "[6-9]5...",
+        card: "?5xxx",
+        description: "GameSpy ServerBrowser error"
+    },
+    {
+        name: "DWC_GS_NATNEG_ERROR",
+        regex: "[6-9]6...",
+        card: "?6xxx",
+        description: "GameSpy NAT negotiation error"
+    },
+    {
+        name: "DWC_GS_GT2_ERROR",
+        regex: "[6-9]7...",
+        card: "?7xxx",
+        description: "GameSpy transmission error"
+    },
+    {
+        name: "DWC_GS_GHTTP_ERROR",
+        regex: "[6-9]8...",
+        card: "?8xxx",
+        description: "GameSpy HTTP error"
+    },
+    {
+        name: "DWC_GS_GENERIC_ERROR",
+        regex: "[6-9]9...",
+        card: "?9xxx",
+        description: "Generic GameSpy error"
+    },
+    // DWC GameSpy error codes
+    {
+        name: "DWC_GS_NETWORK_FAILURE",
+        regex: "[6-9].01.",
+        card: "?x01x",
+        description: "Network failure",
+    },
+    {
+        name: "DWC_GS_SERVER_DOWN",
+        regex: "[6-9].02.",
+        card: "?x02x",
+        description: "Server failure",
+    },
+    {
+        name: "DWC_GS_DNS_FAILURE",
+        regex: "[6-9].03.",
+        card: "?x03x",
+        description: "DNS failure",
+    },
+    {
+        name: "DWC_GS_INVALID_DATA",
+        regex: "[6-9].04.",
+        card: "?x04x",
+        description: "Invalid data received",
+    },
+    {
+        name: "DWC_GS_SOCKET_COMMUNICATION_ERROR",
+        regex: "[6-9].05.",
+        card: "?x05x",
+        description: "Socket communication error",
+    },
+    {
+        name: "DWC_GS_SOCKER_BIND_ERROR",
+        regex: "[6-9].06.",
+        card: "?x06x",
+        description: "Socket bind error",
+    },
+    {
+        name: "DWC_GS_TIMED_OUT",
+        regex: "[6-9].07.",
+        card: "?x07x",
+        description: "Timed out",
+    },
+    {
+        name: "DWC_GS_PEER_CONNECTION_FAILED",
+        regex: "[6-9].08.",
+        card: "?x08x",
+        description: "Problem with peer-to-peer connection",
+    },
+    {
+        name: "DWC_GS_SERVER_FULL",
+        regex: "[6-9].10.",
+        card: "?x10x",
+        description: "Number of max connections exceeded",
+    },
+    {
+        name: "DWC_GS_STATS_LOGIN_FAILED",
+        regex: "[6-9].20.",
+        card: "?x20x",
+        description: "GameStats login failed",
+    },
+    {
+        name: "DWC_GS_STATS_DATA_LOAD_ERROR",
+        regex: "[6-9].21.",
+        card: "?x21x",
+        description: "GameStats data load error"
+    },
+    {
+        name: "DWC_GS_STATS_DATA_SAVE_ERROR",
+        regex: "[6-9].22.",
+        card: "?x22x",
+        description: "GameStats data save error"
+    },
+    // Peer-to-peer errors
+    {
+        name: "DWC_GS_NOT_MUTUAL_FRIENDS",
+        regex: "[6-9].40.",
+        card: "?x40x",
+        description: "The other party is not a friend"
+    },
+    {
+        name: "DWC_GS_PEER_CLOSED_CONNECTION",
+        regex: "[6-9].41.",
+        card: "?x41x",
+        description: "The other party closed the connection"
+    },
+    {
+        name: "DWC_GS_NATNEG_FAILURE",
+        regex: "[6-9].42.",
+        card: "?x42x",
+        description: "Exceeded maximum allowed NAT negotiation attempts",
+    },
+    {
+        name: "DWC_GS_SINGLE_NATNEG_FAILURE",
+        regex: "[6-9].43.",
+        card: "?x43x",
+        description: "Failed to NAT negotiate with the other player",
+    },
+    {
+        name: "DWC_GS_CONN_CLOSE_FAILED",
+        regex: "[6-9].60.",
+        card: "?x60x",
+        description: "Error during closing a connection"
+    },
+    {
+        name: "DWC_GS_RECV_INVALID_STATE",
+        regex: "[6-9].61.",
+        card: "?x61x",
+        description: "Data received in invalid receive state"
+    },
+    {
+        name: "DWC_GS_RECV_BUFFER_OVERFLOW",
+        regex: "[6-9].62.",
+        card: "?x62x",
+        description: "Buffer overflow caused by received data"
+    },
+    {
+        name: "DWC_GS_CONN_ALREADY_CLOSED",
+        regex: "[6-9].64.",
+        card: "?x64x",
+        description: "Attempted to close an already closed connection"
+    },
+    {
+        name: "DWC_GS_AC_FATAL_ERROR",
+        regex: "[6-9].70.",
+        card: "?x70x",
+        description: "AC fatal error"
+    },
+    // GHTTP error codes
+    {
+        name: "DWC_GS_GHTTP_OPEN_FILE_FAILURE",
+        regex: "[6-9].80.",
+        card: "?x80x",
+        description: "GHTTP file open failed"
+    },
+    {
+        name: "DWC_GS_GHTTP_INVALID_POST",
+        regex: "[6-9].81.",
+        card: "?x81x",
+        description: "Invalid GHTTP transfer"
+    },
+    {
+        name: "DWC_GS_GHTTP_INVALID",
+        regex: "[6-9].82.",
+        card: "?x82x",
+        description: "Invalid GHTTP information"
+    },
+    {
+        name: "DWC_GS_GHTTP_UNSPECIFIED_ERROR",
+        regex: "[6-9].83.",
+        card: "?x83x",
+        description: "Unspecified GHTTP error"
+    },
+    {
+        name: "DWC_GS_GHTTP_BUFFER_OVERFLOW",
+        regex: "[6-9].84.",
+        card: "?x84x",
+        description: "GHTTP buffer overflow"
+    },
+    {
+        name: "DWC_GS_GHTTP_FAIL_PARSE_URL",
+        regex: "[6-9].85.",
+        card: "?x85x",
+        description: "GHTTP URL parsing error"
+    },
+    {
+        name: "DWC_GS_GHTTP_INVALID_RESPONSE",
+        regex: "[6-9].86.",
+        card: "?x86x",
+        description: "Invalid response from GHTTP server"
+    },
+    {
+        name: "DWC_GS_GHTTP_UNAUTHORIZED",
+        regex: "[6-9].87.",
+        card: "?x87x",
+        description: "GHTTP request rejected"
+    },
+    {
+        name: "DWC_GS_GHTTP_FILE_READ_WRITE_FAILURE",
+        regex: "[6-9].88.",
+        card: "?x88x",
+        description: "GHTTP local file read/write error"
+    },
+    {
+        name: "DWC_GS_GHTTP_FILE_INCOMPLETE",
+        regex: "[6-9].89.",
+        card: "?x89x",
+        description: "GHTTP download halted"
+    },
+    {
+        name: "DWC_GS_GHTTP_FILE_TOO_BIG",
+        regex: "[6-9].90.",
+        card: "?x90x",
+        description: "GHTTP file size too big"
+    },
+    {
+        name: "DWC_GS_GHTTP_ENCRYPTION_ERROR",
+        regex: "[6-9].91.",
+        card: "?x91x",
+        description: "GHTTP encryption error"
+    },
+    // DWC GameSpy sub-error reasons
+    {
+        name: "DWC_GS_NO_MEMORY",
+        regex: "[6-9]...1",
+        card: "?xxx1",
+        description: "Memory allocation failure"
+    },
+    {
+        name: "DWC_GS_INVALID_ARGUMENT",
+        regex: "[6-9]...2",
+        card: "?xxx2",
+        description: "Parameter error"
+    },
+    {
+        name: "DWC_GS_GT2_SOCKET_ERROR",
+        regex: "[6-9]...3",
+        card: "?xxx3",
+        description: "GameSpy GT2 socket error caused by SO error"
+    },
+    {
+        name: "DWC_GS_NOT_INITIALIZED",
+        regex: "[6-9]...4",
+        card: "?xxx4",
+        description: "Library not initialized"
+    },
+    {
+        name: "DWC_GS_ALREADY_INITIALIZED",
+        regex: "[6-9]...5",
+        card: "?xxx5",
+        description: "Library initialized twice"
+    },
+    {
+        name: "DWC_GS_WM_INIT_FAILURE",
+        regex: "[6-9]...6",
+        card: "?xxx6",
+        description: "WM init faked"
+    },
+    {
+        name: "DWC_GS_UNEXPECTED_STATE",
+        regex: "[6-9]...9",
+        card: "?xxx9",
+        description: "Unexpected state or unknown Gamespy error"
+    },
+    // Forecast/News Channel errors
+    {
+        name: "WCC_FORECAST_ERROR",
+        regex: "FORE......",
+        card: "FORExxxxxx",
+        description: "Forecast Channel error"
+    },
+    {
+        name: "WCC_NEWS_ERROR",
+        regex: "NEWS......",
+        card: "NEWSxxxxxx",
+        description: "News Channel error"
+    },
+    {
+        // Only seems to trigger if NANDDelete fails
+        name: "WCC_DELETE_ERROR",
+        regex: "(FORE|NEWS)000001",
+        card: "????000001",
+        description: "Error deleting outdated data",
+    },
+    {
+        // Misc NWC24 error, one that doesn't have its own message
+        name: "WCC_MISC_WC24_ERROR",
+        regex: "(FORE|NEWS)000002",
+        card: "????000002",
+        description: "Miscellaneous WiiConnect24 error",
+    },
+    {
+        // if VFUnmountDrive, VFCloseFile, or VFMountDriveNANDFlash fails
+        name: "WCC_FILESYSTEM_ERROR",
+        regex: "(FORE|NEWS)000003",
+        card: "????000003",
+        description: "Error mounting the virtual FAT filesystem",
+    },
+    {
+        // Doesn't seem to be used, at least in the Forecast Channel
+        name: "WCC_UNKNOWN_ERROR",
+        regex: "(FORE|NEWS)000004",
+        card: "????000004",
+        description: "Unknown error"
+    },
+    {
+        // if NWC24GetDlTask fails, task URL mismatch, VFOpenFile fails, or VFMountDriveNANDFlash fails (in a different place)
+        name: "WCC_TASK_ERROR",
+        regex: "(FORE|NEWS)000005",
+        card: "????000005",
+        description: "Error retrieving the downloaded data",
+    },
+    {
+        // Download and reading the file was successful but something is still wrong
+        name: "WCC_INVALID_DATA",
+        regex: "(FORE|NEWS)000006",
+        card: "????000006",
+        description: "Error processing the downloaded data",
+    },
+    {
+        // CXIsFinishedUncompLZ() is false before decompressing, or potentially an unknown internal error value, basically should never happen
+        name: "WCC_INTERNAL_ERROR",
+        regex: "(FORE|NEWS)000099",
+        card: "????000099",
+        description: "Internal error",
+    },
+    {
+        name: "HTTP_CONTINUE",
+        regex: "(23|25|11.|220|238|243|372)100",
+        card: "HTTP 100",
+        description: "Continue"
+    },
+    {
+        name: "HTTP_SWITCHING_PROTOCOLS",
+        regex: "(23|25|11.|220|238|243|372)101",
+        card: "HTTP 101",
+        description: "Switching Protocols"
+    },
+    {
+        name: "HTTP_PROCESSING",
+        regex: "(23|25|11.|220|238|243|372)102",
+        card: "HTTP 102",
+        description: "Processing"
+    },
+    {
+        name: "HTTP_EARLY_HINTS",
+        regex: "(23|25|11.|220|238|243|372)103",
+        card: "HTTP 103",
+        description: "Early Hints"
+    },
+    {
+        name: "HTTP_OK",
+        regex: "(23|25|11.|220|238|243|372)200",
+        card: "HTTP 200",
+        description: "OK"
+    },
+    {
+        name: "HTTP_CREATED",
+        regex: "(23|25|11.|220|238|243|372)201",
+        card: "HTTP 201",
+        description: "Created"
+    },
+    {
+        name: "HTTP_ACCEPTED",
+        regex: "(23|25|11.|220|238|243|372)202",
+        card: "HTTP 202",
+        description: "Accepted"
+    },
+    {
+        name: "HTTP_NON_AUTHORITATIVE",
+        regex: "(23|25|11.|220|238|243|372)203",
+        card: "HTTP 203",
+        description: "Non-Authoritative Information"
+    },
+    {
+        name: "HTTP_NO_CONTENT",
+        regex: "(23|25|11.|220|238|243|372)204",
+        card: "HTTP 204",
+        description: "No Content"
+    },
+    {
+        name: "HTTP_RESET_CONTENT",
+        regex: "(23|25|11.|220|238|243|372)205",
+        card: "HTTP 205",
+        description: "Reset Content"
+    },
+    {
+        name: "HTTP_PARTIAL_CONTENT",
+        regex: "(23|25|11.|220|238|243|372)206",
+        card: "HTTP 206",
+        description: "Partial Content"
+    },
+    {
+        name: "HTTP_MULTI_STATUS",
+        regex: "(23|25|11.|220|238|243|372)207",
+        card: "HTTP 207",
+        description: "Multi-Status"
+    },
+    {
+        name: "HTTP_ALREADY_REPORTED",
+        regex: "(23|25|11.|220|238|243|372)208",
+        card: "HTTP 208",
+        description: "Already Reported"
+    },
+    {
+        name: "HTTP_IM_USED",
+        regex: "(23|25|11.|220|238|243|372)226",
+        card: "HTTP 226",
+        description: "IM Used"
+    },
+    {
+        name: "HTTP_MULTIPLE_CHOICES",
+        regex: "(23|25|11.|220|238|243|372)300",
+        card: "HTTP 300",
+        description: "Multiple Choices"
+    },
+    {
+        name: "HTTP_MOVED_PERMANENTLY",
+        regex: "(23|25|11.|220|238|243|372)301",
+        card: "HTTP 301",
+        description: "Moved Permanently"
+    },
+    {
+        name: "HTTP_MOVED_TEMPORARILY",
+        regex: "(23|25|11.|220|238|243|372)302",
+        card: "HTTP 302",
+        description: "Found"
+    },
+    {
+        name: "HTTP_SEE_OTHER",
+        regex: "(23|25|11.|220|238|243|372)303",
+        card: "HTTP 303",
+        description: "See Other"
+    },
+    {
+        name: "HTTP_NOT_MODIFIED",
+        regex: "(23|25|11.|220|238|243|372)304",
+        card: "HTTP 304",
+        description: "Not Modified"
+    },
+    {
+        name: "HTTP_USE_PROXY",
+        regex: "(23|25|11.|220|238|243|372)305",
+        card: "HTTP 305",
+        description: "Use Proxy"
+    },
+    {
+        name: "HTTP_TEMPORARY_REDIRECT",
+        regex: "(23|25|11.|220|238|243|372)307",
+        card: "HTTP 307",
+        description: "Temporary Redirect"
+    },
+    {
+        name: "HTTP_PERMANENT_REDIRECT",
+        regex: "(23|25|11.|220|238|243|372)308",
+        card: "HTTP 308",
+        description: "Permanent Redirect"
+    },
+    {
+        name: "HTTP_BAD_REQUEST",
+        regex: "(23|25|11.|220|238|243|372)400",
+        card: "HTTP 400",
+        description: "Bad Request"
+    },
+    {
+        name: "HTTP_UNAUTHORIZED",
+        regex: "(11.|220|238|243|372)401",
+        card: "HTTP 401",
+        description: "Unauthorized"
+    },
+    {
+        name: "HTTP_UNAUTHORIZED",
+        regex: "(23|25)401",
+        card: "HTTP 401",
+        description: "Unauthorized",
+    },
+    {
+        name: "HTTP_PAYMENT_REQUIRED",
+        regex: "(23|25|11.|220|238|243|372)402",
+        card: "HTTP 402",
+        description: "Payment Required"
+    },
+    {
+        name: "HTTP_FORBIDDEN",
+        regex: "(23|25|11.|220|238|243|372)403",
+        card: "HTTP 403",
+        description: "Forbidden"
+    },
+    {
+        name: "HTTP_NOT_FOUND",
+        regex: "(23|25|11.|220|238|243|372)404",
+        card: "HTTP 404",
+        description: "Not Found"
+    },
+    {
+        name: "HTTP_METHOD_NOT_ALLOWED",
+        regex: "(23|25|11.|220|238|243|372)405",
+        card: "HTTP 405",
+        description: "Method Not Allowed"
+    },
+    {
+        name: "HTTP_NOT_ACCEPTABLE",
+        regex: "(23|25|11.|220|238|243|372)406",
+        card: "HTTP 406",
+        description: "Not Acceptable"
+    },
+    {
+        name: "HTTP_PROXY_AUTHENTICATION_REQUIRED",
+        regex: "(23|25|11.|220|238|243|372)407",
+        card: "HTTP 407",
+        description: "Proxy Authentication Required"
+    },
+    {
+        name: "HTTP_REQUEST_TIME_OUT",
+        regex: "(23|25|11.|220|238|243|372)408",
+        card: "HTTP 408",
+        description: "Request Timeout"
+    },
+    {
+        name: "HTTP_CONFLICT",
+        regex: "(23|25|11.|220|238|243|372)409",
+        card: "HTTP 409",
+        description: "Conflict"
+    },
+    {
+        name: "HTTP_GONE",
+        regex: "(23|25|11.|220|238|243|372)410",
+        card: "HTTP 410",
+        description: "Gone"
+    },
+    {
+        name: "HTTP_LENGTH_REQUIRED",
+        regex: "(23|25|11.|220|238|243|372)411",
+        card: "HTTP 411",
+        description: "Length Required"
+    },
+    {
+        name: "HTTP_PRECONDITION_FAILED",
+        regex: "(23|25|11.|220|238|243|372)412",
+        card: "HTTP 412",
+        description: "Precondition Failed"
+    },
+    {
+        name: "HTTP_REQUEST_ENTITY_TOO_LARGE",
+        regex: "(23|25|11.|220|238|243|372)413",
+        card: "HTTP 413",
+        description: "Payload Too Large"
+    },
+    {
+        name: "HTTP_REQUEST_URI_TOO_LARGE",
+        regex: "(23|25|11.|220|238|243|372)414",
+        card: "HTTP 414",
+        description: "URI Too Long"
+    },
+    {
+        name: "HTTP_UNSUPPORTED_MEDIA_TYPE",
+        regex: "(23|25|11.|220|238|243|372)415",
+        card: "HTTP 415",
+        description: "Unsupported Media Type"
+    },
+    {
+        name: "HTTP_RANGE_NOT_SATISFIABLE",
+        regex: "(23|25|11.|220|238|243|372)416",
+        card: "HTTP 416",
+        description: "Range Not Satisfiable"
+    },
+    {
+        name: "HTTP_EXPECTATION_FAILED",
+        regex: "(23|25|11.|220|238|243|372)417",
+        card: "HTTP 417",
+        description: "Expectation Failed"
+    },
+    {
+        name: "HTTP_IM_A_TEAPOT",
+        regex: "(23|25|11.|220|238|243|372)418",
+        card: "HTTP 418",
+        description: "I'm a teapot"
+    },
+    {
+        name: "HTTP_MISDIRECTED_REQUEST",
+        regex: "(23|25|11.|220|238|243|372)421",
+        card: "HTTP 421",
+        description: "Misdirected Request"
+    },
+    {
+        name: "HTTP_UNPROCESSABLE_ENTITY",
+        regex: "(23|25|11.|220|238|243|372)422",
+        card: "HTTP 422",
+        description: "Unprocessable Content"
+    },
+    {
+        name: "HTTP_LOCKED",
+        regex: "(23|25|11.|220|238|243|372)423",
+        card: "HTTP 423",
+        description: "Locked"
+    },
+    {
+        name: "HTTP_FAILED_DEPENDENCY",
+        regex: "(23|25|11.|220|238|243|372)424",
+        card: "HTTP 424",
+        description: "Failed Dependency"
+    },
+    {
+        name: "HTTP_TOO_EARLY",
+        regex: "(23|25|11.|220|238|243|372)425",
+        card: "HTTP 425",
+        description: "Too Early"
+    },
+    {
+        name: "HTTP_UPGRADE_REQUIRED",
+        regex: "(23|25|11.|220|238|243|372)426",
+        card: "HTTP 426",
+        description: "Upgrade Required"
+    },
+    {
+        name: "HTTP_PRECONDITION_REQUIRED",
+        regex: "(23|25|11.|220|238|243|372)428",
+        card: "HTTP 428",
+        description: "Precondition Required"
+    },
+    {
+        name: "HTTP_TOO_MANY_REQUESTS",
+        regex: "(23|25|11.|220|238|243|372)429",
+        card: "HTTP 429",
+        description: "Too Many Requests"
+    },
+    {
+        name: "HTTP_REQUEST_HEADER_FIELDS_TOO_LARGE",
+        regex: "(23|25|11.|220|238|243|372)431",
+        card: "HTTP 431",
+        description: "Request Header Fields Too Large"
+    },
+    {
+        name: "HTTP_UNAVAILABLE_FOR_LEGAL_REASONS",
+        regex: "(23|25|11.|220|238|243|372)451",
+        card: "HTTP 451",
+        description: "Unavailable For Legal Reasons"
+    },
+    {
+        name: "HTTP_INTERNAL_SERVER_ERROR",
+        regex: "(23|25|11.|220|238|243|372)500",
+        card: "HTTP 500",
+        description: "Internal Server Error"
+    },
+    {
+        name: "HTTP_NOT_IMPLEMENTED",
+        regex: "(23|25|11.|220|238|243|372)501",
+        card: "HTTP 501",
+        description: "Not Implemented"
+    },
+    {
+        name: "HTTP_BAD_GATEWAY",
+        regex: "(23|25|11.|220|238|243|372)502",
+        card: "HTTP 502",
+        description: "Bad Gateway"
+    },
+    {
+        name: "HTTP_SERVICE_UNAVAILABLE",
+        regex: "(23|25|11.|220|238|243|372)503",
+        card: "HTTP 503",
+        description: "Service Unavailable"
+    },
+    {
+        name: "HTTP_GATEWAY_TIME_OUT",
+        regex: "(23|25|11.|220|238|243|372)504",
+        card: "HTTP 504",
+        description: "Gateway Timeout"
+    },
+    {
+        name: "HTTP_VERSION_NOT_SUPPORTED",
+        regex: "(23|25|11.|220|238|243|372)505",
+        card: "HTTP 505",
+        description: "HTTP Version Not Supported"
+    },
+    {
+        name: "HTTP_VARIANT_ALSO_VARIES",
+        regex: "(23|25|11.|220|238|243|372)506",
+        card: "HTTP 506",
+        description: "Variant Also Negotiates"
+    },
+    {
+        name: "HTTP_INSUFFICIENT_STORAGE",
+        regex: "(23|25|11.|220|238|243|372)507",
+        card: "HTTP 507",
+        description: "Insufficient Storage"
+    },
+    {
+        name: "HTTP_LOOP_DETECTED",
+        regex: "(23|25|11.|220|238|243|372)508",
+        card: "HTTP 508",
+        description: "Loop Detected"
+    },
+    {
+        name: "HTTP_NOT_EXTENDED",
+        regex: "(23|25|11.|220|238|243|372)510",
+        card: "HTTP 510",
+        description: "Not Extended"
+    },
+    {
+        name: "HTTP_NETWORK_AUTHENTICATION_REQUIRED",
+        regex: "(23|25|11.|220|238|243|372)511",
+        card: "HTTP 511",
+        description: "Network Authentication Required"
+    }
+]
+;

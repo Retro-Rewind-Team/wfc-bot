@@ -460,10 +460,10 @@ export async function queryJson<T>(url: string): Promise<T | null> {
     return json as T;
 }
 
-export function wrapTryCatch(fn: () => void): () => void {
-    return () => {
+export function wrapTryCatch(fn: () => Promise<void>): () => Promise<void> {
+    return async () => {
         try {
-            fn();
+            await fn();
         }
         catch (e) {
             console.error(e);
