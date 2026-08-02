@@ -41,6 +41,9 @@ export enum BadgeType {
     EarthboundGold,
     EarthboundSilver,
     EarthboundBronze,
+    BotBGold,
+    BotBSilver,
+    BotBBronze,
 }
 
 export const BadgeOpts: { name: string, value: BadgeType }[] = [];
