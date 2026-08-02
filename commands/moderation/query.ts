@@ -104,7 +104,11 @@ export default {
             const user = res.Users[i];
 
             embeds.push(
-                createUserEmbed(user, true)
+                createUserEmbed(user, {
+                    priv: true,
+                    verbose: true,
+                    showBanInfo: true,
+                })
                     .setFooter({
                         text: `User ${i + 1} of ${res.Users.length}`
                     })

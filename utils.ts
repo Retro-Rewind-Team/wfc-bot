@@ -125,12 +125,6 @@ export async function makeWFCRequest(route: string, method: string, data?: objec
     }
 }
 
-interface SendEmbedOpt {
-    name: string,
-    value: string,
-    hidden?: boolean,
-}
-
 export interface WiiLinkUser {
     ProfileId: number,
     UserId: number,
@@ -154,46 +148,73 @@ export interface WiiLinkUser {
     BanExpires: string,
 }
 
+interface SendEmbedLogField {
+    name: string,
+    value: string,
+    hidden?: boolean,
+}
+
+export interface SendEmbedLogOpts {
+    action: string;
+    extraFields?: SendEmbedLogField[];
+    hideMii?: boolean;
+    noPublicEmbed?: boolean;
+    verbose?: boolean;
+    showBanInfo?: boolean;
+}
+
 export async function sendEmbedLog(
     interaction: ChatInputCommandInteraction<CacheType>,
-    action: string,
     user: WiiLinkUser,
-    opts: SendEmbedOpt[] | null = null,
-    hideMii = false,
-    noPublicEmbed = false,
-    reduced = true,
+    opts: SendEmbedLogOpts,
 ): Promise<void> {
     const fc = pidToFc(user.ProfileId);
     const member = interaction.member as GuildMember | null;
 
     const privEmbed = new EmbedBuilder()
         .setColor(getColor())
-        .setTitle(`${capitalize(action)} performed by ${member?.displayName ?? "Unknown"}`)
-        .setTimestamp();
+        .setTitle(`${capitalize(opts.action)} performed by ${member?.displayName ?? "Unknown"}`)
+        .setTimestamp()
+        .addFields(
+            { name: "Server", value: interaction.guild?.name ?? "Unknown"},
+            { name: "Moderator", value: `<@${interaction.user.id}>` },
+        );
 
-    createUserEmbed(user, true, privEmbed, false, reduced);
+    if (opts.extraFields)
+        privEmbed.addFields(...opts.extraFields);
 
-    if (opts)
-        privEmbed.addFields(...opts);
+    createUserEmbed(user, {
+        priv: true,
+        template: privEmbed,
+        hideMii: false,
+        verbose: opts.verbose,
+        showBanInfo: opts.showBanInfo,
+    });
 
     await getChannels().logs.send({ embeds: [privEmbed] });
-    await interaction.reply({ content: `Successful ${action} performed on friend code "${fc}"` });
+    await interaction.reply({ content: `Successful ${opts.action} performed on friend code "${fc}"` });
 
-    if (noPublicEmbed)
+    if (opts.noPublicEmbed)
         return;
 
     const pubEmbed = new EmbedBuilder()
         .setColor(getColor())
-        .setTitle(`${capitalize(action)} performed by moderator`)
+        .setTitle(`${capitalize(opts.action)} performed by moderator`)
         .setTimestamp();
 
-    createUserEmbed(user, false, pubEmbed, hideMii);
-
-    if (opts) {
-        const filtered = opts.filter((opt) => !opt["hidden"]);
+    if (opts.extraFields) {
+        const filtered = opts.extraFields.filter((opt) => !opt["hidden"]);
 
         pubEmbed.addFields(...filtered);
     }
+
+    createUserEmbed(user, {
+        priv: false,
+        template: pubEmbed,
+        hideMii: opts.hideMii,
+        verbose: opts.verbose,
+        showBanInfo: opts.showBanInfo,
+    });
 
     await getChannels().publicLogs.send({ embeds: [pubEmbed] });
 }
@@ -272,6 +293,19 @@ function fmtDeviceID(deviceIDs: number[]): string {
     return ret;
 }
 
+export interface CreateUserEmbedOpts {
+    // Private embed, hide sensitive fields
+    priv: boolean;
+    // Template embed, prefill certain fields and avoid setting the title
+    template?: EmbedBuilder;
+    // Hide the Mii name and image
+    hideMii?: boolean;
+    // Show detailed fields for private embeds
+    verbose?: boolean;
+    // Hide ban info
+    showBanInfo?: boolean
+}
+
 // Creates an embed based on a WiiLinkUser.
 // priv exposes private fields such as IP Address, Device ID, and serials
 // templateEmbed will prevent touching color, title, or timestamp
@@ -279,21 +313,18 @@ function fmtDeviceID(deviceIDs: number[]): string {
 // reduced will clear some of the clutter fields from private embeds.
 export function createUserEmbed(
     user: WiiLinkUser,
-    priv: boolean,
-    templateEmbed: EmbedBuilder | null = null,
-    hideMii: boolean = false,
-    reduced: boolean = true,
+    opts: CreateUserEmbedOpts,
 ): EmbedBuilder {
     const fc = pidToFc(user.ProfileId);
 
-    const embed = templateEmbed
-        ? templateEmbed
+    const embed = opts.template
+        ? opts.template
         : new EmbedBuilder()
             .setColor(getColor())
             .setTitle(`Player info for friend code ${fc}`)
             .setTimestamp();
 
-    if (priv || !hideMii)
+    if (opts.priv || !opts.hideMii)
         embed.setThumbnail(getMiiImageURL(fc));
 
     let issuedDate = Date.parse(user.BanIssued);
@@ -313,7 +344,7 @@ export function createUserEmbed(
         banLengthStr = fmtTimeSpan(expiresDate - issuedDate);
     }
 
-    const miiName = !priv && hideMii
+    const miiName = !opts.priv && opts.hideMii
         ? "\\*\\*\\*\\*\\*"
         : user.LastInGameSn != ""
             ? user.LastInGameSn
@@ -322,45 +353,56 @@ export function createUserEmbed(
     embed.addFields(
         { name: "Profile ID", value: `${user.ProfileId}` },
         { name: "Mii Name", value: miiName },
-        { name: "Open Host", value: `${user.OpenHost}` },
-        { name: "Banned", value: `${user.Restricted}${expiredBan ? " (Expired)" : ""}` },
-        { name: "Discord ID", value: user.DiscordID.length != 0 ? `<@${user.DiscordID}>` : "None Linked" }
     );
 
-    if (user.Restricted || expiredBan) {
-        if (priv) {
-            let banModerator;
+    if (opts.verbose)
+        embed.addFields({ name: "Open Host", value: `${user.OpenHost }` });
 
-            if (!user.BanModerator || user.BanModerator == "" || user.BanModerator == "admin")
-                banModerator = "Unknown";
-            else if (user.BanModerator.match(idRegex))
-                banModerator = `<@${user.BanModerator}>`;
-            else
-                banModerator = user.BanModerator;
-
-            embed.addFields({ name: "Ban Moderator", value: `${banModerator}` });
-        }
-
-        embed.addFields({ name: "Ban Reason", value: `${user.BanReason}` });
-
-        if (priv) {
-            embed.addFields({
-                name: "Hidden Reason",
-                value: `${user.BanReasonHidden && user.BanReasonHidden.length != 0 ? user.BanReasonHidden : "None"}`
-            });
-        }
-
-        embed.addFields(
-            { name: "Ban Issued", value: `<t:${issuedDate}:F>` },
-            { name: "Ban Expires", value: `<t:${expiresDate}:F>` },
-            { name: "Ban Length", value: `${banLengthStr ?? "Unknown"}` },
-        );
+    if (user.DiscordID.length != 0) {
+        embed.addFields({
+            name: "Discord ID",
+            value: `<@${user.DiscordID }>`
+        });
     }
 
-    if (priv) {
+    if (opts.showBanInfo) {
+        embed.addFields({ name: "Banned", value: `${user.Restricted}${expiredBan ? " (Expired)" : ""}` });
+
+        if (user.Restricted || expiredBan) {
+            if (opts.priv) {
+                let banModerator;
+
+                if (!user.BanModerator || user.BanModerator == "" || user.BanModerator == "admin")
+                    banModerator = "Unknown";
+                else if (user.BanModerator.match(idRegex))
+                    banModerator = `<@${user.BanModerator}>`;
+                else
+                    banModerator = user.BanModerator;
+
+                embed.addFields({ name: "Ban Moderator", value: `${banModerator}` });
+            }
+
+            embed.addFields({ name: "Ban Reason", value: `${user.BanReason}` });
+
+            if (opts.priv) {
+                embed.addFields({
+                    name: "Hidden Reason",
+                    value: `${user.BanReasonHidden && user.BanReasonHidden.length != 0 ? user.BanReasonHidden : "None"}`
+                });
+            }
+
+            embed.addFields(
+                { name: "Ban Issued", value: `<t:${issuedDate}:F>` },
+                { name: "Ban Expires", value: `<t:${expiresDate}:F>` },
+                { name: "Ban Length", value: `${banLengthStr ?? "Unknown"}` },
+            );
+        }
+    }
+
+    if (opts.priv) {
         const csnums = user.Csnum?.join(", ") ?? "null";
 
-        if (!reduced) {
+        if (opts.verbose) {
             embed.addFields(
                 { name: "User ID", value: `${user.UserId}` },
                 { name: "Gsbr Code", value: `${user.GsbrCode}` },

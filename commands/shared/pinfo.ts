@@ -53,6 +53,13 @@ export async function pinfo(interaction: ChatInputCommandInteraction<CacheType>,
     await reply(
         interaction,
         priv,
-        { embeds: [createUserEmbed(res.User, priv)] }
+        { embeds: [
+            createUserEmbed(res.User, {
+                priv: priv,
+                hideMii: false,
+                verbose: true,
+                showBanInfo: true,
+            })
+        ]}
     );
 }

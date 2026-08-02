@@ -2,6 +2,7 @@ import { CacheType, ChatInputCommandInteraction, SlashCommandBuilder } from "dis
 import { makeWFCRequest, pidToFc, resolveModRestrictPermission, resolvePidFromString, sendEmbedLog, validateID } from "../../utils.js";
 import { getConfig } from "../../config.js";
 import { PermissionBit } from "../shared/roles.js";
+import { plural as p } from "../../utils.js";
 
 const config = getConfig();
 
@@ -54,10 +55,12 @@ export default {
         const hidePublic = interaction.options.getBoolean("hide-public") ?? false;
         const moderator = interaction.user.id;
 
+        let perm = false;
         if (hours + minutes + days == 0) {
             // Perm ban lol
             // A normal person lives about 31000 days
             days = 100000;
+            perm = true;
         }
 
         const fc = pidToFc(pid);
@@ -111,6 +114,23 @@ export default {
             console.error(`Error calling leaderboard API for player ${pid}:`, error);
         }
 
-        await sendEmbedLog(interaction, "ban", res.User, null, hideMii, hidePublic);
+        await sendEmbedLog(interaction, res.User, {
+            action: "ban",
+            extraFields: [
+                { name: "Reason", value: reason },
+                { name: "Hidden Reason", value: reasonHidden ?? "None", hidden: true },
+                {
+                    name: "Ban Length",
+                    value: perm
+                        ? "Permanent"
+                        : `${days} ${p(days, "day")}, ${hours} ${p(hours, "hour")}, ${minutes} ${p(minutes, "minute")}`
+                },
+            ],
+            hideMii: hideMii,
+            noPublicEmbed: hidePublic,
+            verbose: false,
+            // We already show the ban info ourselves above.
+            showBanInfo: false,
+        });
     }
 };

@@ -23,8 +23,13 @@ async function fetchNewPlayers(): Promise<void> {
     }
 
     const embeds: EmbedBuilder[] = [];
-    for (const user of res.Users as WiiLinkUser[])
-        embeds.push(createUserEmbed(user, true));
+    for (const user of res.Users as WiiLinkUser[]) {
+        embeds.push(createUserEmbed(user, {
+            priv: true,
+            verbose: true,
+            showBanInfo: false,
+        }));
+    }
 
     const message = channels.newPlayerLogs.send({
         embeds: embeds,

@@ -44,10 +44,17 @@ export default {
         const fc = pidToFc(pid);
         const [success, res] = await makeWFCRequest("/unban", "POST", { secret: config.wfcSecret, pid: pid });
         if (success) {
-            await sendEmbedLog(interaction, "unban", res.User, [
-                { name: "Reason", value: reason },
-                { name: "Hidden Reason", value: reason_hidden ?? "None", hidden: true },
-            ], hideMii, hidePublic);
+            await sendEmbedLog(interaction, res.User, {
+                action: "unban",
+                extraFields: [
+                    { name: "Reason", value: reason },
+                    { name: "Hidden Reason", value: reason_hidden ?? "None", hidden: true },
+                ],
+                hideMii: hideMii,
+                noPublicEmbed: hidePublic,
+                verbose: false,
+                showBanInfo: true,
+            });
         }
         else
             await interaction.reply({ content: `Failed to unban friend code "${fc}": error ${res.Error ?? "no error message provided"}` });

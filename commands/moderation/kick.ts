@@ -44,10 +44,17 @@ export default {
         const fc = pidToFc(pid);
         const [success, res] = await makeWFCRequest("/kick", "POST", { secret: config.wfcSecret, pid: pid, reason: reason });
         if (success) {
-            await sendEmbedLog(interaction, "kick", res.User, [
-                { name: "Reason", value: reason },
-                { name: "Hidden Reason", value: reason_hidden ?? "None", hidden: true },
-            ], hideMii, hidePublic);
+            await sendEmbedLog(interaction, res.User, {
+                action: "kick",
+                extraFields: [
+                    { name: "Reason", value: reason },
+                    { name: "Hidden Reason", value: reason_hidden ?? "None", hidden: true },
+                ],
+                hideMii: hideMii,
+                noPublicEmbed: hidePublic,
+                verbose: false,
+                showBanInfo: false,
+            });
         }
         else
             await interaction.reply({ content: `Failed to kick friend code "${fc}": error ${res.Error ?? "no error message provided"}` });
