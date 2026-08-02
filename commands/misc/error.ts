@@ -1,6 +1,7 @@
 import { CacheType, ChatInputCommandInteraction, EmbedBuilder, MessageFlags, SlashCommandBuilder } from "discord.js";
 import { PermissionBit } from "../shared/roles.js";
-import { getWiiLinkErrorComments, getWiiLinkErrorDef } from "../shared/error.js";
+import { getWiiLinkErrorAddendum, getWiiLinkErrorDef, WiiLinkErrorAddendum } from "../shared/error.js";
+import { capitalize } from "../../utils.js";
 
 interface WiimmfiErrorInfo {
     type: string,
@@ -16,6 +17,12 @@ interface WiimmfiError {
 
 type WiimmfiErrorResponse = WiimmfiError[];
 
+const wiimmfiVerboseTypes: string[] = [
+    "class",
+    "section",
+    "group",
+];
+
 export default {
     permissions: PermissionBit.NONE,
 
@@ -24,11 +31,14 @@ export default {
         .setDescription("Look up an RWFC numeric error")
         .addIntegerOption(option => option.setName("ecode")
             .setDescription("5-6 digit error code")
-            .setRequired(true)),
+            .setRequired(true))
+        .addBooleanOption(option => option.setName("verbose")
+            .setDescription("show additionl error fields")),
 
     exec: async function(interaction: ChatInputCommandInteraction<CacheType>): Promise<void> {
         const ecode = interaction.options.getInteger("ecode", true);
         const length = ecode.toString().length;
+        const verbose = interaction.options.getBoolean("verbose") ?? false;
 
         if (length < 5 || length > 6) {
             await interaction.reply({
@@ -48,19 +58,20 @@ export default {
         const embed = new EmbedBuilder()
             .setTitle(`Retro WFC Error ${ecode}: ${wiiLinkErrorDef.name}\n`);
 
-        const success = await addWiimmfiError(embed, response);
-        let footer = "Using error definitions from wiimmfi.de.";
+        const addendum = getWiiLinkErrorAddendum(ecode);
+        const success = await addWiimmfiError(embed, response, verbose, addendum);
 
-        if (!success) {
-            embed.addFields({
-                name: "Description",
-                value: wiiLinkErrorDef.description,
-            });
+        let footer = success
+            ? "Using error definitions from wiimmfi.de."
+            : "Unable to query error from wiimmfi.de.";
 
-            footer = "Unable to query error from wiimmfi.de.\nUsing fallback WiiLink error defintions.";
-        }
+        embed.addFields({
+            name: "WiiLink Description",
+            value: wiiLinkErrorDef.description,
+        });
 
-        const comments = getWiiLinkErrorComments(ecode);
+        const comments = addendum.comments;
+
         if (comments && comments.length != 0) {
             for (let i = 0; i < comments.length; i++) {
                 const comment = comments[i];
@@ -82,7 +93,9 @@ export default {
 // Returns false if there is an issue with the wiimmfi error response
 async function addWiimmfiError(
     embed: EmbedBuilder,
-    response: Response
+    response: Response,
+    verbose: boolean,
+    addendum: WiiLinkErrorAddendum,
 ): Promise<boolean> {
     if (!response.ok)
         return false;
@@ -92,14 +105,38 @@ async function addWiimmfiError(
     if (wiimmfiError[0].found == 0)
         return false;
 
-    for (const key in Object.keys(wiimmfiError[0].infolist)) {
-        const info = wiimmfiError[0].infolist[key];
+    const originalInfoList = Object.values(wiimmfiError[0].infolist);
 
-        const infoText = formatHREF(info.info);
+    const filtered = originalInfoList.filter(info =>
+        !wiimmfiVerboseTypes.includes(info.type.toLowerCase()));
+
+    const infolist = verbose ? filtered : originalInfoList;
+
+    if (infolist.length == 0)
+        return false;
+
+    for (const info of infolist) {
+        if (wiimmfiVerboseTypes.includes(info.type.toLowerCase()) && !verbose)
+            continue;
+
+        const override = addendum.overrides[info.type.toLowerCase()];
+
+        if (override == "skip")
+            continue;
 
         embed.addFields({
             name: `${info.name}: ${info.type}`,
-            value: infoText,
+            value: override ?? formatHREF(info.info),
+        });
+    }
+
+    for (const type of Object.keys(addendum.overrides)) {
+        if (originalInfoList.find(info => info.type.toLowerCase() == type))
+            continue;
+
+        embed.addFields({
+            name: `xxxxx: ${capitalize(type)}`,
+            value: addendum.overrides[type]!,
         });
     }
 
@@ -118,8 +155,6 @@ function formatHREF(str: string): string {
     let match;
 
     while ((match = hrefRegex.exec(str)) != null) {
-        console.log(match);
-
         const href = match.groups as unknown as HREFMatch;
         str = str.slice(0, match.index)
             + `[${href.display}](${href.link})`

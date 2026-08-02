@@ -111,7 +111,7 @@ async function resolveCommands(files: string[], callback: (_: Dictionary<Command
         }
 
         if ("data" in spec && "exec" in spec) {
-            const name = path.basename(file, ".js");
+            const name = spec.data.name;
             console.log(`Registered command ${name} from file ${file}`);
             ret[name] = spec;
 
