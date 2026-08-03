@@ -6,11 +6,6 @@
     "module": "nodenext",
     "skipLibCheck": true,
     "moduleResolution": "nodenext",
-    // "allowImportingTsExtensions": true,
-    "resolveJsonModule": true,
-    "esModuleInterop": true,
-    "isolatedModules": true,
-    "moduleDetection": "force",
     "noEmit": false,
     "outDir": "build",
     /* Linting */
@@ -21,9 +16,6 @@
     "noUncheckedSideEffectImports": true
   },
   "include": [
-    "index.ts",
-    "utils.ts",
-    "commands",
-    "services"
+    "./src/**/*.ts"
   ]
 }
