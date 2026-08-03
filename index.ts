@@ -5,6 +5,7 @@ import * as fs from "fs";
 import * as path from "path";
 import { Command } from "./commands/shared/command.js";
 import { isAllowedInteraction, PermissionBit as PermissionBit } from "./commands/shared/roles.js";
+import { shouldEnable } from "./feature_flags.js";
 
 // https://stackoverflow.com/questions/43834559/how-to-find-which-promises-are-unhandled-in-node-js-unhandledpromiserejectionwar
 // Better logging of unhandled promises
@@ -104,6 +105,15 @@ async function resolveCommands(files: string[], callback: (_: Dictionary<Command
 
         if (spec == undefined || spec == null)
             continue;
+
+        if (spec.featureFlags) {
+            const [success, missing] = shouldEnable(spec.featureFlags, config.featureFlags);
+
+            if (!success) {
+                console.log(`Disabling spec ${file}, Feature flags ${missing.join(", ")} missing.`);
+                continue;
+            }
+        }
 
         if ("init" in spec && spec.init) {
             spec.init().catch(err =>

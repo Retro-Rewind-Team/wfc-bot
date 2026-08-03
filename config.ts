@@ -2,6 +2,7 @@ import { Client, GuildChannel, PermissionFlagsBits, TextChannel, VoiceChannel } 
 import { Dictionary } from "./dictionary.js";
 import { PermissionBit } from "./commands/shared/roles.js";
 import { fileExists } from "./fs_helpers.js";
+import { DefaultFeatureFlags, FeatureFlag, migrateConfigFeatureFlags } from "./feature_flags.js";
 import * as fs from "fs/promises";
 import * as process from "process";
 
@@ -32,6 +33,7 @@ export interface Config {
     leaderboardServer: string
     leaderboardPort: number
     logServices: boolean
+    featureFlags: Record<FeatureFlag, boolean>,
 }
 
 let _config: Config;
@@ -93,6 +95,7 @@ export async function initConfig(path: string): Promise<void> {
                 leaderboardPort: 5000,
                 leaderboardServer: "localhost",
                 logServices: false,
+                featureFlags: DefaultFeatureFlags,
             });
 
             throw "No config.json was provided. One has been generated for you, please adjust it before retrying!";
@@ -181,7 +184,9 @@ function migrateConfig(config: Config): boolean {
 
     const m4 = migrateAdminServers(config);
 
-    return m1 || m2 || m3 || m4;
+    const m5 = migrateConfigFeatureFlags(config);
+
+    return m1 || m2 || m3 || m4 || m5;
 }
 
 function migrateOldPermission(

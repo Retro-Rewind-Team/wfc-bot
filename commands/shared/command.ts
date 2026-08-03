@@ -1,6 +1,8 @@
 import { AutocompleteInteraction, CacheType, ChatInputCommandInteraction, SlashCommandOptionsOnlyBuilder } from "discord.js";
+import { FeatureFlag } from "../../feature_flags.js";
 
 export interface Command {
+    featureFlags?: FeatureFlag[]
     permissions: number,
     data: SlashCommandOptionsOnlyBuilder,
     init?: () => Promise<void>,
