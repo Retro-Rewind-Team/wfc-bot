@@ -1,3 +1,4 @@
+import { _fetch as fetch } from "#src/fetch.js";
 import { Command } from "#src/commands/shared/command.js";
 import { AutocompleteInteraction, CacheType, ChatInputCommandInteraction, EmbedBuilder, GuildMember, Locale, MessageFlags, SlashCommandBuilder } from "discord.js";
 import { processCrashdump } from "../shared/crash.js";

@@ -1,3 +1,4 @@
+import { _fetch as fetch } from "#src/fetch.js";
 import { EmbedBuilder } from "discord.js";
 import { getConfig } from "../../config.js";
 import { BadgeType, listBadges } from "./badges.js";

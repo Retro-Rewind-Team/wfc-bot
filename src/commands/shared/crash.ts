@@ -1,3 +1,4 @@
+import { _fetch as fetch } from "#src/fetch.js";
 import { Config, getConfig, setConfig } from "../../config.js";
 import child_process from "child_process";
 import os from "os";

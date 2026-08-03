@@ -1,3 +1,4 @@
+import { _fetch as fetch } from "#src/fetch.js";
 import { Command } from "#src/commands/shared/command.js";
 import { ActionRowBuilder, APIMessageTopLevelComponent, AutocompleteInteraction, ButtonInteraction, CacheType, ChatInputCommandInteraction, EmbedBuilder, SlashCommandBuilder } from "discord.js";
 import { pidToFc, resolveModRestrictPermission, resolvePidFromString, validateID } from "../../utils.js";

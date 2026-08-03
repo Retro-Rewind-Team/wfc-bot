@@ -1,3 +1,4 @@
+import { _fetch as fetch } from "#src/fetch.js";
 import crypto from "crypto";
 import { CacheType, ChatInputCommandInteraction, EmbedBuilder, GuildMember, PermissionFlagsBits } from "discord.js";
 import { getChannels, getConfig } from "./config.js";

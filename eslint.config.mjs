@@ -32,5 +32,12 @@ export default tseslint.config({
         "nonblock-statement-body-position": ["error", "below"],
         "@typescript-eslint/no-floating-promises": ["error"],
         "@typescript-eslint/explicit-function-return-type": "error",
+        "no-restricted-globals": [
+            "error",
+            {
+                "name": "fetch",
+                "message": "Use imported fetch instead."
+            }
+        ]
     },
 });
