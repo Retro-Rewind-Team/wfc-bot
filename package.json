@@ -5,8 +5,8 @@
   "main": "index.ts",
   "type": "module",
   "scripts": {
-    "start": "node build/src/index.js",
-    "build": "rm -rf build && tsc",
+    "start": "bash -c './scripts/start.sh'",
+    "build": "bash -c './scripts/build.sh'",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "ppeb",
@@ -21,6 +21,7 @@
     "typescript-eslint": "^8.24.1"
   },
   "imports": {
-    "#src/*": "./src/*"
+    "#src/*": "./src/*",
+    "#b/*": "./build/src/*"
   }
 }
