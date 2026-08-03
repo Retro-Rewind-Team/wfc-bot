@@ -3,44 +3,47 @@
 import eslint from "@eslint/js";
 import tseslint from "typescript-eslint";
 
-export default tseslint.config({
-    files: ["**/*.ts"],
-    extends: [
-        eslint.configs.recommended,
-        tseslint.configs.recommended,
-    ],
-    languageOptions: {
-        parserOptions: {
-            projectService: true,
-        }
-    },
-    rules: {
-        indent: ["error", 4, {
-            "SwitchCase": 0,
-        }],
-        "@typescript-eslint/no-unused-vars": ["error", { "argsIgnorePattern": "^_" }],
-        semi: ["warn", "always"],
-        quotes: ["warn", "double"],
-        "sort-imports": ["error", {
-            ignoreCase: true,
-            ignoreDeclarationSort: true,
-            ignoreMemberSort: false,
-        }],
-        curly: ["error", "multi-or-nest"],
-        "brace-style": ["error", "stroustrup"],
-        "no-trailing-spaces": "error",
-        "nonblock-statement-body-position": ["error", "below"],
-        "@typescript-eslint/no-floating-promises": ["error"],
-        "@typescript-eslint/explicit-function-return-type": "error",
-        "no-restricted-globals": [
-            "error",
-            {
-                "name": "fetch",
-                "message": "Use imported fetch instead."
-            }
+export default tseslint.config(
+    { ignores: [ "./build/**/*.js" ] },
+    {
+        files: [ "./src/**/*.ts" ],
+        extends: [
+            eslint.configs.recommended,
+            tseslint.configs.recommended,
         ],
-        "no-restricted-imports": ["error", {
-            "patterns": [".*"]
-        }],
-    },
-});
+        languageOptions: {
+            parserOptions: {
+                projectService: true,
+            }
+        },
+        rules: {
+            indent: ["error", 4, {
+                "SwitchCase": 0,
+            }],
+            "@typescript-eslint/no-unused-vars": ["error", { "argsIgnorePattern": "^_" }],
+            semi: ["warn", "always"],
+            quotes: ["warn", "double"],
+            "sort-imports": ["error", {
+                ignoreCase: true,
+                ignoreDeclarationSort: true,
+                ignoreMemberSort: false,
+            }],
+            curly: ["error", "multi-or-nest"],
+            "brace-style": ["error", "stroustrup"],
+            "no-trailing-spaces": "error",
+            "nonblock-statement-body-position": ["error", "below"],
+            "@typescript-eslint/no-floating-promises": ["error"],
+            "@typescript-eslint/explicit-function-return-type": "error",
+            "no-restricted-globals": [
+                "error",
+                {
+                    "name": "fetch",
+                    "message": "Use imported fetch instead."
+                }
+            ],
+            "no-restricted-imports": ["error", {
+                "patterns": [".*"]
+            }],
+        },
+    }
+);
