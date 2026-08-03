@@ -1,9 +1,10 @@
+import { Command } from "#src/commands/shared/command.js";
 import { CacheType, ChatInputCommandInteraction, SlashCommandBuilder } from "discord.js";
 import { PermissionBit } from "../shared/roles.js";
 import { pidToFc, resolvePidFromString, validateID } from "../../utils.js";
 import { fetchStatsEmbed } from "../shared/stats_embed.js";
 
-export default {
+export const command: Command = {
     permissions: PermissionBit.NONE,
 
     data: new SlashCommandBuilder()

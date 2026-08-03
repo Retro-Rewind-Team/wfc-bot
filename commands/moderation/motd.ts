@@ -1,3 +1,4 @@
+import { Command } from "#src/commands/shared/command.js";
 import { CacheType, ChatInputCommandInteraction, PermissionFlagsBits, SlashCommandBuilder } from "discord.js";
 import { getConfig } from "../../config.js";
 import { makeWFCRequest } from "../../utils.js";
@@ -8,7 +9,7 @@ import { PermissionBit } from "../shared/roles.js";
 const config = getConfig();
 const state: State = await loadState();
 
-export default {
+export const command: Command = {
     permissions: PermissionBit.ADMIN,
 
     data: new SlashCommandBuilder()

@@ -1,3 +1,4 @@
+import { Service } from "./service.js";
 import { getChannels, getConfig } from "../config.js";
 import { loadState, State } from "../state.js";
 import * as utils from "../utils.js";
@@ -272,10 +273,10 @@ function aOrAn(following: string): string {
     return isVowel ? "an" : "a";
 }
 
-export default {
-    register: function(): void {
+export const service: Service = {
+    async register(): Promise<void> {
         setInterval(utils.wrapTryCatch(fetchGroups), 60000);
 
-        utils.wrapTryCatch(fetchGroups)();
+        await utils.wrapTryCatch(fetchGroups)();
     },
 };

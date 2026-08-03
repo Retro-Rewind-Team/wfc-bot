@@ -3,9 +3,10 @@ import { getConfig, initChannels, initConfig } from "./config.js";
 import { Dictionary } from "./dictionary.js";
 import * as fs from "fs";
 import * as path from "path";
-import { Command } from "./commands/shared/command.js";
+import { Command, SharedInitializer } from "./commands/shared/command.js";
 import { isAllowedInteraction, PermissionBit as PermissionBit } from "./commands/shared/roles.js";
 import { shouldEnable } from "./feature_flags.js";
+import { Service } from "./services/service.js";
 
 // https://stackoverflow.com/questions/43834559/how-to-find-which-promises-are-unhandled-in-node-js-unhandledpromiserejectionwar
 // Better logging of unhandled promises
@@ -46,7 +47,7 @@ for (let i = 2; i < process.argv.length; i++) {
 await initConfig(configPath.length > 0 ? configPath : path.join(process.cwd(), "config.json"));
 const config = getConfig();
 
-function findCommadFiles(root: string): string[] {
+function findCommandFiles(root: string): string[] {
     let ret: string[] = [];
     const files = fs.readdirSync(root);
 
@@ -59,19 +60,21 @@ function findCommadFiles(root: string): string[] {
         }
 
         if (fs.statSync(full).isDirectory())
-            ret = ret.concat(findCommadFiles(full));
+            ret = ret.concat(findCommandFiles(full));
     }
 
     return ret;
 }
+
+const cwd = import.meta.dirname ?? __dirname;
 
 client.once(Events.ClientReady, async function(readyClient) {
     console.log(`Logged in as ${readyClient.user.tag}`);
 
     await initChannels(client);
 
-    const commandsRoot = path.join(import.meta.dirname ?? __dirname, "commands");
-    const commandFiles = findCommadFiles(commandsRoot);
+    const commandsRoot = path.join(cwd, "commands");
+    const commandFiles = findCommandFiles(commandsRoot);
 
     // Because of really strange node behavior involving import and resolving
     // promises, commands cannot be awaited, so a callback is used instead.
@@ -88,7 +91,7 @@ client.once(Events.ClientReady, async function(readyClient) {
         if (refresh)
             await refreshCommands(commands);
 
-        const servicesRoot = path.join(import.meta.dirname ?? __dirname, "services");
+        const servicesRoot = path.join(cwd, "services");
         const serviceFiles = fs.readdirSync(servicesRoot).filter(file => file.endsWith(".js"));
         await startServices(servicesRoot, serviceFiles);
     });
@@ -101,7 +104,9 @@ async function resolveCommands(files: string[], callback: (_: Dictionary<Command
 
     for (const file of files) {
         const commandFile = await import(file);
-        const spec: Command  = commandFile.default;
+        const relative = path.relative(cwd, file);
+
+        const spec: Command | SharedInitializer = commandFile.command ?? commandFile.initializer;
 
         if (spec == undefined || spec == null)
             continue;
@@ -110,19 +115,23 @@ async function resolveCommands(files: string[], callback: (_: Dictionary<Command
             const [success, missing] = shouldEnable(spec.featureFlags, config.featureFlags);
 
             if (!success) {
-                console.log(`Disabling spec ${file}, Feature flags ${missing.join(", ")} missing.`);
+                console.log(`Disabling spec ${relative}, Feature flags ${missing.join(", ")} missing.`);
                 continue;
             }
         }
 
-        if ("init" in spec && spec.init) {
-            spec.init().catch(err =>
-                console.error(`Failed to run init for spec ${file}, ${err}`));
+        if (spec.init) {
+            spec.init()
+                .then(() => console.log(`Ran init for spec ${relative}`))
+                .catch(err => console.error(`Failed to run init for spec ${relative}, ${err}`));
+
+            if (commandFile.initializer)
+                continue;
         }
 
         if ("data" in spec && "exec" in spec) {
             const name = spec.data.name;
-            console.log(`Registered command ${name} from file ${file}`);
+            console.log(`Registered command ${name} from file ${relative}`);
             ret[name] = spec;
 
             if (!("permissions" in spec))
@@ -141,21 +150,16 @@ async function resolveCommands(files: string[], callback: (_: Dictionary<Command
 
 async function startServices(root: string, files: string[]): Promise<void> {
     for (const file of files) {
-        let spec = await import(path.join(root, file));
-        spec = spec.default;
+        const serviceFile = await import(path.join(root, file));
+        const spec: Service = serviceFile.service;
 
         if (spec == undefined || spec == null)
             continue;
 
-        if ("register" in spec) {
-            try {
-                spec.register();
-            }
-            catch (e) {
-                console.error(`Error starting service ${file}: ${e}.`);
-            }
-
-            console.log(`Started service ${file}`);
+        if (spec.register) {
+            spec.register()
+                .then(() => console.log(`Started service ${file}`))
+                .catch(err => console.error(`Error starting service ${file}: ${err}.`));
         }
     }
 }

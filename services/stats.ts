@@ -1,3 +1,4 @@
+import { Service } from "./service.js";
 import { client } from "../index.js";
 import { getConfig } from "../config.js";
 import * as utils from "../utils.js";
@@ -46,10 +47,10 @@ async function fetchStats(): Promise<void> {
         console.log(`Successfully fetched stats! Time is ${new Date(Date.now())}. ${presenceText}`);
 }
 
-export default {
-    register: function(): void {
+export const service: Service = {
+    async register(): Promise<void> {
         setInterval(utils.wrapTryCatch(fetchStats), 60000);
 
-        utils.wrapTryCatch(fetchStats)();
+        await utils.wrapTryCatch(fetchStats)();
     },
 };

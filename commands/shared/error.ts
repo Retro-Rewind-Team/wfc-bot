@@ -1,3 +1,4 @@
+import { SharedInitializer } from "./command.js";
 import { unknownWiiLinkError, WiiLinkErrorDef, wiiLinkErrorDefs } from "./error_defs.js";
 import * as fs from "fs/promises";
 
@@ -37,7 +38,7 @@ export async function setWiiLinkErrorAddendum(ecode: number, addendum: WiiLinkEr
     await fs.writeFile(WIILINK_ERROR_ADDENDUM_PATH, JSON.stringify(wiiLinkErrorAddendums, null, 4));
 }
 
-export default {
+export const initializer: SharedInitializer = {
     init: async function(): Promise<void> {
         let exists = true;
         try {

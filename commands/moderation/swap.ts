@@ -1,3 +1,4 @@
+import { Command } from "#src/commands/shared/command.js";
 import { CacheType, ChatInputCommandInteraction, EmbedBuilder, GuildMember, SlashCommandBuilder } from "discord.js";
 import { getChannels, getConfig } from "../../config.js";
 import { getColor, getMiiImageURL, pidToFc, resolveModRestrictPermission, resolvePidFromString, validateID } from "../../utils.js";
@@ -5,7 +6,7 @@ import { PermissionBit } from "../shared/roles.js";
 
 const config = getConfig();
 
-export default {
+export const command: Command = {
     permissions: PermissionBit.MODERATOR,
 
     data: new SlashCommandBuilder()

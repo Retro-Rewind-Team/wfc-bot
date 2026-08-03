@@ -1,3 +1,4 @@
+import { Command } from "#src/commands/shared/command.js";
 import { CacheType, ChatInputCommandInteraction, EmbedBuilder, SlashCommandBuilder } from "discord.js";
 import { getConfig } from "../../config.js";
 import { PermissionBit } from "../shared/roles.js";
@@ -8,7 +9,7 @@ interface DeleteResponse {
     message: string;
 }
 
-export default {
+export const command: Command = {
     permissions: PermissionBit.BKT_UPDATER,
 
     data: new SlashCommandBuilder()

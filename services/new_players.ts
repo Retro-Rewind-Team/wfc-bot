@@ -1,3 +1,4 @@
+import { Service } from "./service.js";
 import { EmbedBuilder } from "discord.js";
 import { getChannels, getConfig } from "../config.js";
 import { createUserEmbed, makeWFCRequest as makeWFCRequest, WiiLinkUser, wrapTryCatch } from "../utils.js";
@@ -41,10 +42,10 @@ async function fetchNewPlayers(): Promise<void> {
     }
 }
 
-export default {
-    register: function(): void {
+export const service: Service = {
+    async register(): Promise<void> {
         setInterval(wrapTryCatch(fetchNewPlayers), 60000);
 
-        wrapTryCatch(fetchNewPlayers)();
+        await wrapTryCatch(fetchNewPlayers)();
     }
 };

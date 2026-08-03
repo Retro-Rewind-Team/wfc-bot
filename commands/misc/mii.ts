@@ -1,9 +1,10 @@
+import { Command } from "#src/commands/shared/command.js";
 import { CacheType, ChatInputCommandInteraction, EmbedBuilder, MessageFlags, SlashCommandBuilder } from "discord.js";
 import { formatMiiData, getMiiBuf, processMiiBuf } from "../shared/mii.js";
 import { getMiiImageURL, pidToFc, resolvePidFromString, validateID } from "../../utils.js";
 import { PermissionBit } from "../shared/roles.js";
 
-export default {
+export const command: Command = {
     permissions: PermissionBit.NONE,
 
     data: new SlashCommandBuilder()

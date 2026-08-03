@@ -1,3 +1,4 @@
+import { Command } from "#src/commands/shared/command.js";
 import { ActionRowBuilder, APIMessageTopLevelComponent, ButtonInteraction, CacheType, ChatInputCommandInteraction, EmbedBuilder, SlashCommandBuilder } from "discord.js";
 import { getConfig } from "../../config.js";
 import { Dictionary } from "../../dictionary.js";
@@ -28,7 +29,7 @@ interface ProfileListState {
 
 const stateByMessageID: Dictionary<ProfileListState> = {};
 
-export default {
+export const command: Command = {
     permissions: PermissionBit.NONE,
 
     data: new SlashCommandBuilder()

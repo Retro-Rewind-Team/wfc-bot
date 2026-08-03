@@ -1,9 +1,10 @@
+import { Command } from "#src/commands/shared/command.js";
 import { CacheType, ChatInputCommandInteraction, MessageFlags, SlashCommandBuilder } from "discord.js";
 import { PermissionBit } from "../shared/roles.js";
 import { getWiiLinkErrorAddendum, getWiiLinkErrorDef, setWiiLinkErrorAddendum } from "../shared/error.js";
 import { capitalize } from "../../utils.js";
 
-export default {
+export const command: Command = {
     permissions: PermissionBit.MODERATOR,
 
     data: new SlashCommandBuilder()

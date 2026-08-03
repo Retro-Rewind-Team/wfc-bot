@@ -1,3 +1,4 @@
+import { Command } from "#src/commands/shared/command.js";
 import { CacheType, ChatInputCommandInteraction, EmbedBuilder, GuildMember, MessageFlags, SlashCommandBuilder } from "discord.js";
 import { getChannels, getConfig } from "../../config.js";
 import crypto from "crypto";
@@ -285,7 +286,7 @@ async function del(interaction: ChatInputCommandInteraction<CacheType>): Promise
     }
 }
 
-export default {
+export const command: Command = {
     permissions: PermissionBit.NONE,
 
     data: new SlashCommandBuilder()

@@ -1,3 +1,4 @@
+import { Command } from "#src/commands/shared/command.js";
 import { ActionRowBuilder, APIMessageTopLevelComponent, ButtonInteraction, CacheType, ChatInputCommandInteraction, EmbedBuilder, MessageFlags, SlashCommandBuilder } from "discord.js";
 import { getConfig } from "../../config.js";
 import { Dictionary } from "../../dictionary.js";
@@ -15,7 +16,7 @@ interface QueryState {
 
 const stateByMessageID: Dictionary<QueryState> = {};
 
-export default {
+export const command: Command = {
     permissions: PermissionBit.MODERATOR,
 
     data: new SlashCommandBuilder()

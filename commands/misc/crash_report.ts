@@ -1,3 +1,4 @@
+import { Command } from "#src/commands/shared/command.js";
 import { AutocompleteInteraction, CacheType, ChatInputCommandInteraction, EmbedBuilder, GuildMember, Locale, MessageFlags, SlashCommandBuilder } from "discord.js";
 import { processCrashdump } from "../shared/crash.js";
 import { getChannels } from "../../config.js";
@@ -222,7 +223,7 @@ function a(b: string): { name: string, value: string } {
     return { name: b, value: b };
 }
 
-export default {
+export const command: Command = {
     permissions: PermissionBit.NONE,
 
     data: new SlashCommandBuilder()

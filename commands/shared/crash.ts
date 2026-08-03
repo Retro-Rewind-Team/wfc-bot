@@ -4,6 +4,7 @@ import os from "os";
 import { exit } from "process";
 import { existsSync, writeFileSync } from "fs";
 import { haste } from "../../utils.js";
+import { SharedInitializer } from "./command.js";
 
 let config: Config = null!;
 export let pulsarToolsBin: string = null!;
@@ -49,7 +50,7 @@ async function processCrashdumpInner(buf: Buffer): Promise<[code: number | null,
     );
 }
 
-export default {
+export const initializer: SharedInitializer = {
     init: async function(): Promise<void> {
         config = getConfig();
         switch (os.platform()) {

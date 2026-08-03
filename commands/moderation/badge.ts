@@ -1,3 +1,4 @@
+import { Command } from "#src/commands/shared/command.js";
 import { ActionRowBuilder, APIMessageTopLevelComponent, AutocompleteInteraction, ButtonInteraction, CacheType, ChatInputCommandInteraction, EmbedBuilder, SlashCommandBuilder } from "discord.js";
 import { pidToFc, resolveModRestrictPermission, resolvePidFromString, validateID } from "../../utils.js";
 import { BadgeOpts, BadgeType, listBadges } from "../shared/badges.js";
@@ -315,7 +316,7 @@ async function listSingle(interaction: ChatInputCommandInteraction<CacheType>, i
     });
 }
 
-export default {
+export const command: Command = {
     permissions: PermissionBit.PROFILE_MODERATOR,
 
     data: new SlashCommandBuilder()

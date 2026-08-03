@@ -1,3 +1,4 @@
+import { Command } from "#src/commands/shared/command.js";
 import { CacheType, ChatInputCommandInteraction, SlashCommandBuilder } from "discord.js";
 import { makeWFCRequest, pidToFc, resolveModRestrictPermission, resolvePidFromString, sendEmbedLog, validateID } from "../../utils.js";
 import { getConfig } from "../../config.js";
@@ -6,7 +7,7 @@ import { plural as p } from "../../utils.js";
 
 const config = getConfig();
 
-export default {
+export const command: Command = {
     permissions: PermissionBit.MODERATOR,
 
     data: new SlashCommandBuilder()

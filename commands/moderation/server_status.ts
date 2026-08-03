@@ -1,3 +1,4 @@
+import { Command } from "#src/commands/shared/command.js";
 import { CacheType, ChatInputCommandInteraction, PermissionFlagsBits, SlashCommandBuilder } from "discord.js";
 import { getChannels, getConfig } from "../../config.js";
 import { getStatusColorEmoji, getStatusText, StatusColor } from "../shared/server_status.js";
@@ -15,7 +16,7 @@ const ColorOpts = [
     { name: "Green", value: StatusColor.GREEN },
 ];
 
-export default {
+export const command: Command = {
     permissions: PermissionBit.ADMIN,
 
     data: new SlashCommandBuilder()

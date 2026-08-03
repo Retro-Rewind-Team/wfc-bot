@@ -1,3 +1,4 @@
+import { Command } from "#src/commands/shared/command.js";
 import { AutocompleteInteraction, CacheType, ChatInputCommandInteraction, EmbedBuilder, SlashCommandBuilder } from "discord.js";
 import { getConfig } from "../../config.js";
 import { handleCountryAutocomplete, handleProfileAutocomplete } from "./tt_utils.js";
@@ -26,7 +27,7 @@ interface ErrorResponse {
     message?: string;
 }
 
-export default {
+export const command: Command = {
     permissions: PermissionBit.BKT_UPDATER,
 
     data: new SlashCommandBuilder()

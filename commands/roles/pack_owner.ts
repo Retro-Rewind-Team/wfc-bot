@@ -1,3 +1,4 @@
+import { Command } from "#src/commands/shared/command.js";
 import { CacheType, ChatInputCommandInteraction, EmbedBuilder, PermissionFlagsBits, SlashCommandBuilder } from "discord.js";
 import { getConfig, setConfig } from "../../config.js";
 import { packIDToName, PackOpts } from "../shared/pack.js";
@@ -6,7 +7,7 @@ import { PermissionBit, sendEmbed } from "../shared/roles.js";
 
 const config = getConfig();
 
-export default {
+export const command: Command = {
     permissions: PermissionBit.ADMIN,
 
     data: new SlashCommandBuilder()
