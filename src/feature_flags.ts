@@ -1,4 +1,4 @@
-import { Config } from "./config.js";
+import { Config } from "#src/config.js";
 
 export const DefaultFeatureFlags = {
     selfCommand: false,

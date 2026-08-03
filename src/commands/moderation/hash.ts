@@ -1,11 +1,11 @@
 import { _fetch as fetch } from "#src/fetch.js";
 import { Command } from "#src/commands/shared/command.js";
 import { CacheType, ChatInputCommandInteraction, EmbedBuilder, GuildMember, MessageFlags, SlashCommandBuilder } from "discord.js";
-import { getChannels, getConfig } from "../../config.js";
+import { getChannels, getConfig } from "#src/config.js";
 import crypto from "crypto";
-import { fmtHex, getColor, makeWFCRequest, resolveModRestrictPermission } from "../../utils.js";
-import { packIDToName, PackOpts } from "../shared/pack.js";
-import { PermissionBit } from "../shared/roles.js";
+import { fmtHex, getColor, makeWFCRequest, resolveModRestrictPermission } from "#src/utils.js";
+import { packIDToName, PackOpts } from "#src/commands/shared/pack.js";
+import { PermissionBit } from "#src/commands/shared/roles.js";
 
 const config = getConfig();
 const channels = getChannels();

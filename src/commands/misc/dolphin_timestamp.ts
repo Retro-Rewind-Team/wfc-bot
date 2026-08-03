@@ -1,6 +1,6 @@
 import { Command } from "#src/commands/shared/command.js";
 import { CacheType, ChatInputCommandInteraction, MessageFlags, SlashCommandBuilder } from "discord.js";
-import { PermissionBit } from "../shared/roles.js";
+import { PermissionBit } from "#src/commands/shared/roles.js";
 
 const serialRegexp = /([0-9]*)/;
 

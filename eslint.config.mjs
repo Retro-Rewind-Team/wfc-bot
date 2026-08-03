@@ -38,6 +38,9 @@ export default tseslint.config({
                 "name": "fetch",
                 "message": "Use imported fetch instead."
             }
-        ]
+        ],
+        "no-restricted-imports": ["error", {
+            "patterns": [".*"]
+        }],
     },
 });

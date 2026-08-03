@@ -1,8 +1,8 @@
 import { _fetch as fetch } from "#src/fetch.js";
 import { Command } from "#src/commands/shared/command.js";
 import { CacheType, ChatInputCommandInteraction, MessageFlags, SlashCommandBuilder } from "discord.js";
-import { formatMiiData, processMiiBuf } from "../shared/mii.js";
-import { PermissionBit } from "../shared/roles.js";
+import { formatMiiData, processMiiBuf } from "#src/commands/shared/mii.js";
+import { PermissionBit } from "#src/commands/shared/roles.js";
 
 export const command: Command = {
     permissions: PermissionBit.NONE,

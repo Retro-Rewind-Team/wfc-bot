@@ -1,11 +1,11 @@
 import { _fetch as fetch } from "#src/fetch.js";
-import { Config, getConfig, setConfig } from "../../config.js";
+import { Config, getConfig, setConfig } from "#src/config.js";
 import child_process from "child_process";
 import os from "os";
 import { exit } from "process";
 import { existsSync, writeFileSync } from "fs";
-import { haste } from "../../utils.js";
-import { SharedInitializer } from "./command.js";
+import { haste } from "#src/utils.js";
+import { SharedInitializer } from "#src/commands/shared/command.js";
 
 let config: Config = null!;
 export let pulsarToolsBin: string = null!;

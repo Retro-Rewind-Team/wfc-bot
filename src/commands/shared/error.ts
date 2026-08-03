@@ -1,5 +1,5 @@
-import { SharedInitializer } from "./command.js";
-import { unknownWiiLinkError, WiiLinkErrorDef, wiiLinkErrorDefs } from "./error_defs.js";
+import { SharedInitializer } from "#src/commands/shared/command.js";
+import { unknownWiiLinkError, WiiLinkErrorDef, wiiLinkErrorDefs } from "#src/commands/shared/error_defs.js";
 import * as fs from "fs/promises";
 
 const WIILINK_ERROR_ADDENDUM_PATH = "./wiilink_error_addendum.json";

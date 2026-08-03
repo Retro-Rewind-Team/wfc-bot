@@ -1,9 +1,9 @@
 import { Command } from "#src/commands/shared/command.js";
 import { CacheType, ChatInputCommandInteraction, EmbedBuilder, PermissionFlagsBits, SlashCommandBuilder } from "discord.js";
-import { getConfig, setConfig } from "../../config.js";
-import { packIDToName, PackOpts } from "../shared/pack.js";
-import { fmtHex, getColor } from "../../utils.js";
-import { PermissionBit, sendEmbed } from "../shared/roles.js";
+import { getConfig, setConfig } from "#src/config.js";
+import { packIDToName, PackOpts } from "#src/commands/shared/pack.js";
+import { fmtHex, getColor } from "#src/utils.js";
+import { PermissionBit, sendEmbed } from "#src/commands/shared/roles.js";
 
 const config = getConfig();
 

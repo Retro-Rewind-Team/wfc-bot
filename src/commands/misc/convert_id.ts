@@ -1,7 +1,7 @@
 import { Command } from "#src/commands/shared/command.js";
 import { CacheType, ChatInputCommandInteraction, MessageFlags, SlashCommandBuilder } from "discord.js";
-import { pidToFc, resolvePidFromString, validateID } from "../../utils.js";
-import { PermissionBit } from "../shared/roles.js";
+import { pidToFc, resolvePidFromString, validateID } from "#src/utils.js";
+import { PermissionBit } from "#src/commands/shared/roles.js";
 
 export const command: Command = {
     permissions: PermissionBit.NONE,

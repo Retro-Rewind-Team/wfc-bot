@@ -1,11 +1,11 @@
 import { Message } from "discord.js";
-import { Dictionary } from "./dictionary.js";
+import { Dictionary } from "#src/dictionary.js";
 import { exit } from "process";
-import { getChannels } from "./config.js";
-import { Group } from "./services/groups.js";
-import { Status, StatusColor } from "./commands/shared/server_status.js";
+import { getChannels } from "#src/config.js";
+import { Group } from "#src/services/groups.js";
+import { Status, StatusColor } from "#src/commands/shared/server_status.js";
 import * as fs from "fs/promises";
-import { fileExists } from "./fs_helpers.js";
+import { fileExists } from "#src/fs_helpers.js";
 
 const channels = getChannels();
 

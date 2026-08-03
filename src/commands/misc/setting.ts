@@ -1,8 +1,8 @@
 import { _fetch as fetch } from "#src/fetch.js";
 import { Command } from "#src/commands/shared/command.js";
 import { CacheType, ChatInputCommandInteraction, EmbedBuilder, MessageFlags, SlashCommandBuilder } from "discord.js";
-import { getColor } from "../../utils.js";
-import { PermissionBit } from "../shared/roles.js";
+import { getColor } from "#src/utils.js";
+import { PermissionBit } from "#src/commands/shared/roles.js";
 
 
 export const command: Command = {

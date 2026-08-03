@@ -1,8 +1,8 @@
 import { Client, GuildChannel, PermissionFlagsBits, TextChannel, VoiceChannel } from "discord.js";
-import { Dictionary } from "./dictionary.js";
-import { PermissionBit } from "./commands/shared/roles.js";
-import { fileExists } from "./fs_helpers.js";
-import { DefaultFeatureFlags, FeatureFlag, migrateConfigFeatureFlags } from "./feature_flags.js";
+import { Dictionary } from "#src/dictionary.js";
+import { PermissionBit } from "#src/commands/shared/roles.js";
+import { fileExists } from "#src/fs_helpers.js";
+import { DefaultFeatureFlags, FeatureFlag, migrateConfigFeatureFlags } from "#src/feature_flags.js";
 import * as fs from "fs/promises";
 import * as process from "process";
 

@@ -1,8 +1,8 @@
-import { Service } from "./service.js";
-import { getChannels, getConfig } from "../config.js";
-import { loadState, State } from "../state.js";
-import * as utils from "../utils.js";
-import { Dictionary } from "../dictionary.js";
+import { Service } from "#src/services/service.js";
+import { getChannels, getConfig } from "#src/config.js";
+import { loadState, State } from "#src/state.js";
+import * as utils from "#src/utils.js";
+import { Dictionary } from "#src/dictionary.js";
 
 const config = getConfig();
 const channels = getChannels();

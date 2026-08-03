@@ -1,5 +1,5 @@
 import { AutocompleteInteraction, CacheType, ChatInputCommandInteraction, SharedSlashCommand } from "discord.js";
-import { FeatureFlag } from "../../feature_flags.js";
+import { FeatureFlag } from "#src/feature_flags.js";
 
 export interface Command {
     featureFlags?: FeatureFlag[]

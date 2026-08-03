@@ -1,7 +1,7 @@
-import { Service } from "./service.js";
-import { client } from "../index.js";
-import { getConfig } from "../config.js";
-import * as utils from "../utils.js";
+import { Service } from "#src/services/service.js";
+import { client } from "#src/index.js";
+import { getConfig } from "#src/config.js";
+import * as utils from "#src/utils.js";
 
 const config = getConfig();
 

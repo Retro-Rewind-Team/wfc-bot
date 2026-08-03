@@ -1,5 +1,5 @@
-import { getConfig } from "../../config.js";
-import { makeWFCRequest, resolvePidFromString, validateID } from "../../utils.js";
+import { getConfig } from "#src/config.js";
+import { makeWFCRequest, resolvePidFromString, validateID } from "#src/utils.js";
 
 // Name lengths are 10, each char is 2 bytes
 const NAME_LEN = 10;

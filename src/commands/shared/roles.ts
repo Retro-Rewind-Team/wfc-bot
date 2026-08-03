@@ -1,7 +1,7 @@
 import { CacheType, ChatInputCommandInteraction, EmbedBuilder, GuildMember, MessageFlags, PermissionFlagsBits, SlashCommandBuilder, User } from "discord.js";
-import { getChannels, getConfig, setConfig } from "../../config.js";
-import { Command } from "./command.js";
-import { capitalize, getColor } from "../../utils.js";
+import { getChannels, getConfig, setConfig } from "#src/config.js";
+import { Command } from "#src/commands/shared/command.js";
+import { capitalize, getColor } from "#src/utils.js";
 
 export enum PermissionBit {
     NONE = 0,

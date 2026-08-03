@@ -1,10 +1,10 @@
 import { Command } from "#src/commands/shared/command.js";
 import { CacheType, ChatInputCommandInteraction, PermissionFlagsBits, SlashCommandBuilder } from "discord.js";
-import { getConfig } from "../../config.js";
-import { makeWFCRequest } from "../../utils.js";
-import { loadState, State } from "../../state.js";
-import { getStatusText } from "../shared/server_status.js";
-import { PermissionBit } from "../shared/roles.js";
+import { getConfig } from "#src/config.js";
+import { makeWFCRequest } from "#src/utils.js";
+import { loadState, State } from "#src/state.js";
+import { getStatusText } from "#src/commands/shared/server_status.js";
+import { PermissionBit } from "#src/commands/shared/roles.js";
 
 const config = getConfig();
 const state: State = await loadState();

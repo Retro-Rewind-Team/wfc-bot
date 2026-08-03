@@ -1,12 +1,12 @@
 import { AutocompleteInteraction, ButtonInteraction, CacheType, ChatInputCommandInteraction, Client, Events, IntentsBitField, MessageFlags, REST, RESTPostAPIChatInputApplicationCommandsJSONBody, RESTPutAPIApplicationCommandsResult, Routes } from "discord.js";
-import { getConfig, initChannels, initConfig } from "./config.js";
-import { Dictionary } from "./dictionary.js";
+import { getConfig, initChannels, initConfig } from "#src/config.js";
+import { Dictionary } from "#src/dictionary.js";
 import * as fs from "fs";
 import * as path from "path";
-import { Command, SharedInitializer } from "./commands/shared/command.js";
-import { isAllowedInteraction, PermissionBit as PermissionBit } from "./commands/shared/roles.js";
-import { shouldEnable } from "./feature_flags.js";
-import { Service } from "./services/service.js";
+import { Command, SharedInitializer } from "#src/commands/shared/command.js";
+import { isAllowedInteraction, PermissionBit as PermissionBit } from "#src/commands/shared/roles.js";
+import { shouldEnable } from "#src/feature_flags.js";
+import { Service } from "#src/services/service.js";
 
 // https://stackoverflow.com/questions/43834559/how-to-find-which-promises-are-unhandled-in-node-js-unhandledpromiserejectionwar
 // Better logging of unhandled promises
