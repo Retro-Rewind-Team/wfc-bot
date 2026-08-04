@@ -10,6 +10,7 @@ export enum PermissionBit {
     MODERATOR = 1 << 2,
     BKT_UPDATER = 1 << 3,
     PROFILE_MODERATOR = 1 << 4, // Restricts the clear command
+    MINI_MODERATOR = 1 << 5, // Allows kick, ban, reduced query
 }
 
 export function isAllowedInteraction(
@@ -29,6 +30,14 @@ export function isAllowedInteraction(
     const required = permissionBitsToList(command.permissions);
     const has = permissionBitsToList(userPermissions);
     return [false, `Command requires one of: ${required.join(", ")}.\nUser has: ${has.join(", ")}.`];
+}
+
+// Check if a user has the required permission bits
+export function hasPermissionBits(requiredBits: number, user: string): boolean {
+    const config = getConfig();
+    const userPermissions = config.userPermissions[user] ?? 0;
+
+    return (userPermissions & requiredBits) == requiredBits;
 }
 
 export function permissionBitsToList(permissionBits: number): string[] {

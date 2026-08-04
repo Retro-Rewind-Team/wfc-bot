@@ -7,7 +7,7 @@ import { PermissionBit } from "#src/commands/shared/roles.js";
 const config = getConfig();
 
 export const command: Command = {
-    permissions: PermissionBit.MODERATOR,
+    permissions: PermissionBit.MODERATOR | PermissionBit.MINI_MODERATOR,
 
     data: new SlashCommandBuilder()
         .setName("kick")

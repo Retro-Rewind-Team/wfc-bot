@@ -4,7 +4,7 @@ import { getConfig } from "#src/config.js";
 import { Dictionary } from "#src/dictionary.js";
 import { registerButtonHandlerByMessageID } from "#src/index.js";
 import { createUserEmbed, makeWFCRequest, resolveModRestrictPermission, resolvePidFromString, validateID } from "#src/utils.js";
-import { PermissionBit } from "#src/commands/shared/roles.js";
+import { hasPermissionBits, PermissionBit } from "#src/commands/shared/roles.js";
 import { getNavigationButtons, newIndexFromButtonInteraction, validateButtonInteraction } from "#src/commands/shared/buttons.js";
 
 const config = getConfig();
@@ -17,7 +17,7 @@ interface QueryState {
 const stateByMessageID: Dictionary<QueryState> = {};
 
 export const command: Command = {
-    permissions: PermissionBit.MODERATOR,
+    permissions: PermissionBit.MODERATOR | PermissionBit.MINI_MODERATOR,
 
     data: new SlashCommandBuilder()
         .setName("query")
@@ -101,6 +101,9 @@ export const command: Command = {
         }
 
         const embeds: EmbedBuilder[] = [];
+        // mini-mods don't get to see pii here.
+        const showPII = hasPermissionBits(PermissionBit.MODERATOR, interaction.user.id);
+
         for (let i = 0; i < res.Users.length; i++) {
             const user = res.Users[i];
 
@@ -109,10 +112,10 @@ export const command: Command = {
                     priv: true,
                     verbose: true,
                     showBanInfo: true,
+                    showPII: showPII,
+                }).setFooter({
+                    text: `User ${i + 1} of ${res.Users.length}`
                 })
-                    .setFooter({
-                        text: `User ${i + 1} of ${res.Users.length}`
-                    })
             );
         }
 

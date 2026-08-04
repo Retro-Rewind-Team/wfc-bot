@@ -9,7 +9,7 @@ import { plural as p } from "#src/utils.js";
 const config = getConfig();
 
 export const command: Command = {
-    permissions: PermissionBit.MODERATOR,
+    permissions: PermissionBit.MODERATOR | PermissionBit.MINI_MODERATOR,
 
     data: new SlashCommandBuilder()
         .setName("ban")

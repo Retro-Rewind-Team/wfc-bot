@@ -303,8 +303,10 @@ export interface CreateUserEmbedOpts {
     hideMii?: boolean;
     // Show detailed fields for private embeds
     verbose?: boolean;
-    // Hide ban info
-    showBanInfo?: boolean
+    // Show ban info
+    showBanInfo?: boolean;
+    // Default true. Determines if csnum, ip, etc are shown
+    showPII?: boolean,
 }
 
 // Creates an embed based on a WiiLinkUser.
@@ -317,6 +319,9 @@ export function createUserEmbed(
     opts: CreateUserEmbedOpts,
 ): EmbedBuilder {
     const fc = pidToFc(user.ProfileId);
+
+    if (opts.showPII == undefined)
+        opts.showPII = true;
 
     const embed = opts.template
         ? opts.template
@@ -415,12 +420,14 @@ export function createUserEmbed(
             );
         }
 
-        embed.addFields(
-            { name: "NG Device IDs", value: `${fmtDeviceID(user.NgDeviceId)}` },
-            { name: "Last IP Address", value: `${user.LastIPAddress}` },
-            { name: "IP Info", value: `https://ipinfo.io/${user.LastIPAddress}` },
-            { name: "Console Serial Numbers", value: `${csnums.length <= 1024 ? csnums : "Too many Serial Numbers!"}` },
-        );
+        if (opts.showPII) {
+            embed.addFields(
+                { name: "NG Device IDs", value: `${fmtDeviceID(user.NgDeviceId)}` },
+                { name: "Last IP Address", value: `${user.LastIPAddress}` },
+                { name: "IP Info", value: `https://ipinfo.io/${user.LastIPAddress}` },
+                { name: "Console Serial Numbers", value: `${csnums.length <= 1024 ? csnums : "Too many Serial Numbers!"}` },
+            );
+        }
     }
 
     return embed;
