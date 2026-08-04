@@ -2,7 +2,7 @@ import { Command } from "#src/commands/shared/command.js";
 import { CacheType, ChatInputCommandInteraction, MessageFlags, SlashCommandBuilder } from "discord.js";
 import { PermissionBit } from "#src/commands/shared/roles.js";
 
-const serialRegexp = /([0-9]*)/;
+const serialRegexp = /(\d+)/;
 
 export const command: Command = {
     permissions: PermissionBit.NONE,
@@ -17,16 +17,17 @@ export const command: Command = {
     exec: async function(interaction: ChatInputCommandInteraction<CacheType>): Promise<void> {
         const serialRaw = interaction.options.getString("serial", true);
 
-        const matches = serialRaw.match(serialRegexp);
+        const match = serialRegexp.exec(serialRaw);
 
-        if (!matches || !matches[0] || matches[0].length < 8 || matches[0].length > 9) {
+        if (!match || !match[0] || match[0].length < 8 || match[0].length > 10) {
             await interaction.reply({
                 content: `The provided serial '${serialRaw}' is not in the correct format! There should be 9-10 numbers in your serial.`,
+                flags: MessageFlags.Ephemeral,
             });
             return;
         }
 
-        const [legacy, unix] = decode(matches[0]);
+        const [legacy, unix] = decode(match[0]);
 
         let fmtLegacy = "— none in range —";
         let fmtUnix = "— none in range —";
