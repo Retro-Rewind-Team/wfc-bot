@@ -1,5 +1,6 @@
 import { getConfig } from "#src/config.js";
-import { makeWFCRequest, resolvePidFromString, validateID } from "#src/utils.js";
+import { getColor, getMiiImageURL, makeWFCRequest, resolvePidFromString, validateID } from "#src/utils.js";
+import { EmbedBuilder } from "discord.js";
 
 // Name lengths are 10, each char is 2 bytes
 const NAME_LEN = 10;
@@ -84,42 +85,63 @@ export async function getMiiBuf(pidOrFC: string, sanitized: boolean): Promise<[B
     return [ Buffer.from(res.Mii, "base64"), null ];
 }
 
-export function formatMiiData(mii: MiiData): string {
-    let ret = "";
+export function createMiiEmbed(mii: MiiData, fc?: string): EmbedBuilder {
+    const embed = new EmbedBuilder()
+        .setColor(getColor())
+        .setTimestamp();
 
     if (mii.fileName)
-        ret += `Mii File: ${mii.fileName}\n`;
+        embed.addFields({ name: "Mii File", value: mii.fileName });
 
-    ret += `Mii Name: ${mii.name}\n`;
+    embed.addFields({ name: "Mii Name", value: mii.name });
+
+
+    if (fc) {
+        embed.setThumbnail(getMiiImageURL(fc));
+        embed.addFields(
+            { name: "Profile ID", value: resolvePidFromString(fc).toString() },
+            { name: "Friend Code", value: fc },
+        );
+    }
 
     if (mii.creatorName != "")
-        ret += `Creator: ${mii.creatorName}\n`;
+        embed.addFields({ name: "Creator", value: mii.creatorName });
 
-    if (mii.birthMonth != 0 && mii.birthDay != 0)
-        ret += `Birth Date: ${mii.birthMonth}/${mii.birthDay}\n`;
+    if (mii.birthMonth != 0 && mii.birthDay != 0) {
+        embed.addFields({
+            name: "Birth Date",
+            value: `${mii.birthMonth }/${mii.birthDay }`
+        });
+    }
 
     if (((mii.miiID) >> 3) > 0)
-        ret += `MiiID: ${mii.miiID.toString(16)}\n`;
+        embed.addFields({ name: "MiiID", value: mii.miiID.toString(16) });
 
     if (mii.sysID > 0)
-        ret += `SysID: ${mii.sysID.toString(16)}\n`;
+        embed.addFields({ name: "SysID", value: mii.sysID.toString(16) });
 
-    if (mii.creationDate.getTime() != START_DATE)
-        ret += `Mii Creation Date: ${mii.creationDate.toLocaleString()}\n`;
+    if (mii.creationDate.getTime() != START_DATE) {
+        embed.addFields({
+            name: "Mii Creation Date",
+            value: mii.creationDate.toLocaleString()
+        });
+    }
 
     if (!(mii.idStyleBits & 0b111))
-        return ret.trimEnd();
+        return embed;
 
-    ret += "Mii Special Style Bits: ";
+    const styles: string[] = [];
 
     if (mii.idStyleBits & 0b100)
-        ret += "Special (Gold Pants), ";
+        styles.push("Special (Gold Pants)");
 
     if (mii.idStyleBits & 0b010)
-        ret += "Foreign (Blue Pants), ";
+        styles.push("Foreign (Blue Pants)");
 
     if (mii.idStyleBits & 0b001)
-        ret += "Regular (Gray Pants), ";
+        styles.push("Regular (Gray Pants)");
 
-    return ret.substring(0, ret.length - 2);
+    embed.addFields({ name: "Mii Special Style Bits", value: styles.join(", ")});
+
+    return embed;
 }

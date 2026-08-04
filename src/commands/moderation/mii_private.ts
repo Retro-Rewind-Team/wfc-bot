@@ -1,7 +1,7 @@
 import { Command } from "#src/commands/shared/command.js";
-import { CacheType, ChatInputCommandInteraction, EmbedBuilder, MessageFlags, SlashCommandBuilder } from "discord.js";
-import { formatMiiData, getMiiBuf, processMiiBuf } from "#src/commands/shared/mii.js";
-import { getMiiImageURL, pidToFc, resolveModRestrictPermission, resolvePidFromString, validateID } from "#src/utils.js";
+import { CacheType, ChatInputCommandInteraction, MessageFlags, SlashCommandBuilder } from "discord.js";
+import { createMiiEmbed, getMiiBuf, processMiiBuf } from "#src/commands/shared/mii.js";
+import { pidToFc, resolveModRestrictPermission, resolvePidFromString, validateID } from "#src/utils.js";
 import { PermissionBit } from "#src/commands/shared/roles.js";
 
 export const command: Command = {
@@ -39,10 +39,7 @@ export const command: Command = {
         const mii = processMiiBuf(null, miiBuf);
 
         await interaction.reply({
-            content: formatMiiData(mii),
-            embeds: [
-                new EmbedBuilder().setImage(getMiiImageURL(fc)),
-            ],
+            embeds: [createMiiEmbed(mii, fc)],
             files: [{
                 name: `${fc}.mii`,
                 attachment: miiBuf,
