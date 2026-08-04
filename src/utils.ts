@@ -353,6 +353,7 @@ export function createUserEmbed(
 
     embed.addFields(
         { name: "Profile ID", value: `${user.ProfileId}` },
+        { name: "Friend Code", value: fc },
         { name: "Mii Name", value: miiName },
     );
 
