@@ -19,7 +19,7 @@ export default {
                 .setDescription("friend code or pid to kick")
                 .setRequired(true))),
 
-    exec: async function(interaction: ChatInputCommandInteraction<CacheType>) {
+    exec: async function(interaction: ChatInputCommandInteraction<CacheType>): Promise<void> {
         const discordID = interaction.member?.user.id;
 
         if (!discordID) {
