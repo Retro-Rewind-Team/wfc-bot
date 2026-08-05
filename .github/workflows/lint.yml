@@ -15,5 +15,12 @@ jobs:
       - uses: actions/setup-node@v7
         with:
           node-version: 26
+      - name: Cache npm dependencies
+        uses: actions/cache@v6
+        with:
+          path: '~/.npm'
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
       - run: npm ci
       - run: npx eslint
