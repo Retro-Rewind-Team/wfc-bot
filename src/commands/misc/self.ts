@@ -1,12 +1,14 @@
 import { CacheType, ChatInputCommandInteraction, SlashCommandBuilder } from "discord.js";
 import { getChannels, getConfig } from "#src/config.js";
 import { makeWFCRequest, pidToFc, resolvePidFromString, sendEmbedLog, validateID } from "#src/utils.js";
+import { PermissionBit } from "#src/commands/shared/roles.js";
+import { Command } from "#src/commands/shared/command.js";
 
 const config = getConfig();
 
-export default {
-    modOnly: false,
-    adminOnly: false,
+export const command: Command = {
+    permissions: PermissionBit.NONE,
+    featureFlags: [ "selfCommand" ],
 
     data: new SlashCommandBuilder()
         .setName("self")
@@ -20,61 +22,82 @@ export default {
                 .setRequired(true))),
 
     exec: async function(interaction: ChatInputCommandInteraction<CacheType>): Promise<void> {
-        const discordID = interaction.member?.user.id;
-
-        if (!discordID) {
-            await interaction.reply({ content: "Failed to determine interaction user" });
-            return;
-        }
-
         const subcommand = interaction.options.getSubcommand(true);
 
-        let pid = 0;
-        if (subcommand == "froom_kick") {
-            let id = interaction.options.getString("id", true);
-            id = id.trim();
-
-            const [valid, err] = validateID(id);
-            if (!valid) {
-                await interaction.reply({ content: `Error kicking friend code or pid "${id}": ${err}` });
-                return;
-            }
-
-            pid = resolvePidFromString(id);
-        }
-
-        const [success, res] = await makeWFCRequest("/api/self", "POST", {
-            secret: config.wfcSecret,
-            discordID: discordID,
-            command: subcommand,
-            pid: pid,
-        });
-
-        if (success) {
-            await sendEmbedLog(
-                interaction,
-                res.User,
-                {
-                    action: subcommand == "froom-kick" ? "froom-kick" : "self-kick",
-                    hideMii: false,
-                    noPublicEmbed: false,
-                    showBanInfo: false,
-                    verbose: false,
-                    pubChannel: getChannels().publicSelfLogs,
-                }
-            );
-        }
-        else {
-            if (subcommand == "kick") {
-                await interaction.reply({
-                    content: `Failed to self-kick": error ${res.Error ?? "no error message provided"}`
-                });
-            }
-            else {
-                await interaction.reply({
-                    content: `Failed to kick friend code "${pidToFc(pid)}": error ${res.Error ?? "no error message provided"}`
-                });
-            }
+        switch (subcommand) {
+        case "froom_kick":
+            await froomKick(interaction);
+            break;
+        case "kick":
+            await selfKick(interaction);
+            break;
         }
     }
 };
+
+async function froomKick(interaction: ChatInputCommandInteraction<CacheType>): Promise<void> {
+    const discordID = interaction.user.id;
+
+    let id = interaction.options.getString("id", true);
+    id = id.trim();
+
+    const [valid, err] = validateID(id);
+    if (!valid) {
+        await interaction.reply({ content: `Error kicking friend code or pid "${id}": ${err}` });
+        return;
+    }
+
+    const pid = resolvePidFromString(id);
+    await interaction.deferReply();
+
+    const [success, res] = await makeWFCRequest("/api/self", "POST", {
+        secret: config.wfcSecret,
+        discordID: discordID,
+        command: "froom_kick",
+        pid: pid,
+    });
+
+    if (!success) {
+        await interaction.editReply({
+            content: `Failed to kick friend code "${pidToFc(pid)}": error ${res.Error ?? "no error message provided"}`
+        });
+        return;
+    }
+
+    await sendEmbedLog(
+        interaction,
+        res.User,
+        {
+            action: "froom-kick",
+            pubChannel: getChannels().publicSelfLogs,
+        }
+    );
+}
+
+async function selfKick(interaction: ChatInputCommandInteraction<CacheType>): Promise<void> {
+    const discordID = interaction.user.id;
+
+    await interaction.deferReply();
+
+    const [success, res] = await makeWFCRequest("/api/self", "POST", {
+        secret: config.wfcSecret,
+        discordID: discordID,
+        command: "kick",
+    });
+
+    if (!success) {
+        await interaction.editReply({
+            content: `Failed to self-kick: error ${res.Error ?? "no error message provided"}`
+        });
+        return;
+    }
+
+    await sendEmbedLog(
+        interaction,
+        res.User,
+        {
+            action: "self-kick",
+            pubChannel: getChannels().publicSelfLogs,
+        }
+    );
+}
