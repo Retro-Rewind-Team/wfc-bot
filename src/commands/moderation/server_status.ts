@@ -1,7 +1,7 @@
 import { Command } from "#src/commands/shared/command.js";
 import { CacheType, ChatInputCommandInteraction, PermissionFlagsBits, SlashCommandBuilder } from "discord.js";
 import { getChannels, getConfig } from "#src/config.js";
-import { getStatusColorEmoji, getStatusText, StatusColor } from "#src/commands/shared/server_status.js";
+import { getStatusColorEmoji, getStatusText, replaceGlyphsForDiscord, StatusColor } from "#src/commands/shared/server_status.js";
 import { loadState, State } from "#src/state.js";
 import { makeWFCRequest } from "#src/utils.js";
 import { PermissionBit } from "#src/commands/shared/roles.js";
@@ -44,8 +44,11 @@ export const command: Command = {
         const [success, res] = await makeWFCRequest("/motd", "POST", { secret: config.wfcSecret, motd: motd});
         if (!success)
             await interaction.followUp({ content: `Failed to set message of the day, error: ${res.Error ?? "no error message provided"}` });
-        else
-            await interaction.followUp({ content: `Set message of the day to:\n${motd}` });
+        else {
+            await interaction.followUp({
+                content: `Set message of the day to:\n${replaceGlyphsForDiscord(motd)}`
+            });
+        }
 
         let channelEditSuccess = false;
 

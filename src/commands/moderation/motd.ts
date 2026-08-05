@@ -3,7 +3,7 @@ import { CacheType, ChatInputCommandInteraction, PermissionFlagsBits, SlashComma
 import { getConfig } from "#src/config.js";
 import { makeWFCRequest } from "#src/utils.js";
 import { loadState, State } from "#src/state.js";
-import { getStatusText } from "#src/commands/shared/server_status.js";
+import { getStatusText, replaceGlyphsForDiscord } from "#src/commands/shared/server_status.js";
 import { PermissionBit } from "#src/commands/shared/roles.js";
 
 const config = getConfig();
@@ -36,7 +36,10 @@ export const command: Command = {
                 return;
             }
 
-            await interaction.reply({ content: `Set message of the day to:\n${realMotd}` });
+            await interaction.reply({
+                content: `Set message of the day to:\n${replaceGlyphsForDiscord(realMotd) }`
+            });
+
             // Serialize the original motd
             state.motd = motd;
             await state.save();
@@ -44,8 +47,11 @@ export const command: Command = {
         else {
             const [success, res] = await makeWFCRequest("/motd", "GET");
 
-            if (success)
-                await interaction.reply({ content: `Current message of the day is:\n${res.Motd}` });
+            if (success) {
+                await interaction.reply({
+                    content: `Current message of the day is:\n${replaceGlyphsForDiscord(res.Motd)}`
+                });
+            }
             else
                 await interaction.reply({ content: `Failed to fetch current message of the day, error: ${res.Error ?? "no error message provided"}` });
         }

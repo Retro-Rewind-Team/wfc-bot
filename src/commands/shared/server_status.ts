@@ -9,29 +9,34 @@ export interface Status {
     message: string,
 }
 
+interface Glyph {
+    game: string;
+    motd: string;
+    emoji: string;
+}
+
+const glyphs: Record<StatusColor, Glyph> = {
+    [StatusColor.RED]: { game: "\uE009", motd: ">:(", emoji:   "🔴" },
+    [StatusColor.YELLOW]: { game: "\uE00A", motd: ":(", emoji: "🟡" },
+    [StatusColor.GREEN]: { game: "\uE008", motd: ":)", emoji:  "🟢" }
+};
+
 export function getStatusColorEmoji(statusColor: StatusColor): string {
-    switch (statusColor) {
-    case StatusColor.RED:
-        return "🔴";
-    case StatusColor.YELLOW:
-        return "🟡";
-    case StatusColor.GREEN:
-        return "🟢";
-    }
+    return glyphs[statusColor].emoji;
 }
 
 // Maps to ingame glyphs
 export function getStatusColorGlyph(statusColor: StatusColor): string {
-    switch (statusColor) {
-    case StatusColor.RED:
-        return "\uE009"; // Angry
-    case StatusColor.YELLOW:
-        return "\uE00A"; // Sad
-    case StatusColor.GREEN:
-        return "\uE008"; // Smiley
-    }
+    return glyphs[statusColor].game;
 }
 
 export function getStatusText(status: Status): string {
     return `Server Status: ${getStatusColorGlyph(status.color)} - ${status.message}`;
+}
+
+export function replaceGlyphsForDiscord(motd: string): string {
+    for (const glyph of Object.values(glyphs))
+        motd = motd.replace(glyph.game, glyph.motd);
+
+    return motd;
 }
