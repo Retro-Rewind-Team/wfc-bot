@@ -20,17 +20,18 @@ export function getStatusColorEmoji(statusColor: StatusColor): string {
     }
 }
 
-export function getStatusColorText(statusColor: StatusColor): string {
+// Maps to ingame glyphs
+export function getStatusColorGlyph(statusColor: StatusColor): string {
     switch (statusColor) {
     case StatusColor.RED:
-        return "OFFLINE";
+        return "\uE009"; // Angry
     case StatusColor.YELLOW:
-        return "POOR";
+        return "\uE00A"; // Sad
     case StatusColor.GREEN:
-        return "GOOD";
+        return "\uE008"; // Smiley
     }
 }
 
 export function getStatusText(status: Status): string {
-    return `Server Status: ${getStatusColorText(status.color)} - ${status.message}`;
+    return `Server Status: ${getStatusColorGlyph(status.color)} - ${status.message}`;
 }
