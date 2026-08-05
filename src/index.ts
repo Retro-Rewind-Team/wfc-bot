@@ -6,7 +6,7 @@ import * as path from "path";
 import { Command, SharedInitializer } from "#src/commands/shared/command.js";
 import { isAllowedInteraction, PermissionBit as PermissionBit } from "#src/commands/shared/roles.js";
 import { shouldEnable } from "#src/feature_flags.js";
-import { Service } from "#src/services/service.js";
+import { Service } from "#src/services/servic.js";
 
 // https://stackoverflow.com/questions/43834559/how-to-find-which-promises-are-unhandled-in-node-js-unhandledpromiserejectionwar
 // Better logging of unhandled promises
@@ -44,7 +44,7 @@ for (let i = 2; i < process.argv.length; i++) {
     }
 }
 
-await initConfig(configPath.length > 0 ? configPath : path.join(process.cwd(), "config.json"));
+initConfig(configPath.length > 0 ? configPath : path.join(process.cwd(), "config.json"));
 const config = getConfig();
 
 function findCommandFiles(root: string): string[] {
