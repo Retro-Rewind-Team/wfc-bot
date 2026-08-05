@@ -1,9 +1,8 @@
 rm -rf build
 
 echo "Building"
-if ! tsc; then
-    exit $?
-fi
+
+tsc || exit "$?"
 
 echo "Transforming imports"
 
