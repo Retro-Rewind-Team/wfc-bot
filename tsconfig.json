@@ -1,6 +1,7 @@
 {
   "compilerOptions": {
     "rootDir": "./",
+    "baseUrl": "./",
     "target": "ES2020",
     "useDefineForClassFields": true,
     "module": "nodenext",
@@ -17,5 +18,11 @@
   },
   "include": [
     "./src/**/*.ts"
-  ]
+  ],
+  "paths": {
+    "#src/*": [
+      "./src/",
+      "./src/*"
+    ]
+  }
 }
