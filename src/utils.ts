@@ -451,10 +451,6 @@ export function createUserEmbed(
             );
         }
 
-        console.log(user.Csnum);
-        console.log(user.NgDeviceId);
-        console.log(user.LastIPAddress);
-
         const csnums = !user.Csnum
             ? "Null"
             : user.Csnum.length == 0
