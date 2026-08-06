@@ -88,6 +88,8 @@ async function froomKick(interaction: ChatInputCommandInteraction<CacheType>): P
         res.User,
         {
             action: "froom-kick",
+            showMember: true,
+            nonModerator: true,
             pubChannel: getChannels().publicSelfLogs,
         }
     );
@@ -116,6 +118,8 @@ async function selfKick(interaction: ChatInputCommandInteraction<CacheType>): Pr
         res.User,
         {
             action: "self-kick",
+            showMember: true,
+            nonModerator: true,
             pubChannel: getChannels().publicSelfLogs,
         }
     );

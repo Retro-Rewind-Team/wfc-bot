@@ -162,6 +162,10 @@ export interface SendEmbedLogOpts {
     noPublicEmbed?: boolean;
     verbose?: boolean;
     showBanInfo?: boolean;
+    // Show who sent the command publically
+    showMember?: boolean,
+    // Action was not performed by a moderator
+    nonModerator?: boolean
     pubChannel?: TextChannel;
 }
 
@@ -171,15 +175,18 @@ export async function sendEmbedLog(
     opts: SendEmbedLogOpts,
 ): Promise<void> {
     const fc = pidToFc(user.ProfileId);
-    const member = interaction.member as GuildMember | null;
+    const member = interaction.member as GuildMember ?? interaction.user;
 
     const privEmbed = new EmbedBuilder()
         .setColor(getColor())
-        .setTitle(`${capitalize(opts.action)} performed by ${member?.displayName ?? "Unknown"}`)
+        .setTitle(`${capitalize(opts.action)} performed by ${member.displayName}`)
         .setTimestamp()
         .addFields(
             { name: "Server", value: interaction.guild?.name ?? "Unknown"},
-            { name: "Moderator", value: `<@${interaction.user.id}>` },
+            {
+                name: opts.nonModerator ? "User" : "Moderator",
+                value: `<@${interaction.user.id}>`
+            },
         );
 
     if (opts.extraFields)
@@ -194,15 +201,37 @@ export async function sendEmbedLog(
     });
 
     await getChannels().logs.send({ embeds: [privEmbed] });
-    await interaction.reply({ content: `Successful ${opts.action} performed on friend code "${fc}"` });
+
+    const content = `Successful ${opts.action} performed on friend code "${fc}"`;
+    if (interaction.deferred)
+        await interaction.editReply(content);
+    else if (interaction.replied)
+        await interaction.followUp(content);
+    else
+        await interaction.reply(content);
 
     if (opts.noPublicEmbed)
         return;
 
+    let title = `${capitalize(opts.action)} performed by `;
+    if (opts.showMember)
+        title += member.displayName;
+    else if (opts.nonModerator)
+        title += "user";
+    else
+        title += "moderator";
+
     const pubEmbed = new EmbedBuilder()
         .setColor(getColor())
-        .setTitle(`${capitalize(opts.action)} performed by moderator`)
+        .setTitle(title)
         .setTimestamp();
+
+    if (opts.showMember) {
+        pubEmbed.addFields({
+            name: opts.nonModerator ? "User" : "Moderator",
+            value: `<@${interaction.user.id}>`
+        });
+    }
 
     if (opts.extraFields) {
         const filtered = opts.extraFields.filter((opt) => !opt["hidden"]);
