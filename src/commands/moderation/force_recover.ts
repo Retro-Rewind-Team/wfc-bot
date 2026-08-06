@@ -1,16 +1,17 @@
+import { Command } from "#src/commands/shared/command.js";
+import { recover } from "#src/commands/shared/recover.js";
+import { PermissionBit } from "#src/commands/shared/roles.js";
+import { resolveModRestrictPermission } from "#src/utils.js";
 import { CacheType, ChatInputCommandInteraction, SlashCommandBuilder } from "discord.js";
-import { resolveModRestrictPermission } from "../../utils.js";
-import { executeRecover } from "../shared/recover_command.js";
-import { PermissionBit } from "../shared/roles.js";
 
-export default {
+export const command: Command = {
     permissions: PermissionBit.PROFILE_MODERATOR,
 
     data: new SlashCommandBuilder()
         .setName("force_recover")
         .setDescription("Recover any friend code on an rksys.dat save")
         .addAttachmentOption(option => option
-            .setName("file")
+            .setName("rksys")
             .setDescription("The rksys.dat save to modify")
             .setRequired(true))
         .addIntegerOption(option => option
@@ -26,6 +27,6 @@ export default {
         .setDefaultMemberPermissions(resolveModRestrictPermission()),
 
     exec: async function(interaction: ChatInputCommandInteraction<CacheType>): Promise<void> {
-        await executeRecover(interaction, false);
+        await recover(interaction, false);
     },
 };

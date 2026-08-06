@@ -11,24 +11,24 @@ const DWC_AUTHENTIC_PLAYER_ID_OFFSET = 0x18;
 const DWC_PROFILE_ID_OFFSET = 0x1C;
 const RADIX32_ALPHABET = "0123456789abcdefghijklmnopqrstuv";
 
-export function decodeDwcPlayerId(gsbrCode: string): number {
+export function decodeDWCPlayerID(gsbrCode: string): [number, string | null] {
     const code = gsbrCode.trim().toLowerCase();
     if (!code.startsWith("rmcj") || code.length <= 4 || code.length > 11)
-        throw new Error("gsbr code does not contain an MKW DWC Player ID");
+        return [0, "gsbr code does not contain an MKW DWC Player ID"];
 
-    let playerId = 0;
+    let playerID = 0;
     for (const character of code.slice(4)) {
         const digit = RADIX32_ALPHABET.indexOf(character);
         if (digit < 0)
-            throw new Error("gsbr code contains an invalid DWC Player ID");
+            return [0, "gsbr code contains an invalid DWC Player ID"];
 
-        playerId = playerId * 32 + digit;
+        playerID = playerID * 32 + digit;
     }
 
-    if (playerId <= 0 || playerId > 0xFFFFFFFF)
-        throw new Error("gsbr code contains an invalid DWC Player ID");
+    if (playerID <= 0 || playerID > 0xFFFFFFFF)
+        return [0, "gsbr code contains an invalid DWC Player ID"];
 
-    return playerId;
+    return [playerID, null];
 }
 
 function crc32(buffer: Buffer, start: number, end: number): number {
@@ -44,7 +44,7 @@ function crc32(buffer: Buffer, start: number, end: number): number {
     return (crc ^ 0xFFFFFFFF) >>> 0;
 }
 
-function dwcCrc32(buffer: Buffer, base: number): number {
+function dwcCalcCRC32(buffer: Buffer, base: number): number {
     const reversed = Buffer.alloc(DWC_DATA_LENGTH);
 
     for (let offset = 0; offset < DWC_DATA_LENGTH; offset += 4) {
@@ -78,24 +78,26 @@ function hasMagic(buffer: Buffer, offset: number, magic: string): boolean {
     return buffer.subarray(offset, offset + magic.length).toString("ascii") == magic;
 }
 
-function validateRksys(buffer: Buffer, license: number): void {
+function validateRksys(buffer: Buffer, license: number): string | null {
     if (buffer.length != RKSYS_SIZE)
-        throw new Error(`Invalid rksys.dat size: got ${buffer.length} bytes, expected ${RKSYS_SIZE}.`);
+        return `Invalid rksys.dat size: got ${buffer.length} bytes, expected ${RKSYS_SIZE}.`;
 
     if (!hasMagic(buffer, 0, "RKSD"))
-        throw new Error("Invalid rksys.dat magic; expected RKSD.");
+        return "Invalid rksys.dat magic; expected RKSD.";
 
     if (buffer.subarray(4, 8).toString("ascii") != "0006")
-        throw new Error("Unsupported rksys.dat version; expected save version 0006.");
+        return "Unsupported rksys.dat version; expected save version 0006.";
 
     if (license < 1 || license > 4)
-        throw new Error("License number must be between 1 and 4.");
+        return "License number must be between 1 and 4.";
 
     if (!hasMagic(buffer, licenseBase(license), "RKPD"))
-        throw new Error(`License ${license} does not contain a valid RKPD block.`);
+        return `License ${license} does not contain a valid RKPD block.`;
+
+    return null;
 }
 
-function findDwcTemplate(buffer: Buffer, targetLicense: number): number | null {
+function findDWCTemplate(buffer: Buffer, targetLicense: number): number | null {
     const target = dwcBase(targetLicense);
     if (!isZeroRange(buffer, target, DWC_DATA_LENGTH))
         return target;
@@ -110,18 +112,18 @@ function findDwcTemplate(buffer: Buffer, targetLicense: number): number | null {
     return null;
 }
 
-export function recoverRksys(input: Buffer, license: number, profileId: number, dwcPlayerId: number): Buffer {
+export function recoverRksys(input: Buffer, license: number, profileID: number, dwcPlayerID: number): Buffer {
     validateRksys(input, license);
 
-    if (!Number.isInteger(profileId) || profileId <= 0 || profileId > 0xFFFFFFFF)
+    if (!Number.isInteger(profileID) || profileID <= 0 || profileID > 0xFFFFFFFF)
         throw new Error("Profile ID must be a non-zero unsigned 32-bit integer.");
 
-    if (!Number.isInteger(dwcPlayerId) || dwcPlayerId <= 0 || dwcPlayerId > 0xFFFFFFFF)
+    if (!Number.isInteger(dwcPlayerID) || dwcPlayerID <= 0 || dwcPlayerID > 0xFFFFFFFF)
         throw new Error("DWC Player ID must be a non-zero unsigned 32-bit integer.");
 
     const output = Buffer.from(input);
     const target = dwcBase(license);
-    const template = findDwcTemplate(output, license);
+    const template = findDWCTemplate(output, license);
 
     if (template == null) {
         throw new Error(
@@ -134,10 +136,10 @@ export function recoverRksys(input: Buffer, license: number, profileId: number, 
         output.copy(output, target, template, template + DWC_LENGTH);
 
     output.writeUInt32BE(DWC_LENGTH, target);
-    output.writeUInt32BE(dwcPlayerId >>> 0, target + DWC_PSEUDO_PLAYER_ID_OFFSET);
-    output.writeUInt32BE(dwcPlayerId >>> 0, target + DWC_AUTHENTIC_PLAYER_ID_OFFSET);
-    output.writeUInt32BE(profileId >>> 0, target + DWC_PROFILE_ID_OFFSET);
-    output.writeUInt32BE(dwcCrc32(output, target), target + DWC_DATA_LENGTH);
+    output.writeUInt32BE(dwcPlayerID >>> 0, target + DWC_PSEUDO_PLAYER_ID_OFFSET);
+    output.writeUInt32BE(dwcPlayerID >>> 0, target + DWC_AUTHENTIC_PLAYER_ID_OFFSET);
+    output.writeUInt32BE(profileID >>> 0, target + DWC_PROFILE_ID_OFFSET);
+    output.writeUInt32BE(dwcCalcCRC32(output, target), target + DWC_DATA_LENGTH);
     output.writeUInt32BE(crc32(output, 0, GLOBAL_CRC_OFFSET), GLOBAL_CRC_OFFSET);
 
     return output;

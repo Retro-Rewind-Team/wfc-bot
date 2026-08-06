@@ -3,6 +3,7 @@ import { getChannels, getConfig } from "#src/config.js";
 import { makeWFCRequest, pidToFc, resolvePidFromString, sendEmbedLog, validateID } from "#src/utils.js";
 import { PermissionBit } from "#src/commands/shared/roles.js";
 import { Command } from "#src/commands/shared/command.js";
+import { recover } from "#src/commands/shared/recover.js";
 
 const config = getConfig();
 
@@ -19,6 +20,22 @@ export const command: Command = {
             .setDescription("Kick someone from a froom you host")
             .addStringOption(option => option.setName("id")
                 .setDescription("friend code or pid to kick")
+                .setRequired(true)))
+        .addSubcommand(subcommand => subcommand.setName("recover")
+            .setDescription("Recover your linked friend code on an rksys.dat save")
+            .addAttachmentOption(option => option
+                .setName("rksys")
+                .setDescription("The rksys.dat save to modify")
+                .setRequired(true))
+            .addIntegerOption(option => option
+                .setName("license")
+                .setDescription("The license to replace (1-4)")
+                .setMinValue(1)
+                .setMaxValue(4)
+                .setRequired(true))
+            .addStringOption(option => option
+                .setName("id")
+                .setDescription("Your linked friend code or profile ID")
                 .setRequired(true))),
 
     exec: async function(interaction: ChatInputCommandInteraction<CacheType>): Promise<void> {
@@ -30,6 +47,9 @@ export const command: Command = {
             break;
         case "kick":
             await selfKick(interaction);
+            break;
+        case "recover":
+            await recover(interaction, true);
             break;
         }
     }
