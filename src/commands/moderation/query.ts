@@ -102,7 +102,10 @@ export const command: Command = {
 
         const embeds: EmbedBuilder[] = [];
         // mini-mods don't get to see pii here.
-        const showPII = hasPermissionBits(PermissionBit.MODERATOR, interaction.user.id);
+        const showPII = hasPermissionBits(
+            PermissionBit.SUPER_ADMIN | PermissionBit.ADMIN | PermissionBit.MODERATOR,
+            interaction.user.id,
+        );
 
         for (let i = 0; i < res.Users.length; i++) {
             const user = res.Users[i];

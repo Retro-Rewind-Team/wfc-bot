@@ -32,12 +32,12 @@ export function isAllowedInteraction(
     return [false, `Command requires one of: ${required.join(", ")}.\nUser has: ${has.join(", ")}.`];
 }
 
-// Check if a user has the required permission bits
+// Check if a user has any of the required permission bits
 export function hasPermissionBits(requiredBits: number, user: string): boolean {
     const config = getConfig();
     const userPermissions = config.userPermissions[user] ?? 0;
 
-    return (userPermissions & requiredBits) == requiredBits;
+    return !!(userPermissions & requiredBits);
 }
 
 export function permissionBitsToList(permissionBits: number): string[] {
