@@ -7,6 +7,7 @@
   "scripts": {
     "start": "node build/src/index.js",
     "build": "bash -c './scripts/build.sh'",
+    "lint": "eslint",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "ppeb",
