@@ -6,14 +6,14 @@ import * as utils from "#src/utils.js";
 const config = getConfig();
 
 interface Stat {
-    online: number,
-    active: number,
-    groups: number,
+    online: number;
+    active: number;
+    groups: number;
 }
 
 interface Stats {
-    global: Stat,
-    mariokartwii: Stat,
+    global: Stat;
+    mariokartwii: Stat;
 }
 
 let stats: Stats | null = null;
@@ -40,7 +40,7 @@ async function fetchStats(): Promise<void> {
             name: "Stats",
             type: 4,
             state: presenceText,
-        }]
+        }],
     });
 
     if (config.logServices)

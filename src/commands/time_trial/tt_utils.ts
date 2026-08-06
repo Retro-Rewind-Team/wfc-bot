@@ -43,7 +43,7 @@ export async function fetchTracks(): Promise<Track[]> {
     const leaderboardUrl = `http://${config.leaderboardServer}:${config.leaderboardPort}`;
     const response = await fetch(`${leaderboardUrl}/api/timetrial/tracks`, {
         method: "GET",
-        headers: { "Authorization": `Bearer ${config.wfcSecret}` }
+        headers: { "Authorization": `Bearer ${config.wfcSecret}` },
     });
 
     if (response.ok) {
@@ -62,7 +62,7 @@ export async function fetchProfiles(): Promise<TTProfile[]> {
     const leaderboardUrl = `http://${config.leaderboardServer}:${config.leaderboardPort}`;
     const response = await fetch(`${leaderboardUrl}/api/moderation/timetrial/profiles`, {
         method: "GET",
-        headers: { "Authorization": `Bearer ${config.wfcSecret}` }
+        headers: { "Authorization": `Bearer ${config.wfcSecret}` },
     });
 
     if (response.ok) {
@@ -79,7 +79,7 @@ export async function fetchCountries(): Promise<Country[]> {
     const leaderboardUrl = `http://${config.leaderboardServer}:${config.leaderboardPort}`;
     const response = await fetch(`${leaderboardUrl}/api/moderation/countries`, {
         method: "GET",
-        headers: { "Authorization": `Bearer ${config.wfcSecret}` }
+        headers: { "Authorization": `Bearer ${config.wfcSecret}` },
     });
 
     if (response.ok) {
@@ -101,7 +101,7 @@ export async function handleTrackAutocomplete(interaction: AutocompleteInteracti
         .slice(0, 25)
         .map(track => ({
             name: track.name,
-            value: track.id.toString()
+            value: track.id.toString(),
         }));
 
     await interaction.respond(filtered);
@@ -116,7 +116,7 @@ export async function handleProfileAutocomplete(interaction: AutocompleteInterac
         .slice(0, 25)
         .map(profile => ({
             name: `${profile.displayName} (${profile.totalSubmissions} submissions, ${profile.currentWorldRecords} WRs)`,
-            value: profile.id.toString()
+            value: profile.id.toString(),
         }));
 
     await interaction.respond(filtered);
@@ -129,12 +129,12 @@ export async function handleCountryAutocomplete(interaction: AutocompleteInterac
     const filtered = countries
         .filter(country =>
             country.name.toLowerCase().includes(focusedValue) ||
-            country.alpha2.toLowerCase().includes(focusedValue)
+            country.alpha2.toLowerCase().includes(focusedValue),
         )
         .slice(0, 25)
         .map(country => ({
             name: `${country.name} (${country.alpha2})`,
-            value: country.numericCode.toString()
+            value: country.numericCode.toString(),
         }));
 
     await interaction.respond(filtered);

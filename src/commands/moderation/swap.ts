@@ -59,14 +59,14 @@ export const command: Command = {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
-                    "Authorization": `Bearer ${config.wfcSecret}`
+                    "Authorization": `Bearer ${config.wfcSecret}`,
                 },
                 body: JSON.stringify({
                     sourcePid: sourcePid.toString(),
                     targetPid: targetPid.toString(),
                     moderator: moderator,
-                    reason: reason
-                })
+                    reason: reason,
+                }),
             });
 
             if (leaderboardResponse.ok) {
@@ -87,7 +87,7 @@ export const command: Command = {
 
                 await getChannels().logs.send({ embeds: [embed] });
                 await interaction.reply({
-                    content: `Successfully swapped stats between "${sourceFc}" and "${targetFc}".`
+                    content: `Successfully swapped stats between "${sourceFc}" and "${targetFc}".`,
                 });
                 console.log(`Successfully swapped stats between ${sourcePid} and ${targetPid} for reason: ${reason}`);
             }
@@ -97,15 +97,15 @@ export const command: Command = {
                 console.error(`Error details: ${errorText}`);
 
                 await interaction.reply({
-                    content: `Failed to swap "${sourceFc}" and "${targetFc}": error ${leaderboardResponse.status}`
+                    content: `Failed to swap "${sourceFc}" and "${targetFc}": error ${leaderboardResponse.status}`,
                 });
             }
         }
         catch (error) {
             console.error(`Error calling leaderboard API for swap ${sourcePid} <-> ${targetPid}:`, error);
             await interaction.reply({
-                content: `Failed to swap "${sourceFc}" and "${targetFc}": network error`
+                content: `Failed to swap "${sourceFc}" and "${targetFc}": network error`,
             });
         }
-    }
+    },
 };

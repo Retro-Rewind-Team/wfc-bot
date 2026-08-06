@@ -35,8 +35,8 @@ export const command: Command = {
             await interaction.editReply({ embeds: [embed] });
         else {
             await interaction.editReply({
-                content: `Failed to retrieve stats for friend code "${fc}": ${statsErr}`
+                content: `Failed to retrieve stats for friend code "${fc}": ${statsErr}`,
             });
         }
-    }
+    },
 };

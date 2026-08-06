@@ -51,7 +51,7 @@ export const command: Command = {
             .setRequired(false)
             .addChoices(
                 { name: "150cc", value: 150 },
-                { name: "200cc", value: 200 }
+                { name: "200cc", value: 200 },
             ))
         .addIntegerOption(option => option
             .setName("drift_category")
@@ -59,7 +59,7 @@ export const command: Command = {
             .setRequired(false)
             .addChoices(
                 { name: "Outside", value: 0 },
-                { name: "Inside", value: 1 }
+                { name: "Inside", value: 1 },
             ))
         .addBooleanOption(option => option
             .setName("glitch")
@@ -120,7 +120,7 @@ export const command: Command = {
         const leaderboardUrl = `http://${config.leaderboardServer}:${config.leaderboardPort}`;
         const response = await fetch(`${leaderboardUrl}/api/moderation/timetrial/submissions/search?${params.toString()}`, {
             method: "GET",
-            headers: { "Authorization": `Bearer ${config.wfcSecret}` }
+            headers: { "Authorization": `Bearer ${config.wfcSecret}` },
         });
 
         if (response.ok) {
@@ -156,7 +156,7 @@ export const command: Command = {
                 embed.addFields({
                     name: `${sub.trackName} - ${sub.finishTimeDisplay}`,
                     value: `**ID:** \`${sub.id}\` | ${countryFlag} ${sub.playerName}\n${badges} | **Date Set:** ${timestamp}`,
-                    inline: false
+                    inline: false,
                 });
             });
 
@@ -165,8 +165,8 @@ export const command: Command = {
         else {
             const errorData = await response.json() as ErrorResponse;
             await interaction.editReply({
-                content: `Failed to search submissions: ${errorData.message || response.statusText}`
+                content: `Failed to search submissions: ${errorData.message || response.statusText}`,
             });
         }
-    }
+    },
 };

@@ -58,7 +58,7 @@ export const command: Command = {
             .setRequired(true)
             .addChoices(
                 { name: "150cc", value: 150 },
-                { name: "200cc", value: 200 }
+                { name: "200cc", value: 200 },
             ))
         .addBooleanOption(option => option
             .setName("shroomless")
@@ -93,7 +93,7 @@ export const command: Command = {
         if (!ghostFile.name.toLowerCase().endsWith(".rkg")) {
             await interaction.reply({
                 content: "File must be a .rkg file",
-                ephemeral: true
+                ephemeral: true,
             });
             return;
         }
@@ -103,7 +103,7 @@ export const command: Command = {
         const fileResponse = await fetch(ghostFile.url);
         if (!fileResponse.ok) {
             await interaction.editReply({
-                content: `Error fetching ghost file: ${fileResponse.status}`
+                content: `Error fetching ghost file: ${fileResponse.status}`,
             });
             return;
         }
@@ -125,9 +125,9 @@ export const command: Command = {
         const response = await fetch(`${leaderboardUrl}/api/moderation/timetrial/submit`, {
             method: "POST",
             headers: {
-                "Authorization": `Bearer ${config.wfcSecret}`
+                "Authorization": `Bearer ${config.wfcSecret}`,
             },
-            body: formData
+            body: formData,
         });
 
         if (response.ok) {
@@ -160,7 +160,7 @@ export const command: Command = {
                     { name: "Setup", value: `${submission.characterName} + ${submission.vehicleName}`, inline: true },
                     { name: "Controller", value: submission.controllerName, inline: true },
                     { name: "Drift Type", value: driftTypeWithCategory, inline: true },
-                    { name: "Categories", value: badges, inline: false }
+                    { name: "Categories", value: badges, inline: false },
                 )
                 .setTimestamp()
                 .setFooter({ text: `Submission ID: ${submission.id}` });
@@ -179,8 +179,8 @@ export const command: Command = {
             }
 
             await interaction.editReply({
-                content: `Failed to submit ghost: ${errorMessage}`
+                content: `Failed to submit ghost: ${errorMessage}`,
             });
         }
-    }
+    },
 };

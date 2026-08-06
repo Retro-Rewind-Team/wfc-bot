@@ -9,15 +9,15 @@ const START_DATE = new Date(2006, 0, 1).getTime();
 const config = getConfig();
 
 export interface MiiData {
-    fileName: string | null,
-    name: string,
-    creatorName: string,
-    birthDay: number,
-    birthMonth: number,
-    miiID: number,
-    sysID: number,
-    idStyleBits: number,
-    creationDate: Date,
+    fileName: string | null;
+    name: string;
+    creatorName: string;
+    birthDay: number;
+    birthMonth: number;
+    miiID: number;
+    sysID: number;
+    idStyleBits: number;
+    creationDate: Date;
 }
 
 function readNameFromBuf(buffer: Buffer, offset: number): string {
@@ -72,13 +72,13 @@ export async function getMiiBuf(pidOrFC: string, sanitized: boolean): Promise<[B
     const pid = resolvePidFromString(id);
     const [success, res] = await makeWFCRequest("/mii", "POST", {
         secret: sanitized ? null : config.wfcSecret,
-        pid: pid
+        pid: pid,
     });
 
     if (!success) {
         return [
             null,
-            `Failed to retrieve mii for friend code "${id}": error ${res.Error ?? "no error message provided"}`
+            `Failed to retrieve mii for friend code "${id}": error ${res.Error ?? "no error message provided"}`,
         ];
     }
 
@@ -110,7 +110,7 @@ export function createMiiEmbed(mii: MiiData, fc?: string): EmbedBuilder {
     if (mii.birthMonth != 0 && mii.birthDay != 0) {
         embed.addFields({
             name: "Birth Date",
-            value: `${mii.birthMonth }/${mii.birthDay }`
+            value: `${mii.birthMonth }/${mii.birthDay }`,
         });
     }
 
@@ -123,7 +123,7 @@ export function createMiiEmbed(mii: MiiData, fc?: string): EmbedBuilder {
     if (mii.creationDate.getTime() != START_DATE) {
         embed.addFields({
             name: "Mii Creation Date",
-            value: mii.creationDate.toLocaleString()
+            value: mii.creationDate.toLocaleString(),
         });
     }
 

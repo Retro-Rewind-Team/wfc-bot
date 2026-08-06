@@ -1,4 +1,4 @@
-import { CacheType, ChatInputCommandInteraction, InteractionReplyOptions, MessageFlags, } from "discord.js";
+import { CacheType, ChatInputCommandInteraction, InteractionReplyOptions, MessageFlags } from "discord.js";
 import { createUserEmbed, makeWFCRequest, pidToFc, resolvePidFromString, validateID, WiiLinkUser } from "#src/utils.js";
 import { getConfig } from "#src/config.js";
 
@@ -7,7 +7,7 @@ const config = getConfig();
 async function reply(
     interaction: ChatInputCommandInteraction<CacheType>,
     priv: boolean,
-    options: InteractionReplyOptions
+    options: InteractionReplyOptions,
 ): Promise<void> {
     if (priv) {
         if (typeof options.flags == "number")
@@ -28,7 +28,7 @@ export async function pinfo(interaction: ChatInputCommandInteraction<CacheType>,
         await reply(
             interaction,
             priv,
-            { content: `Error retrieving friend code or pid "${id}": ${idErr}` }
+            { content: `Error retrieving friend code or pid "${id}": ${idErr}` },
         );
         return;
     }
@@ -41,7 +41,7 @@ export async function pinfo(interaction: ChatInputCommandInteraction<CacheType>,
         await reply(
             interaction,
             priv,
-            { content: `Failed to fetch info for friend code "${fc}": error ${err}` }
+            { content: `Failed to fetch info for friend code "${fc}": error ${err}` },
         );
         return;
     }
@@ -55,8 +55,8 @@ export async function pinfo(interaction: ChatInputCommandInteraction<CacheType>,
                 hideMii: false,
                 verbose: true,
                 showBanInfo: true,
-            })
-        ]}
+            }),
+        ]},
     );
 }
 

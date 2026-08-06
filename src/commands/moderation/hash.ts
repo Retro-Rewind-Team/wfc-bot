@@ -18,7 +18,7 @@ async function sendHashResponseEmbed(
     owner: GuildMember | null,
     packID: number,
     version: number,
-    hashResponses: HashResponse[]
+    hashResponses: HashResponse[],
 ): Promise<void> {
     const embed = new EmbedBuilder()
         .setColor(getColor())
@@ -49,10 +49,10 @@ async function sendHashResponseEmbed(
 }
 
 interface HashResponse {
-    hash: string,
-    regionName: string,
-    offset: number,
-    magic: bigint,
+    hash: string;
+    regionName: string;
+    offset: number;
+    magic: bigint;
 }
 
 function regionIdxToName(idx: number): string {
@@ -190,7 +190,7 @@ async function set(interaction: ChatInputCommandInteraction<CacheType>): Promise
 
 async function list(interaction: ChatInputCommandInteraction<CacheType>): Promise<void> {
     const [success, res] = await makeWFCRequest("/get_hash", "POST", {
-        secret: config.wfcSecret
+        secret: config.wfcSecret,
     });
 
     if (!success) {
@@ -332,5 +332,5 @@ export const command: Command = {
             await del(interaction);
             break;
         }
-    }
+    },
 };

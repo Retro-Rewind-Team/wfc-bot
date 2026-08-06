@@ -38,7 +38,7 @@ export const command: Command = {
         const leaderboardUrl = `http://${config.leaderboardServer}:${config.leaderboardPort}`;
         const response = await fetch(`${leaderboardUrl}/api/moderation/timetrial/profile/${profileId}`, {
             method: "DELETE",
-            headers: { "Authorization": `Bearer ${config.wfcSecret}` }
+            headers: { "Authorization": `Bearer ${config.wfcSecret}` },
         });
 
         if (response.ok) {
@@ -55,8 +55,8 @@ export const command: Command = {
         else {
             const errorData = await response.json() as DeleteProfileResponse;
             await interaction.editReply({
-                content: `Failed to delete profile: ${errorData.message || response.statusText}`
+                content: `Failed to delete profile: ${errorData.message || response.statusText}`,
             });
         }
-    }
+    },
 };

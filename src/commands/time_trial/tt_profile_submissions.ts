@@ -62,7 +62,7 @@ export const command: Command = {
         const leaderboardUrl = `http://${config.leaderboardServer}:${config.leaderboardPort}`;
         const response = await fetch(`${leaderboardUrl}/api/moderation/timetrial/submissions/search?ttProfileId=${profileId}&limit=${limit}`, {
             method: "GET",
-            headers: { "Authorization": `Bearer ${config.wfcSecret}` }
+            headers: { "Authorization": `Bearer ${config.wfcSecret}` },
         });
 
         if (response.ok) {
@@ -100,7 +100,7 @@ export const command: Command = {
                 embed.addFields({
                     name: `${sub.trackName} - ${sub.finishTimeDisplay}`,
                     value: `**ID:** \`${sub.id}\` | ${badges}\n**Date Set:** ${timestamp}`,
-                    inline: false
+                    inline: false,
                 });
             });
 
@@ -109,8 +109,8 @@ export const command: Command = {
         else {
             const errorData = await response.json() as ErrorResponse;
             await interaction.editReply({
-                content: `Failed to fetch submissions: ${errorData.message || response.statusText}`
+                content: `Failed to fetch submissions: ${errorData.message || response.statusText}`,
             });
         }
-    }
+    },
 };

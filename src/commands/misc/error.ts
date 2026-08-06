@@ -6,15 +6,15 @@ import { getWiiLinkErrorAddendum, getWiiLinkErrorDef, WiiLinkErrorAddendum } fro
 import { capitalize } from "#src/utils.js";
 
 interface WiimmfiErrorInfo {
-    type: string,
-    name: string,
-    info: string,
+    type: string;
+    name: string;
+    info: string;
 }
 
 interface WiimmfiError {
-    error: number,
-    found: number,
-    infolist: WiimmfiErrorInfo[],
+    error: number;
+    found: number;
+    infolist: WiimmfiErrorInfo[];
 }
 
 type WiimmfiErrorResponse = WiimmfiError[];
@@ -100,7 +100,7 @@ export const command: Command = {
         embed.setFooter({ text: footer });
 
         await interaction.editReply({ embeds: [embed] });
-    }
+    },
 };
 
 enum WiimmfiErrrorStatus {
@@ -165,8 +165,8 @@ async function addWiimmfiError(
 const hrefRegex = /<a\shref="(?<link>.*?)">(?<display>.*?)<\/a>/;
 
 interface HREFMatch {
-    link: string | undefined,
-    display: string | undefined,
+    link: string | undefined;
+    display: string | undefined;
 }
 
 // Replace all href links in wiimmfi info fields with Discord link embeds

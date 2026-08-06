@@ -2,11 +2,15 @@
 
 import eslint from "@eslint/js";
 import tseslint from "typescript-eslint";
+import stylistic from "@stylistic/eslint-plugin";
 
 export default tseslint.config(
     { ignores: [ "./build/**/*.js" ] },
     {
         files: [ "./src/**/*.ts" ],
+        plugins: {
+            "@stylistic": stylistic,
+        },
         extends: [
             eslint.configs.recommended,
             tseslint.configs.recommended,
@@ -44,6 +48,18 @@ export default tseslint.config(
             "no-restricted-imports": ["error", {
                 "patterns": [".*"]
             }],
+            "@stylistic/member-delimiter-style": ["error", {
+                "multiline": {
+                    "delimiter": "semi",
+                    "requireLast": true
+                },
+                "singleline": {
+                    "delimiter": "semi",
+                    "requireLast": false
+                },
+                "multilineDetection": "brackets"
+            }],
+            "@stylistic/comma-dangle": ["error", "always-multiline"]
         },
     }
 );

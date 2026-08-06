@@ -43,7 +43,7 @@ export const command: Command = {
         const leaderboardUrl = `http://${config.leaderboardServer}:${config.leaderboardPort}`;
         const response = await fetch(`${leaderboardUrl}/api/moderation/timetrial/profiles`, {
             method: "GET",
-            headers: { "Authorization": `Bearer ${config.wfcSecret}` }
+            headers: { "Authorization": `Bearer ${config.wfcSecret}` },
         });
 
         if (response.ok) {
@@ -75,7 +75,7 @@ export const command: Command = {
                     embed.addFields({
                         name: `${countryFlag} ${profile.displayName}`,
                         value: `ID: \`${profile.id}\` | Submissions: ${profile.totalSubmissions} | WRs: ${profile.currentWorldRecords}`,
-                        inline: false
+                        inline: false,
                     });
                 });
 
@@ -88,7 +88,7 @@ export const command: Command = {
 
                 const res = await interaction.editReply({
                     embeds: [createEmbed(0)],
-                    components: [row as unknown as APIMessageTopLevelComponent]
+                    components: [row as unknown as APIMessageTopLevelComponent],
                 });
 
                 const message = await res.fetch();
@@ -99,27 +99,27 @@ export const command: Command = {
                     (messageID) => {
                         delete stateByMessageID[messageID];
                     },
-                    handleButton
+                    handleButton,
                 );
 
                 stateByMessageID[message.id] = {
                     profiles: profiles,
                     currentPage: 0,
-                    totalPages: totalPages
+                    totalPages: totalPages,
                 };
             }
             else {
                 await interaction.editReply({
-                    embeds: [createEmbed(0)]
+                    embeds: [createEmbed(0)],
                 });
             }
         }
         else {
             await interaction.editReply({
-                content: `Failed to fetch profiles: ${response.statusText}`
+                content: `Failed to fetch profiles: ${response.statusText}`,
             });
         }
-    }
+    },
 };
 
 async function handleButton(buttonInteraction: ButtonInteraction<CacheType>): Promise<void> {
@@ -153,7 +153,7 @@ async function handleButton(buttonInteraction: ButtonInteraction<CacheType>): Pr
         embed.addFields({
             name: `${countryFlag} ${profile.displayName}`,
             value: `ID: \`${profile.id}\` | Submissions: ${profile.totalSubmissions} | WRs: ${profile.currentWorldRecords}`,
-            inline: false
+            inline: false,
         });
     });
 
@@ -162,12 +162,12 @@ async function handleButton(buttonInteraction: ButtonInteraction<CacheType>): Pr
             getNavigationButtons(
                 buttonInteraction.user.id,
                 state.currentPage,
-                maxPage
-            )
+                maxPage,
+            ),
         );
 
     await buttonInteraction.update({
         embeds: [embed],
-        components: [row as unknown as APIMessageTopLevelComponent]
+        components: [row as unknown as APIMessageTopLevelComponent],
     });
 }

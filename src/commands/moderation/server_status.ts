@@ -46,7 +46,7 @@ export const command: Command = {
             await interaction.followUp({ content: `Failed to set message of the day, error: ${res.Error ?? "no error message provided"}` });
         else {
             await interaction.followUp({
-                content: `Set message of the day to:\n${replaceGlyphsForDiscord(motd)}`
+                content: `Set message of the day to:\n${replaceGlyphsForDiscord(motd)}`,
             });
         }
 
@@ -59,7 +59,7 @@ export const command: Command = {
         setTimeout(async () => {
             if (!channelEditSuccess) {
                 await interaction.followUp({
-                    content: "Failed to update the server status. Try again in a few minutes."
+                    content: "Failed to update the server status. Try again in a few minutes.",
                 });
             }
         }, 5000);
@@ -79,7 +79,7 @@ export const command: Command = {
         await state.save();
 
         await interaction.followUp({
-            content: `Successfully updated the server status to "${channelName}"`
+            content: `Successfully updated the server status to "${channelName}"`,
         });
-    }
+    },
 };

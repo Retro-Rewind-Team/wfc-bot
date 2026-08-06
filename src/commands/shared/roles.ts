@@ -15,7 +15,7 @@ export enum PermissionBit {
 
 export function isAllowedInteraction(
     interaction: ChatInputCommandInteraction<CacheType>,
-    command: Command
+    command: Command,
 ): [boolean, string | null] {
     const config = getConfig();
 
@@ -84,7 +84,7 @@ export function makeRoleCommand(
                     .setDescription(`The user to remove as a(n) ${roleName}`)
                     .setRequired(true)))
             .setDefaultMemberPermissions(
-                PermissionFlagsBits.Administrator
+                PermissionFlagsBits.Administrator,
             ) as SlashCommandBuilder,
         exec: async function(interaction: ChatInputCommandInteraction<CacheType>): Promise<void> {
             const subcommand = interaction.options.getSubcommand();
@@ -100,14 +100,14 @@ export function makeRoleCommand(
                 await removeRole(interaction, roleName, roleBit);
                 break;
             }
-        }
+        },
     };
 }
 
 async function listRole(
     interaction: ChatInputCommandInteraction<CacheType>,
     roleName: string,
-    bit: PermissionBit
+    bit: PermissionBit,
 ): Promise<void> {
     const config = getConfig();
     const uids = Object.keys(config.userPermissions);
@@ -122,14 +122,14 @@ async function listRole(
 
     await interaction.reply({
         content: content,
-        flags: MessageFlags.Ephemeral
+        flags: MessageFlags.Ephemeral,
     });
 }
 
 export async function sendEmbed(
     interaction: ChatInputCommandInteraction<CacheType>,
     action: string,
-    updatedUser: User
+    updatedUser: User,
 ): Promise<void> {
     const channels = getChannels();
     const member = interaction.member as GuildMember | null;
@@ -150,7 +150,7 @@ export async function sendEmbed(
 async function addRole(
     interaction: ChatInputCommandInteraction<CacheType>,
     roleName: string,
-    bit: PermissionBit
+    bit: PermissionBit,
 ): Promise<void> {
     const user = interaction.options.getUser("user", true);
     const config = getConfig();
@@ -171,7 +171,7 @@ async function addRole(
 async function removeRole(
     interaction: ChatInputCommandInteraction<CacheType>,
     roleName: string,
-    bit: PermissionBit
+    bit: PermissionBit,
 ): Promise<void> {
     const user = interaction.options.getUser("user", true);
     const config = getConfig();

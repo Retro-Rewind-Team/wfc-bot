@@ -16,7 +16,7 @@ export const command: Command = {
 
         if (!stats) {
             await interaction.reply({
-                content: "Room data is not populated yet! Please wait a moment. If this keeps happening contact the bot owner."
+                content: "Room data is not populated yet! Please wait a moment. If this keeps happening contact the bot owner.",
             });
             return;
         }
@@ -28,9 +28,9 @@ export const command: Command = {
             .addFields(
                 { name: "Players Online", value: stats.global.online.toString() },
                 { name: "Players Active", value: stats.global.active.toString() },
-                { name: "Rooms Open", value: stats.global.groups.toString() }
+                { name: "Rooms Open", value: stats.global.groups.toString() },
             );
 
         await interaction.reply({ embeds: [embed], flags: MessageFlags.Ephemeral });
-    }
+    },
 };

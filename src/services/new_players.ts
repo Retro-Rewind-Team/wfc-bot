@@ -47,5 +47,5 @@ export const service: Service = {
         setInterval(wrapTryCatch(fetchNewPlayers), 60000);
 
         await wrapTryCatch(fetchNewPlayers)();
-    }
+    },
 };

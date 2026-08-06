@@ -46,7 +46,7 @@ export async function recover(
     const [user, pinfoErr] = await fetchPinfo(pid, true);
     if (pinfoErr) {
         await interaction.editReply({
-            content: `Unable to fetch info for fc ${fc}: error ${pinfoErr}`
+            content: `Unable to fetch info for fc ${fc}: error ${pinfoErr}`,
         });
         return;
     }
@@ -61,7 +61,7 @@ export async function recover(
     const [dwcPlayerID, dwcPlayerIDErr] = decodeDWCPlayerID(user.GsbrCode);
     if (dwcPlayerIDErr) {
         await interaction.reply({
-            content: `Failed to decode dwc player id: error ${dwcPlayerIDErr}`
+            content: `Failed to decode dwc player id: error ${dwcPlayerIDErr}`,
         });
         return;
     }

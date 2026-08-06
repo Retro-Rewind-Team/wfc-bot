@@ -114,8 +114,8 @@ export const command: Command = {
                     showBanInfo: true,
                     showPII: showPII,
                 }).setFooter({
-                    text: `User ${i + 1} of ${res.Users.length}`
-                })
+                    text: `User ${i + 1} of ${res.Users.length}`,
+                }),
             );
         }
 
@@ -177,8 +177,8 @@ async function handleButton(buttonInteraction: ButtonInteraction<CacheType>): Pr
             getNavigationButtons(
                 buttonInteraction.user.id,
                 state.Idx,
-                maxIdx
-            )
+                maxIdx,
+            ),
         );
 
     await buttonInteraction.update({

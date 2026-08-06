@@ -55,7 +55,7 @@ export const command: Command = {
                     { name: "Players", value: Object.keys(group.players).length.toString() },
                     { name: "Average VR", value: Math.round(avgVR).toString() },
                     { name: "Uptime", value: formatUptime(new Date(group.created), new Date(Date.now())) },
-                )
+                ),
             );
         }
 
@@ -63,7 +63,7 @@ export const command: Command = {
             embeds: embeds,
             flags: MessageFlags.Ephemeral,
         });
-    }
+    },
 };
 
 function pad(num: number, size: number): string {

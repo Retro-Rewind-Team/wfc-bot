@@ -33,5 +33,5 @@ export const command: Command = {
             content: `PID: ${pid}\nFC: ${fc}`,
             flags: MessageFlags.Ephemeral,
         });
-    }
+    },
 };

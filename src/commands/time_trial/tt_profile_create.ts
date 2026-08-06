@@ -65,9 +65,9 @@ export const command: Command = {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
-                "Authorization": `Bearer ${config.wfcSecret}`
+                "Authorization": `Bearer ${config.wfcSecret}`,
             },
-            body: JSON.stringify(body)
+            body: JSON.stringify(body),
         });
 
         if (response.ok) {
@@ -81,7 +81,7 @@ export const command: Command = {
                 .addFields(
                     { name: "Profile ID", value: profile.id.toString(), inline: true },
                     { name: "Display Name", value: profile.displayName, inline: true },
-                    { name: "Country", value: profile.countryName || "Not set", inline: true }
+                    { name: "Country", value: profile.countryName || "Not set", inline: true },
                 )
                 .setTimestamp();
 
@@ -90,8 +90,8 @@ export const command: Command = {
         else {
             const errorData = await response.json() as ErrorResponse;
             await interaction.editReply({
-                content: `Failed to create profile: ${errorData.message || response.statusText}`
+                content: `Failed to create profile: ${errorData.message || response.statusText}`,
             });
         }
-    }
+    },
 };

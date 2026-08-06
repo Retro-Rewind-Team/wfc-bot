@@ -102,10 +102,10 @@ const Vehicles: Dictionary<WeightClass> = {
 };
 
 interface LocaleInfo {
-    PercComplete: string | null,
-    DiscordLocale: string,
-    NodeJSLocale: Intl.Locale,
-    Tracks: string[]
+    PercComplete: string | null;
+    DiscordLocale: string;
+    NodeJSLocale: Intl.Locale;
+    Tracks: string[];
 }
 
 const DiscordLocaleToSheetLang: Dictionary<string> = {
@@ -220,7 +220,7 @@ const SheetLangToLocaleInfo: Dictionary<LocaleInfo> = {
     },
 };
 
-function a(b: string): { name: string, value: string } {
+function a(b: string): { name: string; value: string } {
     return { name: b, value: b };
 }
 
@@ -388,7 +388,7 @@ export const command: Command = {
             // preserved after filtering... annoying
             const mapped = choices.map((choice, idx) => ({
                 name: choice,
-                value: englishLocale.Tracks[idx]
+                value: englishLocale.Tracks[idx],
             }));
 
             let filtered;
@@ -475,7 +475,7 @@ export const command: Command = {
             return;
 
         const response = await interaction.reply({
-            content: "Thanks for submitting your crashdump!"
+            content: "Thanks for submitting your crashdump!",
         });
 
         const embed = new EmbedBuilder()
@@ -505,5 +505,5 @@ export const command: Command = {
         await interaction.editReply({
             content: `Thanks for submitting your crashdump! Your response and the full stacktrace is available here: ${message?.url}`,
         });
-    }
+    },
 };

@@ -128,7 +128,7 @@ export function recoverRksys(input: Buffer, license: number, profileID: number, 
     if (template == null) {
         throw new Error(
             "The save has no populated DWC Auth Data block to recover from. " +
-            "A faithful recovery requires the original block's console-specific user IDs."
+            "A faithful recovery requires the original block's console-specific user IDs.",
         );
     }
 

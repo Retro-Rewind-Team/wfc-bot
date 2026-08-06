@@ -43,13 +43,13 @@ export const command: Command = {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
-                    "Authorization": `Bearer ${config.wfcSecret}`
+                    "Authorization": `Bearer ${config.wfcSecret}`,
                 },
                 body: JSON.stringify({
                     pid: pid.toString(),
                     moderator: moderator,
-                    reason: reason
-                })
+                    reason: reason,
+                }),
             });
 
             if (leaderboardResponse.ok) {
@@ -69,7 +69,7 @@ export const command: Command = {
 
                 await getChannels().logs.send({ embeds: [embed] });
                 await interaction.reply({
-                    content: `Successfully flagged player with friend code "${fc}" as suspicious.`
+                    content: `Successfully flagged player with friend code "${fc}" as suspicious.`,
                 });
                 console.log(`Successfully flagged player ${pid} for reason: ${reason}`);
             }
@@ -79,15 +79,15 @@ export const command: Command = {
                 console.error(`Error details: ${errorText}`);
 
                 await interaction.reply({
-                    content: `Failed to flag friend code "${fc}": error ${leaderboardResponse.status}`
+                    content: `Failed to flag friend code "${fc}": error ${leaderboardResponse.status}`,
                 });
             }
         }
         catch (error) {
             console.error(`Error calling leaderboard API for player ${pid}:`, error);
             await interaction.reply({
-                content: `Failed to flag friend code "${fc}": network error`
+                content: `Failed to flag friend code "${fc}": network error`,
             });
         }
-    }
+    },
 };

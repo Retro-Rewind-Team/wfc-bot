@@ -59,5 +59,5 @@ export const command: Command = {
         }
         else
             await interaction.reply({ content: `Failed to kick friend code "${fc}": error ${res.Error ?? "no error message provided"}` });
-    }
+    },
 };

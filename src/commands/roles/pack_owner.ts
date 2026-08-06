@@ -48,7 +48,7 @@ export const command: Command = {
             if (Array.isArray(config.packOwners[packIDStr])) {
                 if (config.packOwners[packIDStr].findIndex(id => id == user.id) > -1) {
                     await interaction.reply({
-                        content: `User ${user.username}, ${user.id} is already added to pack ${packIDToName(packID)}`
+                        content: `User ${user.username}, ${user.id} is already added to pack ${packIDToName(packID)}`,
                     });
                     return;
                 }
@@ -58,14 +58,14 @@ export const command: Command = {
                 await setConfig(config);
 
                 await interaction.reply({
-                    content: `Added user ${user.username}, ${user.id} to pack ${packIDToName(packID)}`
+                    content: `Added user ${user.username}, ${user.id} to pack ${packIDToName(packID)}`,
                 });
                 await sendEmbed(interaction, `${packIDToName(packID)} Owner Addition`, user);
                 return;
             }
 
             await interaction.reply({
-                content: `Failed to add user ${user.username}, ${user.id} to pack ${packIDToName(packID)}. config[packIDStr] is not an array!`
+                content: `Failed to add user ${user.username}, ${user.id} to pack ${packIDToName(packID)}. config[packIDStr] is not an array!`,
             });
         }
         else if (subcommand == "remove") {
@@ -79,7 +79,7 @@ export const command: Command = {
             await setConfig(config);
 
             await interaction.reply({
-                content: `Removed user ${user.username}, ${user.id} from pack ${packIDToName(packID)}`
+                content: `Removed user ${user.username}, ${user.id} from pack ${packIDToName(packID)}`,
             });
             await sendEmbed(interaction, `${packIDToName(packID)} Owner Removal`, user);
         }
@@ -108,8 +108,8 @@ export const command: Command = {
             }
 
             await interaction.reply({
-                embeds: [embed]
+                embeds: [embed],
             });
         }
-    }
+    },
 };

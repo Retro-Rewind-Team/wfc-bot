@@ -15,7 +15,7 @@ process.on("unhandledRejection", (reason, p) => {
 });
 
 export const client = new Client({
-    intents: [IntentsBitField.Flags.Guilds, IntentsBitField.Flags.GuildMessages, IntentsBitField.Flags.GuildModeration]
+    intents: [IntentsBitField.Flags.Guilds, IntentsBitField.Flags.GuildMessages, IntentsBitField.Flags.GuildModeration],
 });
 
 let refresh = false;
@@ -173,7 +173,7 @@ async function handleCommand(interaction: ChatInputCommandInteraction<CacheType>
 
         if (!command) {
             await interaction.reply({
-                content: `No command exists by the name of ${interaction.commandName}`
+                content: `No command exists by the name of ${interaction.commandName}`,
             });
             return;
         }
@@ -181,7 +181,7 @@ async function handleCommand(interaction: ChatInputCommandInteraction<CacheType>
         const [allowed, err] = isAllowedInteraction(interaction, command);
         if (!allowed) {
             await interaction.reply({
-                content: `Command ${interaction.commandName} is not allowed! Error: ${err}`
+                content: `Command ${interaction.commandName} is not allowed! Error: ${err}`,
             });
             return;
         }
@@ -291,7 +291,7 @@ async function refreshCommands(commands: Dictionary<Command>): Promise<void> {
 
     const data = await rest.put(
         Routes.applicationCommands(config.applicationID),
-        { body: globalCommands }
+        { body: globalCommands },
     ) as RESTPutAPIApplicationCommandsResult;
 
     console.log(`Successfully reloaded ${data.length} global application (/) commands`);
@@ -303,7 +303,7 @@ async function refreshCommands(commands: Dictionary<Command>): Promise<void> {
 
         const adminData = await rest.put(
             Routes.applicationGuildCommands(config.applicationID, guildId.toString()),
-            { body: privilegedCommands }
+            { body: privilegedCommands },
         ) as RESTPutAPIApplicationCommandsResult;
 
         console.log(`Successfully reloaded ${adminData.length} application (/) commands for guild ${guildId}`);

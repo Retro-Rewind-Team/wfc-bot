@@ -11,7 +11,7 @@ export const PackOpts = [
     { name: "Insane Kart Wii", value: IKWID },
     { name: "Luminous", value: LID },
     { name: "OptPack", value: OPID },
-    { name: "WTP", value: WTPID }
+    { name: "WTP", value: WTPID },
 ];
 
 export function packIDToName(packID: number): string {

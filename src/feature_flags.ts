@@ -27,7 +27,7 @@ export function migrateConfigFeatureFlags(config: Config): boolean {
 
 export function shouldEnable(
     required: FeatureFlag[] | null,
-    set: Record<FeatureFlag, boolean>
+    set: Record<FeatureFlag, boolean>,
 ): [boolean, FeatureFlag[]] {
     if (!required || required.length == 0)
         return [true, []];

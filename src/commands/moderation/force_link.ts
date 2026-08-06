@@ -40,7 +40,7 @@ export const command: Command = {
 
         if (currentlyVerifying.has(pid)) {
             await interaction.reply({
-                content: `Error linking friend code "${fc}": Already verifying this profile!`
+                content: `Error linking friend code "${fc}": Already verifying this profile!`,
             });
             return;
         }
@@ -56,7 +56,7 @@ export const command: Command = {
         if (!success) {
             currentlyVerifying.delete(pid);
             await interaction.reply({
-                content: `Failed to link friend code "${fc}": error ${res.Error ?? "no error message provided"}`
+                content: `Failed to link friend code "${fc}": error ${res.Error ?? "no error message provided"}`,
             });
         }
         else {
@@ -73,7 +73,7 @@ export const command: Command = {
                     { name: "Server", value: interaction.guild!.name },
                     { name: "Moderator", value: `<@${moderator.id}>` },
                     { name: "Friend Code", value: fc },
-                    { name: "Linked Account", value: `<@${user.id}>` }
+                    { name: "Linked Account", value: `<@${user.id}>` },
                 )
                 .setTimestamp();
 
@@ -82,5 +82,5 @@ export const command: Command = {
 
             await channels.logs.send({ embeds: [embed] });
         }
-    }
+    },
 };

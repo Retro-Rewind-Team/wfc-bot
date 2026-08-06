@@ -21,7 +21,7 @@ export const command: Command = {
         const [valid, err] = validateID(id);
         if (!valid) {
             await interaction.reply({
-                content: `Error retrieving Mii for friend code or pid "${id}": ${err}`
+                content: `Error retrieving Mii for friend code or pid "${id}": ${err}`,
             });
             return;
         }
@@ -40,7 +40,7 @@ export const command: Command = {
         const mii = processMiiBuf(null, miiBuf);
 
         await interaction.reply({
-            embeds: [createMiiEmbed(mii, fc), ],
+            embeds: [createMiiEmbed(mii, fc) ],
             files: [{
                 name: `${fc}.mii`,
                 attachment: miiBuf,

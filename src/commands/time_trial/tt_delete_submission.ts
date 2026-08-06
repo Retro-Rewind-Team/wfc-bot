@@ -29,7 +29,7 @@ export const command: Command = {
         const leaderboardUrl = `http://${config.leaderboardServer}:${config.leaderboardPort}`;
         const response = await fetch(`${leaderboardUrl}/api/moderation/timetrial/submission/${submissionId}`, {
             method: "DELETE",
-            headers: { "Authorization": `Bearer ${config.wfcSecret}` }
+            headers: { "Authorization": `Bearer ${config.wfcSecret}` },
         });
 
         if (response.ok) {
@@ -40,7 +40,7 @@ export const command: Command = {
                 .setTitle("🗑️ Ghost Submission Deleted")
                 .setDescription(result.message)
                 .addFields(
-                    { name: "Submission ID", value: submissionId.toString(), inline: true }
+                    { name: "Submission ID", value: submissionId.toString(), inline: true },
                 )
                 .setTimestamp();
 
@@ -49,8 +49,8 @@ export const command: Command = {
         else {
             const errorData = await response.json() as DeleteResponse;
             await interaction.editReply({
-                content: `Failed to delete submission: ${errorData.message || response.statusText}`
+                content: `Failed to delete submission: ${errorData.message || response.statusText}`,
             });
         }
-    }
+    },
 };

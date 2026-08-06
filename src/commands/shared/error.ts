@@ -52,7 +52,7 @@ export const initializer: SharedInitializer = {
             if (!exists) {
                 await fs.writeFile(
                     WIILINK_ERROR_ADDENDUM_PATH,
-                    JSON.stringify(wiiLinkErrorAddendums, null, 4)
+                    JSON.stringify(wiiLinkErrorAddendums, null, 4),
                 );
             }
             else {
@@ -63,5 +63,5 @@ export const initializer: SharedInitializer = {
         catch (error) {
             console.error(`Failed to read from ${WIILINK_ERROR_ADDENDUM_PATH}`, error);
         }
-    }
+    },
 };

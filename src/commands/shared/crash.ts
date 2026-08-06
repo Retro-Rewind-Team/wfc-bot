@@ -29,7 +29,7 @@ export async function processCrashdump(buf: Buffer): Promise<[code: number | nul
 async function processCrashdumpInner(buf: Buffer): Promise<[code: number | null, stdout: string, stderr: string]> {
     const proc = child_process.spawn(`${process.cwd()}/${pulsarToolsBin}`, ["crash", "--file", "stdin"], {
         cwd: process.cwd(),
-        stdio: "pipe"
+        stdio: "pipe",
     });
     proc.stdin.write(buf);
     proc.stdin.end();
@@ -47,7 +47,7 @@ async function processCrashdumpInner(buf: Buffer): Promise<[code: number | null,
     return new Promise((resolve, _) =>
         proc.on("close", async (code, _) => {
             resolve([code, stdoutAgg, stderrAgg]);
-        })
+        }),
     );
 }
 
@@ -93,7 +93,7 @@ export const initializer: SharedInitializer = {
                     flag: "w+",
                     // Executable
                     mode: 755,
-                }
+                },
             );
 
             console.log(`Downloaded ${pulsarToolsBin}, ${json.tag_name} successfully!`);

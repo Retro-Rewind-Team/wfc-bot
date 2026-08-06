@@ -51,7 +51,7 @@ export const command: Command = {
             await recover(interaction, true);
             break;
         }
-    }
+    },
 };
 
 async function froomKick(interaction: ChatInputCommandInteraction<CacheType>): Promise<void> {
@@ -78,7 +78,7 @@ async function froomKick(interaction: ChatInputCommandInteraction<CacheType>): P
 
     if (!success) {
         await interaction.editReply({
-            content: `Failed to kick friend code "${pidToFc(pid)}": error ${res.Error ?? "no error message provided"}`
+            content: `Failed to kick friend code "${pidToFc(pid)}": error ${res.Error ?? "no error message provided"}`,
         });
         return;
     }
@@ -91,7 +91,7 @@ async function froomKick(interaction: ChatInputCommandInteraction<CacheType>): P
             showMember: true,
             nonModerator: true,
             pubChannel: getChannels().publicSelfLogs,
-        }
+        },
     );
 }
 
@@ -108,7 +108,7 @@ async function selfKick(interaction: ChatInputCommandInteraction<CacheType>): Pr
 
     if (!success) {
         await interaction.editReply({
-            content: `Failed to self-kick: error ${res.Error ?? "no error message provided"}`
+            content: `Failed to self-kick: error ${res.Error ?? "no error message provided"}`,
         });
         return;
     }
@@ -121,6 +121,6 @@ async function selfKick(interaction: ChatInputCommandInteraction<CacheType>): Pr
             showMember: true,
             nonModerator: true,
             pubChannel: getChannels().publicSelfLogs,
-        }
+        },
     );
 }

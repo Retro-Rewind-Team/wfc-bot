@@ -75,7 +75,7 @@ export const command: Command = {
 
         if (hcode != 200) {
             await interaction.editReply({
-                content: `Successfully investigated friend code "${fc}", but failed to upload the results: error ${herr ?? "no error message provided"}`
+                content: `Successfully investigated friend code "${fc}", but failed to upload the results: error ${herr ?? "no error message provided"}`,
             });
 
             return;
@@ -84,5 +84,5 @@ export const command: Command = {
         await interaction.editReply({
             content: hout,
         });
-    }
+    },
 };

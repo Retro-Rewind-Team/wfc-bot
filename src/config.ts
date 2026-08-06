@@ -7,34 +7,34 @@ import * as fs from "fs/promises";
 import * as process from "process";
 
 export interface Config {
-    token: string
-    applicationID: string
-    miiEndPoint: string
-    wfcAPIBase: string
-    wfcSecret: string
-    privilegedServers: string[]
-    userPermissions: Dictionary<number>,
-    logsChannel: string
-    publicLogsChannel: string
-    publicSelfLogsChannel: string
-    packOwnersLogsChannel: string
-    crashReportChannel: string
-    newPlayerLogsChannel: string,
-    statusChannel: string,
-    roomPingChannel: string,
-    roomTypeNameMap: Dictionary<string>,
-    roomPingRoles: Dictionary<string>,
-    highVRPingRole: string,
-    highVRMinVR: number,
-    highVRMinPlayers: number,
-    modRestrictPerm: string
-    friendbot: string
-    packOwners: Dictionary<string[]>
-    pulsarToolsTag: string
-    leaderboardServer: string
-    leaderboardPort: number
-    logServices: boolean
-    featureFlags: Record<FeatureFlag, boolean>,
+    token: string;
+    applicationID: string;
+    miiEndPoint: string;
+    wfcAPIBase: string;
+    wfcSecret: string;
+    privilegedServers: string[];
+    userPermissions: Dictionary<number>;
+    logsChannel: string;
+    publicLogsChannel: string;
+    publicSelfLogsChannel: string;
+    packOwnersLogsChannel: string;
+    crashReportChannel: string;
+    newPlayerLogsChannel: string;
+    statusChannel: string;
+    roomPingChannel: string;
+    roomTypeNameMap: Dictionary<string>;
+    roomPingRoles: Dictionary<string>;
+    highVRPingRole: string;
+    highVRMinVR: number;
+    highVRMinPlayers: number;
+    modRestrictPerm: string;
+    friendbot: string;
+    packOwners: Dictionary<string[]>;
+    pulsarToolsTag: string;
+    leaderboardServer: string;
+    leaderboardPort: number;
+    logServices: boolean;
+    featureFlags: Record<FeatureFlag, boolean>;
 }
 
 let _config: Config;
@@ -74,7 +74,7 @@ export async function initConfig(path: string): Promise<void> {
                 wfcAPIBase: "base route for wfc apis. Something like http://rwfc.net/api",
                 wfcSecret: "your wfc secret key",
                 privilegedServers: [
-                    "Allow guild ids here."
+                    "Allow guild ids here.",
                 ],
                 userPermissions: {},
                 logsChannel: "Channel id to send successful moderative actions to.",
@@ -133,14 +133,14 @@ export async function setConfig(config: Config): Promise<void> {
 }
 
 interface Channels {
-    logs: TextChannel,
-    publicLogs: TextChannel,
-    publicSelfLogs: TextChannel,
-    packOwnersLogs: TextChannel,
-    crashReport: TextChannel,
-    newPlayerLogs: TextChannel,
-    roomPing: TextChannel,
-    status: VoiceChannel,
+    logs: TextChannel;
+    publicLogs: TextChannel;
+    publicSelfLogs: TextChannel;
+    packOwnersLogs: TextChannel;
+    crashReport: TextChannel;
+    newPlayerLogs: TextChannel;
+    roomPing: TextChannel;
+    status: VoiceChannel;
 }
 
 let _channels: Channels;
@@ -196,7 +196,7 @@ function migrateConfig(config: Config): boolean {
 function migrateOldPermission(
     config: Config,
     field: string,
-    permissionBit: PermissionBit
+    permissionBit: PermissionBit,
 ): boolean {
     // Reference to config as a Dictionary so we can access old fields
     const oldConfig = config as unknown as Dictionary<unknown>;

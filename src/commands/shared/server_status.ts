@@ -5,8 +5,8 @@ export const enum StatusColor {
 }
 
 export interface Status {
-    color: StatusColor,
-    message: string,
+    color: StatusColor;
+    message: string;
 }
 
 interface Glyph {
@@ -18,7 +18,7 @@ interface Glyph {
 const glyphs: Record<StatusColor, Glyph> = {
     [StatusColor.RED]: { game: "\uE009", motd: ">:(", emoji:   "🔴" },
     [StatusColor.YELLOW]: { game: "\uE00A", motd: ":(", emoji: "🟡" },
-    [StatusColor.GREEN]: { game: "\uE008", motd: ":)", emoji:  "🟢" }
+    [StatusColor.GREEN]: { game: "\uE008", motd: ":)", emoji:  "🟢" },
 };
 
 export function getStatusColorEmoji(statusColor: StatusColor): string {

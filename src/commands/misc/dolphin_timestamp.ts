@@ -44,17 +44,17 @@ export const command: Command = {
             content: response,
             flags: MessageFlags.Ephemeral,
         });
-    }
+    },
 };
 
 // Adapted from https://gabrlel.github.io/dst.html, with permission.
 const BILLION = 1_000_000_000;
 
 interface IntermediateDate {
-    day: number,
-    hour: number,
-    minute: number,
-    second: number
+    day: number;
+    hour: number;
+    minute: number;
+    second: number;
 }
 
 /* ---------- Legacy decoder (%j%H%M%S) ---------- */

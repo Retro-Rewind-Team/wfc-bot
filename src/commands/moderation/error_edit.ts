@@ -86,7 +86,7 @@ export const command: Command = {
             break;
         }
         }
-    }
+    },
 };
 
 async function commentAdd(interaction: ChatInputCommandInteraction<CacheType>): Promise<void> {
@@ -119,7 +119,7 @@ async function commentAdd(interaction: ChatInputCommandInteraction<CacheType>): 
     const commentsStr = addendum.comments.map((comment, idx) => `Comment ${idx + 1}: ${comment}\n`).join("\n");
 
     await interaction.reply({
-        content: `Appended comment to error ${ecode}: ${wiiLinkErrorDef.name}\n\n${commentsStr}`
+        content: `Appended comment to error ${ecode}: ${wiiLinkErrorDef.name}\n\n${commentsStr}`,
     });
 }
 

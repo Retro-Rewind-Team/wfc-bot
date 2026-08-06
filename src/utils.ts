@@ -104,9 +104,9 @@ export async function makeWFCRequest(route: string, method: string, data?: objec
             method: method,
             headers: {
                 "Content-Type": "application/json",
-                "Authorization": `Bearer ${config.wfcSecret}`
+                "Authorization": `Bearer ${config.wfcSecret}`,
             },
-            body: data ? JSON.stringify(data) : null
+            body: data ? JSON.stringify(data) : null,
         });
 
         const rjson = await response.json();
@@ -127,32 +127,32 @@ export async function makeWFCRequest(route: string, method: string, data?: objec
 }
 
 export interface WiiLinkUser {
-    ProfileId: number,
-    UserId: number,
-    GsbrCode: string,
-    NgDeviceId: number[],
-    Email: string,
-    UniqueNick: string,
-    FirstName: string,
-    LastName: string,
-    Restricted: boolean,
-    RestrictedDeviceId: number,
-    BanReason: string,
-    OpenHost: boolean,
-    LastIPAddress: string,
-    LastInGameSn: string,
-    Csnum: string[],
+    ProfileId: number;
+    UserId: number;
+    GsbrCode: string;
+    NgDeviceId: number[];
+    Email: string;
+    UniqueNick: string;
+    FirstName: string;
+    LastName: string;
+    Restricted: boolean;
+    RestrictedDeviceId: number;
+    BanReason: string;
+    OpenHost: boolean;
+    LastIPAddress: string;
+    LastInGameSn: string;
+    Csnum: string[];
     DiscordID: string;
-    BanModerator: string,
-    BanReasonHidden: string,
-    BanIssued: string,
-    BanExpires: string,
+    BanModerator: string;
+    BanReasonHidden: string;
+    BanIssued: string;
+    BanExpires: string;
 }
 
 interface SendEmbedLogField {
-    name: string,
-    value: string,
-    hidden?: boolean,
+    name: string;
+    value: string;
+    hidden?: boolean;
 }
 
 export interface SendEmbedLogOpts {
@@ -163,9 +163,9 @@ export interface SendEmbedLogOpts {
     verbose?: boolean;
     showBanInfo?: boolean;
     // Show who sent the command publically
-    showMember?: boolean,
+    showMember?: boolean;
     // Action was not performed by a moderator
-    nonModerator?: boolean
+    nonModerator?: boolean;
     pubChannel?: TextChannel;
 }
 
@@ -185,7 +185,7 @@ export async function sendEmbedLog(
             { name: "Server", value: interaction.guild?.name ?? "Unknown"},
             {
                 name: opts.nonModerator ? "User" : "Moderator",
-                value: `<@${interaction.user.id}>`
+                value: `<@${interaction.user.id}>`,
             },
         );
 
@@ -229,7 +229,7 @@ export async function sendEmbedLog(
     if (opts.showMember) {
         pubEmbed.addFields({
             name: opts.nonModerator ? "User" : "Moderator",
-            value: `<@${interaction.user.id}>`
+            value: `<@${interaction.user.id}>`,
         });
     }
 
@@ -336,7 +336,7 @@ export interface CreateUserEmbedOpts {
     // Show ban info
     showBanInfo?: boolean;
     // Default true. Determines if csnum, ip, etc are shown
-    showPII?: boolean,
+    showPII?: boolean;
 }
 
 // Creates an embed based on a WiiLinkUser.
@@ -398,7 +398,7 @@ export function createUserEmbed(
     if (user.DiscordID.length != 0) {
         embed.addFields({
             name: "Discord ID",
-            value: `<@${user.DiscordID }>`
+            value: `<@${user.DiscordID }>`,
         });
     }
 
@@ -424,7 +424,7 @@ export function createUserEmbed(
             if (opts.priv) {
                 embed.addFields({
                     name: "Hidden Reason",
-                    value: `${user.BanReasonHidden && user.BanReasonHidden.length != 0 ? user.BanReasonHidden : "None"}`
+                    value: `${user.BanReasonHidden && user.BanReasonHidden.length != 0 ? user.BanReasonHidden : "None"}`,
                 });
             }
 

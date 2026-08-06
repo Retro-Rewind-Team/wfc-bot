@@ -22,7 +22,7 @@ export const command: Command = {
         const [valid, err] = validateID(id);
         if (!valid) {
             await interaction.reply({
-                content: `Error retrieving Mii for friend code or pid "${id}": ${err}`
+                content: `Error retrieving Mii for friend code or pid "${id}": ${err}`,
             });
             return;
         }

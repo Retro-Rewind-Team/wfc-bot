@@ -75,7 +75,7 @@ export const command: Command = {
             tos: tos,
             reason: reason,
             reason_hidden: reasonHidden ?? "",
-            moderator: moderator
+            moderator: moderator,
         });
 
         if (!success) {
@@ -90,7 +90,7 @@ export const command: Command = {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
-                    "Authorization": `Bearer ${config.wfcSecret}`
+                    "Authorization": `Bearer ${config.wfcSecret}`,
                 },
                 body: JSON.stringify({
                     pid: pid.toString(),
@@ -100,8 +100,8 @@ export const command: Command = {
                     tos: tos,
                     reason: reason,
                     reason_hidden: reasonHidden ?? "",
-                    moderator: moderator
-                })
+                    moderator: moderator,
+                }),
             });
 
             if (leaderboardResponse.ok)
@@ -125,7 +125,7 @@ export const command: Command = {
                     name: "Ban Length",
                     value: perm
                         ? "Permanent"
-                        : `${days} ${p(days, "day")}, ${hours} ${p(hours, "hour")}, ${minutes} ${p(minutes, "minute")}`
+                        : `${days} ${p(days, "day")}, ${hours} ${p(hours, "hour")}, ${minutes} ${p(minutes, "minute")}`,
                 },
             ],
             hideMii: hideMii,
@@ -134,5 +134,5 @@ export const command: Command = {
             // We already show the ban info ourselves above.
             showBanInfo: false,
         });
-    }
+    },
 };

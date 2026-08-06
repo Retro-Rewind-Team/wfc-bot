@@ -66,7 +66,7 @@ export const command: Command = {
         if (!displayName && !countryCode) {
             await interaction.reply({
                 content: "You must provide at least one field to update (display_name or country)",
-                ephemeral: true
+                ephemeral: true,
             });
             return;
         }
@@ -84,9 +84,9 @@ export const command: Command = {
             method: "PUT",
             headers: {
                 "Content-Type": "application/json",
-                "Authorization": `Bearer ${config.wfcSecret}`
+                "Authorization": `Bearer ${config.wfcSecret}`,
             },
-            body: JSON.stringify(body)
+            body: JSON.stringify(body),
         });
 
         if (response.ok) {
@@ -102,7 +102,7 @@ export const command: Command = {
                     { name: "Display Name", value: profile.displayName, inline: true },
                     { name: "Country", value: profile.countryName || "Not set", inline: true },
                     { name: "Submissions", value: profile.totalSubmissions.toString(), inline: true },
-                    { name: "World Records", value: profile.currentWorldRecords.toString(), inline: true }
+                    { name: "World Records", value: profile.currentWorldRecords.toString(), inline: true },
                 )
                 .setTimestamp();
 
@@ -111,8 +111,8 @@ export const command: Command = {
         else {
             const errorData = await response.json() as ErrorResponse;
             await interaction.editReply({
-                content: `Failed to update profile: ${errorData.message || response.statusText}`
+                content: `Failed to update profile: ${errorData.message || response.statusText}`,
             });
         }
-    }
+    },
 };

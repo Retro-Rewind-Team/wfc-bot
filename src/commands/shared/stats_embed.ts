@@ -45,7 +45,7 @@ function formatVRChange(change: number): string {
 
 export async function fetchStatsEmbed(
     pid: number | string,
-    flags: StatsSectionFlag = StatsSectionFlag.ALL
+    flags: StatsSectionFlag = StatsSectionFlag.ALL,
 ): Promise<[EmbedBuilder | null, string | null]> {
     const fc = typeof pid == "number" ? pidToFc(pid) : pidToFc(parseInt(pid));
 
@@ -76,34 +76,34 @@ export async function fetchStatsEmbed(
                 {
                     name: "🏆 Rating",
                     value: `**${stats.vr.toLocaleString()}** VR`,
-                    inline: true
+                    inline: true,
                 },
                 {
                     name: "📈 Rank",
                     value: `#${stats.rank.toLocaleString()}`,
-                    inline: true
+                    inline: true,
                 },
                 {
                     name: "📅 Last Seen",
                     value: `<t:${Math.floor(lastSeenDate.getTime() / 1000)}:R>`,
-                    inline: true
+                    inline: true,
                 },
                 { name: "\u200B", value: "" },
                 {
                     name: "VR Gain (24h)",
                     value: formatVRChange(stats.vrGain24h),
-                    inline: true
+                    inline: true,
                 },
                 {
                     name: "VR Gain (7d)",
                     value: formatVRChange(stats.vrGain7d),
-                    inline: true
+                    inline: true,
                 },
                 {
                     name: "VR Gain (30d)",
                     value: formatVRChange(stats.vrGain30d),
-                    inline: true
-                }
+                    inline: true,
+                },
             );
         }
 
@@ -117,28 +117,28 @@ export async function fetchStatsEmbed(
                 {
                     name: `🎮 Race Stats (since ${trackedSince})`,
                     value: "\u200B",
-                    inline: false
+                    inline: false,
                 },
                 {
                     name: "Total Races",
                     value: stats.raceStats.totalRaces.toLocaleString(),
-                    inline: true
+                    inline: true,
                 },
                 {
                     name: "Avg Frames in 1st",
                     value: stats.raceStats.avgFramesIn1stPerRace.toFixed(1),
-                    inline: true
+                    inline: true,
                 },
                 { name: "\u200B", value: "\u200B", inline: true },
                 {
                     name: "Favourite Setup",
                     value: topCombo ? topCombo.name : "N/A",
-                    inline: true
+                    inline: true,
                 },
                 {
                     name: "Most Played Track",
                     value: topTrack ? `${topTrack.trackName} (${topTrack.raceCount}x)` : "N/A",
-                    inline: true
+                    inline: true,
                 },
             );
         }
@@ -151,7 +151,7 @@ export async function fetchStatsEmbed(
             embed.addFields({
                 name: "Badges",
                 value: badgeNames,
-                inline: true
+                inline: true,
             });
 
         }
@@ -162,7 +162,7 @@ export async function fetchStatsEmbed(
             .setFooter({
                 text: stats.isSuspicious
                     ? "⚠ This player has been flagged as suspicious"
-                    : "Retro Rewind Leaderboard"
+                    : "Retro Rewind Leaderboard",
             });
 
         return [embed, null];

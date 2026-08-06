@@ -37,7 +37,7 @@ export const command: Command = {
             }
 
             await interaction.reply({
-                content: `Set message of the day to:\n${replaceGlyphsForDiscord(realMotd) }`
+                content: `Set message of the day to:\n${replaceGlyphsForDiscord(realMotd) }`,
             });
 
             // Serialize the original motd
@@ -49,11 +49,11 @@ export const command: Command = {
 
             if (success) {
                 await interaction.reply({
-                    content: `Current message of the day is:\n${replaceGlyphsForDiscord(res.Motd)}`
+                    content: `Current message of the day is:\n${replaceGlyphsForDiscord(res.Motd)}`,
                 });
             }
             else
                 await interaction.reply({ content: `Failed to fetch current message of the day, error: ${res.Error ?? "no error message provided"}` });
         }
-    }
+    },
 };

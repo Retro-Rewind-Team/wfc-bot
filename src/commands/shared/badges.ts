@@ -46,7 +46,7 @@ export enum BadgeType {
     BotBBronze,
 }
 
-export const BadgeOpts: { name: string, value: BadgeType }[] = [];
+export const BadgeOpts: { name: string; value: BadgeType }[] = [];
 
 Object.entries(BadgeType).forEach(entry => {
     if (typeof entry[0] == "string"

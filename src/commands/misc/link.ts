@@ -37,7 +37,7 @@ export const command: Command = {
         await interaction.deferReply();
         if (currentlyVerifying.has(pid)) {
             await interaction.editReply({
-                content: `Error linking friend code "${fc}": Already verifying this profile!`
+                content: `Error linking friend code "${fc}": Already verifying this profile!`,
             });
             return;
         }
@@ -47,21 +47,21 @@ export const command: Command = {
 
         if (!await waitForLinkSuccess(interaction, pid, fc, discordID))
             await timeoutLink(interaction, pid, fc, discordID);
-    }
+    },
 };
 
 async function beginLink(
     interaction: ChatInputCommandInteraction<CacheType>,
     pid: number,
     fc: string,
-    discordID: string
+    discordID: string,
 ): Promise<boolean> {
     currentlyVerifying.add(pid);
     const [success, res] = await makeWFCRequest("/link", "POST", {
         secret: config.wfcSecret,
         pid: pid,
         discordID: discordID,
-        action: "link"
+        action: "link",
     });
 
     if (!success) {
@@ -71,7 +71,7 @@ async function beginLink(
             res.Error = "You must be online to link your friend code.";
 
         await interaction.editReply({
-            content: `Failed to link friend code "${fc}": error ${res.Error ?? "no error message provided"}`
+            content: `Failed to link friend code "${fc}": error ${res.Error ?? "no error message provided"}`,
         });
     }
     else {
@@ -87,7 +87,7 @@ async function waitForLinkSuccess(
     interaction: ChatInputCommandInteraction<CacheType>,
     pid: number,
     fc: string,
-    discordID: string
+    discordID: string,
 ): Promise<boolean> {
     const timeOut = (Date.now() + 600_000); // 10 minutes
     while (Date.now() < timeOut) {
@@ -96,13 +96,13 @@ async function waitForLinkSuccess(
             secret: config.wfcSecret,
             pid: pid,
             discordId: discordID,
-            action: "check"
+            action: "check",
         });
 
         if (success) {
             currentlyVerifying.delete(pid);
             await interaction.editReply({
-                content: `Successfully linked friend code "${fc}" to your Discord account!`
+                content: `Successfully linked friend code "${fc}" to your Discord account!`,
             });
 
             return true;
@@ -118,7 +118,7 @@ async function timeoutLink(
     interaction: ChatInputCommandInteraction<CacheType>,
     pid: number,
     fc: string,
-    discordID: string
+    discordID: string,
 ): Promise<void> {
     currentlyVerifying.delete(pid);
     await interaction.editReply({ content: `Profile linking for "${fc}" timed out!` });
@@ -126,17 +126,17 @@ async function timeoutLink(
         secret: config.wfcSecret,
         pid: pid,
         discordId: discordID,
-        action: "reset"
+        action: "reset",
     });
 
     if (success) {
         await interaction.followUp({
-            content: `Profile linking for "${fc}" cancelled!`
+            content: `Profile linking for "${fc}" cancelled!`,
         });
     }
     else {
         await interaction.followUp({
-            content: `Failed to cancel linking for "${fc}": error ${res.Error ?? "no error message provided"}`
+            content: `Failed to cancel linking for "${fc}": error ${res.Error ?? "no error message provided"}`,
         });
     }
 }

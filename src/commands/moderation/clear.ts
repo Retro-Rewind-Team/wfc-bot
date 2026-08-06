@@ -46,5 +46,5 @@ export const command: Command = {
         }
         else
             await interaction.reply({ content: `Failed to clear friend code "${fc}": error ${res.Error ?? "no error message provided"}` });
-    }
+    },
 };

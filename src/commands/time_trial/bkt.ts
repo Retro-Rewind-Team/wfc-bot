@@ -53,7 +53,7 @@ export const command: Command = {
             .setRequired(true)
             .addChoices(
                 { name: "150cc", value: 150 },
-                { name: "200cc", value: 200 }
+                { name: "200cc", value: 200 },
             ))
         .addBooleanOption(option => option
             .setName("no_glitch")
@@ -70,7 +70,7 @@ export const command: Command = {
             .addChoices(
                 { name: "All runs", value: "all" },
                 { name: "Shroomless only", value: "only" },
-                { name: "Exclude shroomless", value: "exclude" }
+                { name: "Exclude shroomless", value: "exclude" },
             ))
         .addStringOption(option => option
             .setName("vehicle")
@@ -79,7 +79,7 @@ export const command: Command = {
             .addChoices(
                 { name: "All vehicles", value: "all" },
                 { name: "Bikes only", value: "bikes" },
-                { name: "Karts only", value: "karts" }
+                { name: "Karts only", value: "karts" },
             ))
         .addStringOption(option => option
             .setName("drift")
@@ -88,7 +88,7 @@ export const command: Command = {
             .addChoices(
                 { name: "All drift types", value: "all" },
                 { name: "Manual only", value: "manual" },
-                { name: "Hybrid only", value: "hybrid" }
+                { name: "Hybrid only", value: "hybrid" },
             ))
         .addStringOption(option => option
             .setName("drift_category")
@@ -97,7 +97,7 @@ export const command: Command = {
             .addChoices(
                 { name: "All drift categories", value: "all" },
                 { name: "Inside drift only", value: "inside" },
-                { name: "Outside drift only", value: "outside" }
+                { name: "Outside drift only", value: "outside" },
             )),
 
     autocomplete: async function(interaction: AutocompleteInteraction): Promise<void> {
@@ -122,7 +122,7 @@ export const command: Command = {
 
         const trackResponse = await fetch(`${leaderboardUrl}/api/timetrial/tracks/${trackId}`, {
             method: "GET",
-            headers: { "Authorization": `Bearer ${config.wfcSecret}` }
+            headers: { "Authorization": `Bearer ${config.wfcSecret}` },
         });
 
         if (!trackResponse.ok) {
@@ -141,7 +141,7 @@ export const command: Command = {
                 cc: cc.toString(),
                 glitchAllowed: (!nonGlitchOnly).toString(),
                 page: "1",
-                pageSize: "1"
+                pageSize: "1",
             });
             if (shroomless && shroomless !== "all")
                 params.append("shroomless", shroomless);
@@ -150,7 +150,7 @@ export const command: Command = {
 
             response = await fetch(`${leaderboardUrl}/api/timetrial/leaderboard/flap?${params}`, {
                 method: "GET",
-                headers: { "Authorization": `Bearer ${config.wfcSecret}` }
+                headers: { "Authorization": `Bearer ${config.wfcSecret}` },
             });
 
             if (response.ok) {
@@ -162,7 +162,7 @@ export const command: Command = {
             const params = new URLSearchParams({
                 trackId: trackId.toString(),
                 cc: cc.toString(),
-                nonGlitchOnly: nonGlitchOnly.toString()
+                nonGlitchOnly: nonGlitchOnly.toString(),
             });
             if (shroomless && shroomless !== "all")
                 params.append("shroomless", shroomless);
@@ -175,7 +175,7 @@ export const command: Command = {
 
             response = await fetch(`${leaderboardUrl}/api/moderation/timetrial/bkt?${params}`, {
                 method: "GET",
-                headers: { "Authorization": `Bearer ${config.wfcSecret}` }
+                headers: { "Authorization": `Bearer ${config.wfcSecret}` },
             });
 
             if (response.ok)
@@ -186,7 +186,7 @@ export const command: Command = {
             if (response.status == 404) {
                 const category = nonGlitchOnly ? "non-glitch/shortcut" : "unrestricted";
                 await interaction.editReply({
-                    content: `No ${isFlap ? "flap runs" : "times"} found for ${track.name} at ${cc}cc (${category})`
+                    content: `No ${isFlap ? "flap runs" : "times"} found for ${track.name} at ${cc}cc (${category})`,
                 });
             }
             else {
@@ -207,7 +207,7 @@ export const command: Command = {
         if (!submission) {
             const category = nonGlitchOnly ? "non-glitch/shortcut" : "unrestricted";
             await interaction.editReply({
-                content: `No ${isFlap ? "flap runs" : "times"} found for ${track.name} at ${cc}cc (${category})`
+                content: `No ${isFlap ? "flap runs" : "times"} found for ${track.name} at ${cc}cc (${category})`,
             });
             return;
         }
@@ -270,7 +270,7 @@ export const command: Command = {
                 { name: "Drift", value: driftInfo, inline: true },
                 { name: "Date Set", value: `<t:${Math.floor(dateSet.getTime() / 1000)}:D>`, inline: true },
                 { name: "\u200B", value: "\u200B", inline: true },
-                { name: "\u200B", value: "\u200B", inline: true }
+                { name: "\u200B", value: "\u200B", inline: true },
             )
             .setTimestamp()
             .setFooter({ text: `Submission ID: ${submission.id}` });
@@ -283,5 +283,5 @@ export const command: Command = {
         }
 
         await interaction.editReply({ embeds: [embed] });
-    }
+    },
 };

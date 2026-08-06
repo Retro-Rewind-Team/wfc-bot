@@ -24,7 +24,7 @@ interface BadgeResponse {
 }
 
 interface BatchBadgeResponse {
-    badges: Dictionary<BadgeType[]>
+    badges: Dictionary<BadgeType[]>;
 }
 
 async function add(interaction: ChatInputCommandInteraction<CacheType>): Promise<void> {
@@ -34,7 +34,7 @@ async function add(interaction: ChatInputCommandInteraction<CacheType>): Promise
     const [valid, err] = validateID(id);
     if (!valid) {
         await interaction.reply({
-            content: `Error adding badge to friend code or pid "${id}": ${err}`
+            content: `Error adding badge to friend code or pid "${id}": ${err}`,
         });
         return;
     }
@@ -54,13 +54,13 @@ async function add(interaction: ChatInputCommandInteraction<CacheType>): Promise
         }),
         headers: {
             "Content-Type": "application/json",
-            "Authorization": `Bearer ${config.wfcSecret}`
-        }
+            "Authorization": `Bearer ${config.wfcSecret}`,
+        },
     });
 
     if (!response.ok) {
         await interaction.editReply({
-            content: `Failed to add badge ${badgeName} to friend code "${fc}": error ${response.status}`
+            content: `Failed to add badge ${badgeName} to friend code "${fc}": error ${response.status}`,
         });
         return;
     }
@@ -69,13 +69,13 @@ async function add(interaction: ChatInputCommandInteraction<CacheType>): Promise
 
         if (!badgeResponse.success) {
             await interaction.editReply({
-                content: `Failed to add badge ${badgeName} to friend code "${fc}": error ${badgeResponse.message}`
+                content: `Failed to add badge ${badgeName} to friend code "${fc}": error ${badgeResponse.message}`,
             });
             return;
         }
 
         await interaction.editReply({
-            content: `Successfully added badge ${badgeName} to friend code "${fc}"\nThis player's badges are: ${listBadges(badgeResponse.badges)}`
+            content: `Successfully added badge ${badgeName} to friend code "${fc}"\nThis player's badges are: ${listBadges(badgeResponse.badges)}`,
         });
     }
 }
@@ -87,7 +87,7 @@ async function remove(interaction: ChatInputCommandInteraction<CacheType>): Prom
     const [valid, err] = validateID(id);
     if (!valid) {
         await interaction.reply({
-            content: `Error removing badge from friend code or pid "${id}": ${err}`
+            content: `Error removing badge from friend code or pid "${id}": ${err}`,
         });
         return;
     }
@@ -107,13 +107,13 @@ async function remove(interaction: ChatInputCommandInteraction<CacheType>): Prom
         }),
         headers: {
             "Content-Type": "application/json",
-            "Authorization": `Bearer ${config.wfcSecret}`
-        }
+            "Authorization": `Bearer ${config.wfcSecret}`,
+        },
     });
 
     if (!response.ok) {
         await interaction.editReply({
-            content: `Failed to remove badge ${badgeName} from friend code "${fc}": error ${response.status}`
+            content: `Failed to remove badge ${badgeName} from friend code "${fc}": error ${response.status}`,
         });
         return;
     }
@@ -122,7 +122,7 @@ async function remove(interaction: ChatInputCommandInteraction<CacheType>): Prom
 
         if (!badgeResponse.success) {
             await interaction.editReply({
-                content: `Failed to remove badge ${badgeName} from friend code "${fc}": error ${badgeResponse.message}`
+                content: `Failed to remove badge ${badgeName} from friend code "${fc}": error ${badgeResponse.message}`,
             });
             return;
         }
@@ -135,7 +135,7 @@ async function remove(interaction: ChatInputCommandInteraction<CacheType>): Prom
 
 
         await interaction.editReply({
-            content: `Successfully removed badge ${badgeName} from friend code "${fc}"\nThis player's badges are: ${badgeString}`
+            content: `Successfully removed badge ${badgeName} from friend code "${fc}"\nThis player's badges are: ${badgeString}`,
         });
     }
 }
@@ -151,9 +151,9 @@ async function list(interaction: ChatInputCommandInteraction<CacheType>): Promis
 }
 
 interface BadgeListState {
-    Badges: Dictionary<BadgeType[]>,
+    Badges: Dictionary<BadgeType[]>;
     Idx: number;
-    Embeds: EmbedBuilder[],
+    Embeds: EmbedBuilder[];
 }
 
 const stateByMessageID: Dictionary<BadgeListState> = {};
@@ -166,7 +166,7 @@ async function listAll(interaction: ChatInputCommandInteraction<CacheType>): Pro
 
     if (!response.ok) {
         await interaction.editReply({
-            content: `Failed to fetch all badges: error ${response.status}`
+            content: `Failed to fetch all badges: error ${response.status}`,
         });
         return;
     }
@@ -200,7 +200,7 @@ async function listAll(interaction: ChatInputCommandInteraction<CacheType>): Pro
     if (err) {
         const fc = pidToFc(parseInt(keys[0]));
         await interaction.editReply({
-            content: `Failed to fetch embed for player ${fc}: ${err}`
+            content: `Failed to fetch embed for player ${fc}: ${err}`,
         });
 
         return;
@@ -242,7 +242,7 @@ async function handleButton(buttonInteraction: ButtonInteraction<CacheType>): Pr
     state.Idx = newIndexFromButtonInteraction(
         buttonInteraction,
         state.Idx,
-        maxIdx
+        maxIdx,
     );
 
     const row = new ActionRowBuilder()
@@ -250,7 +250,7 @@ async function handleButton(buttonInteraction: ButtonInteraction<CacheType>): Pr
             getNavigationButtons(
                 buttonInteraction.user.id,
                 state.Idx,
-                maxIdx
+                maxIdx,
             ),
         );
 
@@ -263,7 +263,7 @@ async function handleButton(buttonInteraction: ButtonInteraction<CacheType>): Pr
             const fc = pidToFc(parseInt(keys[state.Idx]));
             await buttonInteraction.update({
                 content: `Failed to fetch embed for player ${fc}: ${err}`,
-                components: [row as unknown as APIMessageTopLevelComponent]
+                components: [row as unknown as APIMessageTopLevelComponent],
             });
             return;
         }
@@ -286,7 +286,7 @@ async function listSingle(interaction: ChatInputCommandInteraction<CacheType>, i
     const [valid, err] = validateID(id);
     if (!valid) {
         await interaction.reply({
-            content: `Error retrieving badges for friend code or pid "${id}": ${err}`
+            content: `Error retrieving badges for friend code or pid "${id}": ${err}`,
         });
         return;
     }
@@ -300,7 +300,7 @@ async function listSingle(interaction: ChatInputCommandInteraction<CacheType>, i
 
     if (!response.ok) {
         await interaction.editReply({
-            content: `Failed to fetch badges for friend code ${fc}: error ${response.status}`
+            content: `Failed to fetch badges for friend code ${fc}: error ${response.status}`,
         });
         return;
     }
@@ -313,7 +313,7 @@ async function listSingle(interaction: ChatInputCommandInteraction<CacheType>, i
         badgesString = listBadges(badges);
 
     await interaction.editReply({
-        content: `${fc}: ${badgesString}`
+        content: `${fc}: ${badgesString}`,
     });
 }
 
@@ -375,9 +375,9 @@ export const command: Command = {
         const filtered = focused.value.length == 0
             ? BadgeOpts
             : BadgeOpts.filter(
-                opt => opt.name.toLowerCase().includes(focused.value.toLowerCase())
+                opt => opt.name.toLowerCase().includes(focused.value.toLowerCase()),
             );
 
         await interaction.respond(filtered.slice(0, Math.min(filtered.length, 25)));
-    }
+    },
 };

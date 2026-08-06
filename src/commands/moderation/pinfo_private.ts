@@ -17,5 +17,5 @@ export const command: Command = {
 
     exec: async function(interaction: ChatInputCommandInteraction<CacheType>): Promise<void> {
         await pinfo(interaction, true);
-    }
+    },
 };

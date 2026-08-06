@@ -17,7 +17,7 @@ export const command: Command = {
 
         await interaction.reply({
             content: permissionBitsToList(permissionsBits).join(", "),
-            flags: MessageFlags.Ephemeral
+            flags: MessageFlags.Ephemeral,
         });
-    }
+    },
 };

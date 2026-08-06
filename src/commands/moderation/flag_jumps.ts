@@ -26,7 +26,7 @@ export const command: Command = {
         if (!valid) {
             await interaction.reply({
                 content: `Error checking friend code or pid "${id}": ${err}`,
-                flags: MessageFlags.Ephemeral
+                flags: MessageFlags.Ephemeral,
             });
             return;
         }
@@ -41,8 +41,8 @@ export const command: Command = {
             const leaderboardResponse = await fetch(`${leaderboardUrl}/api/moderation/suspicious-jumps/${pid}`, {
                 method: "GET",
                 headers: {
-                    "Authorization": `Bearer ${config.wfcSecret}`
-                }
+                    "Authorization": `Bearer ${config.wfcSecret}`,
+                },
             });
 
             if (leaderboardResponse.ok) {
@@ -50,7 +50,7 @@ export const command: Command = {
 
                 if (res.count === 0 && !res.player.flagReason && !res.player.unflagReason) {
                     await interaction.editReply({
-                        content: `No suspicious VR jumps found for player ${res.player.name} (${fc})`
+                        content: `No suspicious VR jumps found for player ${res.player.name} (${fc})`,
                     });
                     return;
                 }
@@ -65,7 +65,7 @@ export const command: Command = {
                     `Friend Code: ${fc}`,
                     `Total Suspicious Jumps: ${res.count}`,
                     `Currently Flagged: ${res.player.isSuspicious ? "Yes" : "No"}`,
-                    ...reasonLines
+                    ...reasonLines,
                 ].join("\n");
 
                 const embed = new EmbedBuilder()
@@ -81,13 +81,13 @@ export const command: Command = {
                         month: "short",
                         day: "numeric",
                         hour: "2-digit",
-                        minute: "2-digit"
+                        minute: "2-digit",
                     });
 
                     embed.addFields({
                         name: dateStr,
                         value: `Change: ${jump.vrChange > 0 ? "+" : ""}${jump.vrChange} VR → Total: ${jump.totalVR} VR`,
-                        inline: true
+                        inline: true,
                     });
                 }
 
@@ -104,15 +104,15 @@ export const command: Command = {
                 console.error(`Failed to get suspicious jumps for ${pid}: ${leaderboardResponse.status}`);
                 console.error(`Error details: ${errorText}`);
                 await interaction.editReply({
-                    content: `Failed to retrieve suspicious jumps for friend code "${fc}": error ${leaderboardResponse.status}`
+                    content: `Failed to retrieve suspicious jumps for friend code "${fc}": error ${leaderboardResponse.status}`,
                 });
             }
         }
         catch (error) {
             console.error(`Error calling leaderboard API for player ${pid}:`, error);
             await interaction.editReply({
-                content: `Failed to retrieve suspicious jumps for friend code "${fc}": network error`
+                content: `Failed to retrieve suspicious jumps for friend code "${fc}": network error`,
             });
         }
-    }
+    },
 };

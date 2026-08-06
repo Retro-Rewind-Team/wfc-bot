@@ -50,7 +50,7 @@ export const command: Command = {
         const leaderboardUrl = `http://${config.leaderboardServer}:${config.leaderboardPort}`;
         const response = await fetch(`${leaderboardUrl}/api/moderation/timetrial/profile/${profileId}`, {
             method: "GET",
-            headers: { "Authorization": `Bearer ${config.wfcSecret}` }
+            headers: { "Authorization": `Bearer ${config.wfcSecret}` },
         });
 
         if (response.ok) {
@@ -66,7 +66,7 @@ export const command: Command = {
                 .addFields(
                     { name: "Total Submissions", value: profile.totalSubmissions.toString(), inline: true },
                     { name: "Current World Records", value: profile.currentWorldRecords.toString(), inline: true },
-                    { name: "Country", value: profile.countryName || "Not set", inline: true }
+                    { name: "Country", value: profile.countryName || "Not set", inline: true },
                 )
                 .setTimestamp();
 
@@ -75,8 +75,8 @@ export const command: Command = {
         else {
             const errorData = await response.json() as ErrorResponse;
             await interaction.editReply({
-                content: `Failed to fetch profile: ${errorData.message || response.statusText}`
+                content: `Failed to fetch profile: ${errorData.message || response.statusText}`,
             });
         }
-    }
+    },
 };

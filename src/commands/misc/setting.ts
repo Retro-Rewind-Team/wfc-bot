@@ -88,5 +88,5 @@ export const command: Command = {
             embeds: [embed],
             flags: MessageFlags.Ephemeral,
         });
-    }
+    },
 };

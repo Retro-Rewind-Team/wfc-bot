@@ -8,41 +8,41 @@ const config = getConfig();
 const channels = getChannels();
 
 interface Mii {
-    data: string,
-    name: string,
+    data: string;
+    name: string;
 }
 
 interface Player {
-    count: string,
-    pid: string,
-    name: string,
-    conn_map: string,
-    conn_fail: string,
-    suspend: string,
-    fc: string,
-    ev: string,
-    eb: string,
-    mii: Mii[],
+    count: string;
+    pid: string;
+    name: string;
+    conn_map: string;
+    conn_fail: string;
+    suspend: string;
+    fc: string;
+    ev: string;
+    eb: string;
+    mii: Mii[];
 }
 
 export interface Group {
-    id: string,
-    game: string,
-    created: string,
-    type: string,
-    suspend: boolean,
-    host: string,
-    rk: string,
-    players: Dictionary<Player>,
-    averageVR: number,
+    id: string;
+    game: string;
+    created: string;
+    type: string;
+    suspend: boolean;
+    host: string;
+    rk: string;
+    players: Dictionary<Player>;
+    averageVR: number;
     // Marked true if the room was high vr (and above the min player count) at
     // any point in time
-    highVRPinged: boolean,
+    highVRPinged: boolean;
 }
 
 interface Groups {
-    timestamp: number,
-    rooms: Group[],
+    timestamp: number;
+    rooms: Group[];
 }
 
 let groups: Groups | null = null;
