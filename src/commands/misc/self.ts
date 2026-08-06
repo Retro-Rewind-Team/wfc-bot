@@ -69,10 +69,10 @@ async function froomKick(interaction: ChatInputCommandInteraction<CacheType>): P
     const pid = resolvePidFromString(id);
     await interaction.deferReply();
 
-    const [success, res] = await makeWFCRequest("/api/self", "POST", {
+    const [success, res] = await makeWFCRequest("/self", "POST", {
         secret: config.wfcSecret,
         discordID: discordID,
-        command: "froom_kick",
+        command: "kick_froom",
         pid: pid,
     });
 
@@ -98,7 +98,7 @@ async function selfKick(interaction: ChatInputCommandInteraction<CacheType>): Pr
 
     await interaction.deferReply();
 
-    const [success, res] = await makeWFCRequest("/api/self", "POST", {
+    const [success, res] = await makeWFCRequest("/self", "POST", {
         secret: config.wfcSecret,
         discordID: discordID,
         command: "kick",
