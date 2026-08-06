@@ -284,7 +284,10 @@ const idRegex = new RegExp(/^\d+$/);
 
 function fmtDeviceID(deviceIDs: number[]): string {
     if (!deviceIDs)
-        return "null";
+        return "Null";
+
+    if (deviceIDs.length == 0)
+        return "None";
 
     let ret = "";
 
@@ -437,8 +440,6 @@ export function createUserEmbed(
     }
 
     if (opts.priv) {
-        const csnums = user.Csnum?.join(", ") ?? "null";
-
         if (opts.verbose) {
             embed.addFields(
                 { name: "User ID", value: `${user.UserId}` },
@@ -450,13 +451,32 @@ export function createUserEmbed(
             );
         }
 
+        console.log(user.Csnum);
+        console.log(user.NgDeviceId);
+        console.log(user.LastIPAddress);
+
+        const csnums = !user.Csnum
+            ? "Null"
+            : user.Csnum.length == 0
+                ? "None"
+                : user.Csnum.join(", ");
+
         if (opts.showPII) {
-            embed.addFields(
-                { name: "NG Device IDs", value: `${fmtDeviceID(user.NgDeviceId)}` },
-                { name: "Last IP Address", value: `${user.LastIPAddress}` },
-                { name: "IP Info", value: `https://ipinfo.io/${user.LastIPAddress}` },
-                { name: "Console Serial Numbers", value: `${csnums.length <= 1024 ? csnums : "Too many Serial Numbers!"}` },
-            );
+            embed.addFields({ name: "NG Device IDs", value: `${fmtDeviceID(user.NgDeviceId) }` } );
+
+            if (user.LastIPAddress != "") {
+                embed.addFields(
+                    { name: "Last IP Address", value: `${user.LastIPAddress }` },
+                    { name: "IP Info", value: `https://ipinfo.io/${user.LastIPAddress }` },
+                );
+            }
+            else
+                embed.addFields({ name: "Last IP Address", value: "None" });
+
+            embed.addFields({
+                name: "Console Serial Numbers",
+                value: `${csnums.length<=1024?csnums: "Too many Serial Numbers!" }`,
+            });
         }
     }
 
