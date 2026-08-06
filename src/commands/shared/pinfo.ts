@@ -1,5 +1,5 @@
 import { CacheType, ChatInputCommandInteraction, InteractionReplyOptions, MessageFlags, } from "discord.js";
-import { createUserEmbed, makeWFCRequest, pidToFc, resolvePidFromString, validateID } from "#src/utils.js";
+import { createUserEmbed, makeWFCRequest, pidToFc, resolvePidFromString, validateID, WiiLinkUser } from "#src/utils.js";
 import { getConfig } from "#src/config.js";
 
 const config = getConfig();
@@ -23,12 +23,12 @@ export async function pinfo(interaction: ChatInputCommandInteraction<CacheType>,
     let id = interaction.options.getString("id", true);
     id = id.trim();
 
-    const [valid, err] = validateID(id);
+    const [valid, idErr] = validateID(id);
     if (!valid) {
         await reply(
             interaction,
             priv,
-            { content: `Error retrieving friend code or pid "${id}": ${err}` }
+            { content: `Error retrieving friend code or pid "${id}": ${idErr}` }
         );
         return;
     }
@@ -36,17 +36,13 @@ export async function pinfo(interaction: ChatInputCommandInteraction<CacheType>,
     const pid = resolvePidFromString(id);
 
     const fc = pidToFc(pid);
-    const [success, res] = await makeWFCRequest("/pinfo", "POST", {
-        pid: pid,
-        secret: priv ? config.wfcSecret : null
-    });
-    if (!success) {
+    const [user, err] = await fetchPinfo(pid, priv);
+    if (err) {
         await reply(
             interaction,
             priv,
-            { content: `Failed to query friend code "${fc}": error ${res.Error ?? "no error message provided"}` }
+            { content: `Failed to fetch info for friend code "${fc}": error ${err}` }
         );
-
         return;
     }
 
@@ -54,7 +50,7 @@ export async function pinfo(interaction: ChatInputCommandInteraction<CacheType>,
         interaction,
         priv,
         { embeds: [
-            createUserEmbed(res.User, {
+            createUserEmbed(user, {
                 priv: priv,
                 hideMii: false,
                 verbose: true,
@@ -62,4 +58,13 @@ export async function pinfo(interaction: ChatInputCommandInteraction<CacheType>,
             })
         ]}
     );
+}
+
+export async function fetchPinfo(pid: number, priv: boolean): Promise<[WiiLinkUser, string | null]> {
+    const [success, res] = await makeWFCRequest("/pinfo", "POST", {
+        pid: pid,
+        secret: priv ? config.wfcSecret : null,
+    });
+
+    return [ res.User, success ? null : res.Error ?? "no error message provided" ];
 }
