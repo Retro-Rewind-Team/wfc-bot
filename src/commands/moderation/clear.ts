@@ -11,18 +11,21 @@ export const command: Command = {
 
     data: new SlashCommandBuilder()
         .setName("clear")
-        .setDescription("Clear a user from the database")
+        .setDescription("Clear a user's login info from the database")
         .addStringOption(option => option.setName("id")
             .setDescription("friend code or pid to clear")
             .setRequired(true))
         .addStringOption(option => option.setName("reason")
             .setDescription("clear reason")
             .setRequired(true))
+        .addBooleanOption(option => option.setName("full")
+            .setDescription("should the entire profile be wiped"))
         .setDefaultMemberPermissions(resolveModRestrictPermission()),
 
     exec: async function(interaction: ChatInputCommandInteraction<CacheType>): Promise<void> {
         let id = interaction.options.getString("id", true);
         id = id.trim();
+        const full = interaction.options.getBoolean("full") ?? false;
 
         const [valid, err] = validateID(id);
         if (!valid) {
@@ -34,14 +37,18 @@ export const command: Command = {
         const reason = interaction.options.getString("reason", true);
 
         const fc = pidToFc(pid);
-        const [success, res] = await makeWFCRequest("/clear", "POST", { secret: config.wfcSecret, pid: pid });
+        const [success, res] = await makeWFCRequest("/clear", "POST", {
+            secret: config.wfcSecret,
+            pid: pid,
+            full: full,
+        });
         if (success) {
             await sendEmbedLog(interaction, res.User, {
-                action: "clear",
+                action: full ? "clear" : "partial-clear",
                 extraFields: [{ name: "Reason", value: reason }],
                 noPublicEmbed: true,
-                verbose: true,
-                showBanInfo: true,
+                verbose: full,
+                showBanInfo: full,
             });
         }
         else
