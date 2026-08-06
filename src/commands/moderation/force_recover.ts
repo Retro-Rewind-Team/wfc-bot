@@ -10,9 +10,8 @@ export const command: Command = {
     data: new SlashCommandBuilder()
         .setName("force_recover")
         .setDescription("Recover any friend code on an rksys.dat save")
-        .addAttachmentOption(option => option
-            .setName("rksys")
-            .setDescription("The rksys.dat save to modify")
+        .addStringOption(option => option.setName("id")
+            .setDescription("friend code or pid to recover")
             .setRequired(true))
         .addIntegerOption(option => option
             .setName("license")
@@ -20,9 +19,9 @@ export const command: Command = {
             .setMinValue(1)
             .setMaxValue(4)
             .setRequired(true))
-        .addStringOption(option => option
-            .setName("id")
-            .setDescription("Friend code or profile ID to recover")
+        .addAttachmentOption(option => option
+            .setName("rksys")
+            .setDescription("The rksys.dat save to modify")
             .setRequired(true))
         .setDefaultMemberPermissions(resolveModRestrictPermission()),
 
