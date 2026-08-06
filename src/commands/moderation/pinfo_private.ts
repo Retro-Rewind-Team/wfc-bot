@@ -13,6 +13,8 @@ export const command: Command = {
         .addStringOption(option => option.setName("id")
             .setDescription("friend code to retrieve")
             .setRequired(true))
+        .addBooleanOption(option => option.setName("verbose")
+            .setDescription("display verbose fields"))
         .setDefaultMemberPermissions(resolveModRestrictPermission()),
 
     exec: async function(interaction: ChatInputCommandInteraction<CacheType>): Promise<void> {

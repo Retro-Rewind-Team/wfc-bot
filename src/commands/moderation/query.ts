@@ -36,6 +36,8 @@ export const command: Command = {
             .setDescription("whether the user is banned, defaults to either if unset"))
         .addStringOption(option => option.setName("id")
             .setDescription("friend code to retrieve"))
+        .addBooleanOption(option => option.setName("verbose")
+            .setDescription("display verbose fields"))
         .setDefaultMemberPermissions(resolveModRestrictPermission()),
 
     exec: async function(interaction: ChatInputCommandInteraction<CacheType>): Promise<void> {
@@ -47,6 +49,7 @@ export const command: Command = {
         const banned = interaction.options.getBoolean("banned");
         let id = interaction.options.getString("id") ?? "";
         id = id.trim();
+        const verbose = interaction.options.getBoolean("verbose") ?? false;
 
         let pid = 0;
         if (id != "") {
@@ -113,7 +116,7 @@ export const command: Command = {
             embeds.push(
                 createUserEmbed(user, {
                     priv: true,
-                    verbose: true,
+                    verbose: verbose,
                     showBanInfo: true,
                     showPII: showPII,
                 }).setFooter({

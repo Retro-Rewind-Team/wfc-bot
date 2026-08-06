@@ -22,6 +22,7 @@ async function reply(
 export async function pinfo(interaction: ChatInputCommandInteraction<CacheType>, priv: boolean): Promise<void> {
     let id = interaction.options.getString("id", true);
     id = id.trim();
+    const verbose = interaction.options.getBoolean("verbose") ?? false;
 
     const [valid, idErr] = validateID(id);
     if (!valid) {
@@ -53,7 +54,7 @@ export async function pinfo(interaction: ChatInputCommandInteraction<CacheType>,
             createUserEmbed(user, {
                 priv: priv,
                 hideMii: false,
-                verbose: true,
+                verbose: verbose,
                 showBanInfo: true,
             }),
         ]},
