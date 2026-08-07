@@ -1,7 +1,7 @@
 import { CacheType, ChatInputCommandInteraction, EmbedBuilder, MessageFlags, PermissionFlagsBits, SlashCommandBuilder } from "discord.js";
-import { getChannels, getConfig } from "../../config.js";
-import { capitalize, getColor, makeWFCRequest } from "../../utils.js";
-import { PermissionBit } from "../shared/roles.js";
+import { capitalize, getColor, makeWFCRequest } from "#src/utils.js";
+import { getChannels, getConfig } from "#src/config.js";
+import { PermissionBit } from "#src/commands/shared/roles.js";
 
 const config = getConfig();
 
