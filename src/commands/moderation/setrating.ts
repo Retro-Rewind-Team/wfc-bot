@@ -1,7 +1,7 @@
 import { CacheType, ChatInputCommandInteraction, SlashCommandBuilder } from "discord.js";
-import { getConfig } from "../../config.js";
-import { makeWFCRequest, pidToFc, resolveModRestrictPermission, resolvePidFromString, sendEmbedLog, validateID } from "../../utils.js";
-import { PermissionBit } from "../shared/roles.js";
+import { getConfig } from "#src/config.js";
+import { makeWFCRequest, pidToFc, resolveModRestrictPermission, resolvePidFromString, sendEmbedLog, validateID } from "#src/utils.js";
+import { PermissionBit } from "#src/commands/shared/roles.js";
 
 const config = getConfig();
 
@@ -13,7 +13,7 @@ const ratingChoices = [
     { name: "MMR Vanilla", value: "mmr_vanilla" },
 ];
 
-const ratingLimits: Record<string, { min: number, max: number }> = {
+const ratingLimits: Record<string, { min: number; max: number }> = {
     vr: { min: 100, max: 1000000 },
     br: { min: 100, max: 1000000 },
     mmr_rt: { min: 100, max: 30000 },
