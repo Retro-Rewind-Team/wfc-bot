@@ -20,50 +20,50 @@ export default tseslint.config(
         languageOptions: {
             parserOptions: {
                 projectService: true,
-            }
+            },
         },
         rules: {
+            "brace-style": ["error", "stroustrup"],
+            curly: ["error", "multi-or-nest"],
             indent: ["error", 4, {
                 SwitchCase: 0,
             }],
-            "@typescript-eslint/no-unused-vars": ["error", {
-                argsIgnorePattern: "^_"
+            "nonblock-statement-body-position": ["error", "below"],
+            "no-restricted-globals": [
+                "error",
+                {
+                    name: "fetch",
+                    message: "Use imported fetch instead.",
+                },
+            ],
+            "no-restricted-imports": ["error", {
+                patterns: [".*"],
             }],
-            semi: ["warn", "always"],
+            "no-trailing-spaces": "error",
             quotes: ["warn", "double"],
+            semi: ["warn", "always"],
             "sort-imports": ["error", {
                 ignoreCase: true,
                 ignoreDeclarationSort: true,
                 ignoreMemberSort: false,
             }],
-            curly: ["error", "multi-or-nest"],
-            "brace-style": ["error", "stroustrup"],
-            "no-trailing-spaces": "error",
-            "nonblock-statement-body-position": ["error", "below"],
-            "@typescript-eslint/no-floating-promises": ["error"],
             "@typescript-eslint/explicit-function-return-type": "error",
-            "no-restricted-globals": [
-                "error",
-                {
-                    name: "fetch",
-                    message: "Use imported fetch instead."
-                }
-            ],
-            "no-restricted-imports": ["error", {
-                patterns: [".*"]
+            "@typescript-eslint/no-floating-promises": ["error"],
+            "@typescript-eslint/no-unused-vars": ["error", {
+                argsIgnorePattern: "^_",
             }],
+            "@stylistic/comma-dangle": ["error", "always-multiline"],
             "@stylistic/member-delimiter-style": ["error", {
                 multiline: {
                     delimiter: "semi",
-                    requireLast: true
+                    requireLast: true,
                 },
                 singleline: {
                     delimiter: "semi",
-                    requireLast: false
+                    requireLast: false,
                 },
-                multilineDetection: "brackets"
+                multilineDetection: "brackets",
             }],
-            "@stylistic/comma-dangle": ["error", "always-multiline"],
             "import/order": ["error", {
                 alphabetize: {
                     order: "asc",
@@ -84,5 +84,5 @@ export default tseslint.config(
                 ],
             }],
         },
-    }
+    },
 );
