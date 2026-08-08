@@ -1,7 +1,7 @@
-import { Command } from "#src/commands/shared/command.js";
 import { CacheType, ChatInputCommandInteraction, SlashCommandBuilder } from "discord.js";
-import { PermissionBit } from "#src/commands/shared/roles.js";
 import { pidToFc, resolvePidFromString, validateID } from "#src/utils.js";
+import { Command } from "#src/commands/shared/command.js";
+import { PermissionBit } from "#src/commands/shared/roles.js";
 import { fetchStatsEmbed } from "#src/commands/shared/stats_embed.js";
 
 export const command: Command = {

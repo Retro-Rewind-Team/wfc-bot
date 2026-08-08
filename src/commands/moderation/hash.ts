@@ -1,9 +1,9 @@
-import { _fetch as fetch } from "#src/fetch.js";
-import { Command } from "#src/commands/shared/command.js";
+import crypto from "crypto";
 import { CacheType, ChatInputCommandInteraction, EmbedBuilder, GuildMember, MessageFlags, SlashCommandBuilder } from "discord.js";
 import { getChannels, getConfig } from "#src/config.js";
-import crypto from "crypto";
+import { _fetch as fetch } from "#src/fetch.js";
 import { fmtHex, getColor, makeWFCRequest, resolveModRestrictPermission } from "#src/utils.js";
+import { Command } from "#src/commands/shared/command.js";
 import { packIDToName, PackOpts } from "#src/commands/shared/pack.js";
 import { PermissionBit } from "#src/commands/shared/roles.js";
 

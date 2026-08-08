@@ -1,9 +1,9 @@
-import { _fetch as fetch } from "#src/fetch.js";
-import { Command } from "#src/commands/shared/command.js";
 import { AutocompleteInteraction, CacheType, ChatInputCommandInteraction, EmbedBuilder, SlashCommandBuilder } from "discord.js";
 import { getConfig } from "#src/config.js";
-import { handleProfileAutocomplete } from "#src/commands/time_trial/tt_utils.js";
+import { _fetch as fetch } from "#src/fetch.js";
+import { Command } from "#src/commands/shared/command.js";
 import { PermissionBit } from "#src/commands/shared/roles.js";
+import { handleProfileAutocomplete } from "#src/commands/time_trial/tt_utils.js";
 
 const config = getConfig();
 

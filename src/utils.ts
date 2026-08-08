@@ -1,8 +1,8 @@
-import { _fetch as fetch } from "#src/fetch.js";
 import crypto from "crypto";
 import { CacheType, ChatInputCommandInteraction, EmbedBuilder, GuildMember, PermissionFlagsBits, TextChannel } from "discord.js";
 import { getChannels, getConfig } from "#src/config.js";
 import { Dictionary } from "#src/dictionary.js";
+import { _fetch as fetch } from "#src/fetch.js";
 
 const fcRegex = new RegExp(/[0-9]{4}-[0-9]{4}-[0-9]{4}/);
 const pidRegex = new RegExp(/^\d+$/);

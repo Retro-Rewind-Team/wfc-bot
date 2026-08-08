@@ -1,11 +1,11 @@
-import { _fetch as fetch } from "#src/fetch.js";
-import { Command } from "#src/commands/shared/command.js";
-import { AutocompleteInteraction, CacheType, ChatInputCommandInteraction, EmbedBuilder, GuildMember, Locale, MessageFlags, SlashCommandBuilder } from "discord.js";
-import { processCrashdump } from "#src/commands/shared/crash.js";
-import { getChannels } from "#src/config.js";
 import { exit } from "process";
-import { getColor } from "#src/utils.js";
+import { AutocompleteInteraction, CacheType, ChatInputCommandInteraction, EmbedBuilder, GuildMember, Locale, MessageFlags, SlashCommandBuilder } from "discord.js";
+import { getChannels } from "#src/config.js";
 import { Dictionary } from "#src/dictionary.js";
+import { _fetch as fetch } from "#src/fetch.js";
+import { getColor } from "#src/utils.js";
+import { Command } from "#src/commands/shared/command.js";
+import { processCrashdump } from "#src/commands/shared/crash.js";
 import { PermissionBit } from "#src/commands/shared/roles.js";
 
 const sheetsUrl = "https://docs.google.com/spreadsheets/d/1kas1J6RcIePcaRRxtTluPZm8C8kydpaoQBtRg15M-zM/export?format=tsv&gid=1003203252#gid=1003203252";

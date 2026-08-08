@@ -1,14 +1,14 @@
-import { _fetch as fetch } from "#src/fetch.js";
-import { Command } from "#src/commands/shared/command.js";
 import { ActionRowBuilder, APIMessageTopLevelComponent, AutocompleteInteraction, ButtonInteraction, CacheType, ChatInputCommandInteraction, EmbedBuilder, SlashCommandBuilder } from "discord.js";
-import { pidToFc, resolveModRestrictPermission, resolvePidFromString, validateID } from "#src/utils.js";
-import { BadgeOpts, BadgeType, listBadges } from "#src/commands/shared/badges.js";
 import { getConfig } from "#src/config.js";
 import { Dictionary } from "#src/dictionary.js";
-import { PermissionBit } from "#src/commands/shared/roles.js";
+import { _fetch as fetch } from "#src/fetch.js";
 import { registerButtonHandlerByMessageID } from "#src/index.js";
-import { fetchStatsEmbed, StatsSectionFlag } from "#src/commands/shared/stats_embed.js";
+import { pidToFc, resolveModRestrictPermission, resolvePidFromString, validateID } from "#src/utils.js";
+import { BadgeOpts, BadgeType, listBadges } from "#src/commands/shared/badges.js";
 import { getNavigationButtons, newIndexFromButtonInteraction, validateButtonInteraction } from "#src/commands/shared/buttons.js";
+import { Command } from "#src/commands/shared/command.js";
+import { PermissionBit } from "#src/commands/shared/roles.js";
+import { fetchStatsEmbed, StatsSectionFlag } from "#src/commands/shared/stats_embed.js";
 
 const config = getConfig();
 const leaderboardUrl = `http://${config.leaderboardServer}:${config.leaderboardPort}`;
