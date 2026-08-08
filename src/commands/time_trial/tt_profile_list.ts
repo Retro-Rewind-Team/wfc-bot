@@ -1,11 +1,11 @@
-import { _fetch as fetch } from "#src/fetch.js";
-import { Command } from "#src/commands/shared/command.js";
 import { ActionRowBuilder, APIMessageTopLevelComponent, ButtonInteraction, CacheType, ChatInputCommandInteraction, EmbedBuilder, SlashCommandBuilder } from "discord.js";
 import { getConfig } from "#src/config.js";
 import { Dictionary } from "#src/dictionary.js";
+import { _fetch as fetch } from "#src/fetch.js";
 import { registerButtonHandlerByMessageID } from "#src/index.js";
-import { PermissionBit } from "#src/commands/shared/roles.js";
 import { getNavigationButtons, newIndexFromButtonInteraction, validateButtonInteraction } from "#src/commands/shared/buttons.js";
+import { Command } from "#src/commands/shared/command.js";
+import { PermissionBit } from "#src/commands/shared/roles.js";
 
 const config = getConfig();
 const PROFILES_PER_PAGE = 10;

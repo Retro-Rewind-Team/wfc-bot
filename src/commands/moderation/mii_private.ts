@@ -1,7 +1,7 @@
-import { Command } from "#src/commands/shared/command.js";
 import { CacheType, ChatInputCommandInteraction, MessageFlags, SlashCommandBuilder } from "discord.js";
-import { createMiiEmbed, getMiiBuf, processMiiBuf } from "#src/commands/shared/mii.js";
 import { pidToFc, resolveModRestrictPermission, resolvePidFromString, validateID } from "#src/utils.js";
+import { Command } from "#src/commands/shared/command.js";
+import { createMiiEmbed, getMiiBuf, processMiiBuf } from "#src/commands/shared/mii.js";
 import { PermissionBit } from "#src/commands/shared/roles.js";
 
 export const command: Command = {

@@ -1,9 +1,9 @@
 import { CacheType, ChatInputCommandInteraction, SlashCommandBuilder } from "discord.js";
 import { getChannels, getConfig } from "#src/config.js";
 import { makeWFCRequest, pidToFc, resolvePidFromString, sendEmbedLog, validateID } from "#src/utils.js";
-import { PermissionBit } from "#src/commands/shared/roles.js";
 import { Command } from "#src/commands/shared/command.js";
 import { recover } from "#src/commands/shared/recover.js";
+import { PermissionBit } from "#src/commands/shared/roles.js";
 
 const config = getConfig();
 

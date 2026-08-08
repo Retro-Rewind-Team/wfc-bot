@@ -1,8 +1,8 @@
-import { _fetch as fetch } from "#src/fetch.js";
 import { CacheType, ChatInputCommandInteraction, MessageFlags } from "discord.js";
+import { _fetch as fetch } from "#src/fetch.js";
 import { pidToFc, resolvePidFromString, validateID } from "#src/utils.js";
-import { decodeDWCPlayerID, recoverRksys } from "#src/commands/shared/rksys.js";
 import { fetchPinfo } from "#src/commands/shared/pinfo.js";
+import { decodeDWCPlayerID, recoverRksys } from "#src/commands/shared/rksys.js";
 
 export async function recover(
     interaction: ChatInputCommandInteraction<CacheType>,

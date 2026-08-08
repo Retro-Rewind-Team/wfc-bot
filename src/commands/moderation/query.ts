@@ -1,11 +1,11 @@
-import { Command } from "#src/commands/shared/command.js";
 import { ActionRowBuilder, APIMessageTopLevelComponent, ButtonInteraction, CacheType, ChatInputCommandInteraction, EmbedBuilder, MessageFlags, SlashCommandBuilder } from "discord.js";
 import { getConfig } from "#src/config.js";
 import { Dictionary } from "#src/dictionary.js";
 import { registerButtonHandlerByMessageID } from "#src/index.js";
 import { createUserEmbed, makeWFCRequest, resolveModRestrictPermission, resolvePidFromString, validateID } from "#src/utils.js";
-import { hasPermissionBits, PermissionBit } from "#src/commands/shared/roles.js";
 import { getNavigationButtons, newIndexFromButtonInteraction, validateButtonInteraction } from "#src/commands/shared/buttons.js";
+import { Command } from "#src/commands/shared/command.js";
+import { hasPermissionBits, PermissionBit } from "#src/commands/shared/roles.js";
 
 const config = getConfig();
 

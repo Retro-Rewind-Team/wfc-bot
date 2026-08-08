@@ -1,8 +1,8 @@
-import { _fetch as fetch } from "#src/fetch.js";
-import { Command } from "#src/commands/shared/command.js";
 import { CacheType, ChatInputCommandInteraction, EmbedBuilder, MessageFlags, SlashCommandBuilder } from "discord.js";
-import { getColor, pidToFc, resolveModRestrictPermission, resolvePidFromString, validateID } from "#src/utils.js";
 import { getConfig } from "#src/config.js";
+import { _fetch as fetch } from "#src/fetch.js";
+import { getColor, pidToFc, resolveModRestrictPermission, resolvePidFromString, validateID } from "#src/utils.js";
+import { Command } from "#src/commands/shared/command.js";
 import { PermissionBit } from "#src/commands/shared/roles.js";
 
 const config = getConfig();

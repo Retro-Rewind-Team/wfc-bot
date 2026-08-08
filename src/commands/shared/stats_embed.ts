@@ -1,8 +1,8 @@
-import { _fetch as fetch } from "#src/fetch.js";
 import { EmbedBuilder } from "discord.js";
 import { getConfig } from "#src/config.js";
-import { BadgeType, listBadges } from "#src/commands/shared/badges.js";
+import { _fetch as fetch } from "#src/fetch.js";
 import { getColor, getMiiImageURL, pidToFc } from "#src/utils.js";
+import { BadgeType, listBadges } from "#src/commands/shared/badges.js";
 
 const config = getConfig();
 

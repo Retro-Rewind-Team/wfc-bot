@@ -3,6 +3,7 @@
 import eslint from "@eslint/js";
 import tseslint from "typescript-eslint";
 import stylistic from "@stylistic/eslint-plugin";
+import import_plugin from "eslint-plugin-import";
 
 export default tseslint.config(
     { ignores: [ "./build/**/*.js" ] },
@@ -10,6 +11,7 @@ export default tseslint.config(
         files: [ "./src/**/*.ts" ],
         plugins: {
             "@stylistic": stylistic,
+            "import": import_plugin,
         },
         extends: [
             eslint.configs.recommended,
@@ -62,6 +64,25 @@ export default tseslint.config(
                 multilineDetection: "brackets"
             }],
             "@stylistic/comma-dangle": ["error", "always-multiline"],
+            "import/order": ["error", {
+                alphabetize: {
+                    order: "asc",
+                    caseInsensitive: true,
+                },
+                distinctGroup: false,
+                groups: [
+                    "builtin",
+                    "external",
+                ],
+                "newlines-between": "never",
+                pathGroups: [
+                    {
+                        pattern: "#src/*",
+                        group: "external",
+                        position: "after",
+                    },
+                ],
+            }],
         },
     }
 );
