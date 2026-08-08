@@ -1,6 +1,6 @@
 import { CacheType, ChatInputCommandInteraction, InteractionReplyOptions, MessageFlags } from "discord.js";
-import { createUserEmbed, makeWFCRequest, pidToFc, resolvePidFromString, validateID, WiiLinkUser } from "#src/utils.js";
 import { getConfig } from "#src/config.js";
+import { createUserEmbed, makeWFCRequest, pidToFc, resolvePidFromString, validateID, WiiLinkUser } from "#src/utils.js";
 
 const config = getConfig();
 

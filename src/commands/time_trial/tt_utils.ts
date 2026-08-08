@@ -1,6 +1,6 @@
-import { _fetch as fetch } from "#src/fetch.js";
 import { AutocompleteInteraction } from "discord.js";
 import { getConfig } from "#src/config.js";
+import { _fetch as fetch } from "#src/fetch.js";
 
 const config = getConfig();
 

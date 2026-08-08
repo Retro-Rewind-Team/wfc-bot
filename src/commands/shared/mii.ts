@@ -1,6 +1,6 @@
+import { EmbedBuilder } from "discord.js";
 import { getConfig } from "#src/config.js";
 import { getColor, getMiiImageURL, makeWFCRequest, resolvePidFromString, validateID } from "#src/utils.js";
-import { EmbedBuilder } from "discord.js";
 
 // Name lengths are 10, each char is 2 bytes
 const NAME_LEN = 10;

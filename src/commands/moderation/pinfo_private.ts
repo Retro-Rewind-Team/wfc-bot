@@ -1,7 +1,7 @@
-import { Command } from "#src/commands/shared/command.js";
 import { CacheType, ChatInputCommandInteraction, SlashCommandBuilder } from "discord.js";
-import { pinfo } from "#src/commands/shared/pinfo.js";
 import { resolveModRestrictPermission } from "#src/utils.js";
+import { Command } from "#src/commands/shared/command.js";
+import { pinfo } from "#src/commands/shared/pinfo.js";
 import { PermissionBit } from "#src/commands/shared/roles.js";
 
 export const command: Command = {

@@ -1,8 +1,8 @@
-import { Command } from "#src/commands/shared/command.js";
 import { CacheType, ChatInputCommandInteraction, EmbedBuilder, MessageFlags, SlashCommandBuilder } from "discord.js";
-import { getStats } from "#src/services/stats.js";
 import { getColor } from "#src/utils.js";
+import { Command } from "#src/commands/shared/command.js";
 import { PermissionBit } from "#src/commands/shared/roles.js";
+import { getStats } from "#src/services/stats.js";
 
 export const command: Command = {
     permissions: PermissionBit.NONE,

@@ -1,9 +1,9 @@
-import { _fetch as fetch } from "#src/fetch.js";
-import { Config, getConfig, setConfig } from "#src/config.js";
 import child_process from "child_process";
+import { existsSync, writeFileSync } from "fs";
 import os from "os";
 import { exit } from "process";
-import { existsSync, writeFileSync } from "fs";
+import { Config, getConfig, setConfig } from "#src/config.js";
+import { _fetch as fetch } from "#src/fetch.js";
 import { haste } from "#src/utils.js";
 import { SharedInitializer } from "#src/commands/shared/command.js";
 

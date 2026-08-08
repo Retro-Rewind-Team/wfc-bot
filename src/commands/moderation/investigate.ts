@@ -1,7 +1,7 @@
-import { Command } from "#src/commands/shared/command.js";
 import { CacheType, ChatInputCommandInteraction, MessageFlags, SlashCommandBuilder } from "discord.js";
-import { haste, makeWFCRequest, pidToFc, resolveModRestrictPermission, resolvePidFromString, validateID } from "#src/utils.js";
 import { getConfig } from "#src/config.js";
+import { haste, makeWFCRequest, pidToFc, resolveModRestrictPermission, resolvePidFromString, validateID } from "#src/utils.js";
+import { Command } from "#src/commands/shared/command.js";
 import { PermissionBit } from "#src/commands/shared/roles.js";
 
 const config = getConfig();

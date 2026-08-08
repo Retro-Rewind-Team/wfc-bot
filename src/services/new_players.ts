@@ -1,7 +1,7 @@
-import { Service } from "#src/services/service.js";
 import { EmbedBuilder } from "discord.js";
 import { getChannels, getConfig } from "#src/config.js";
 import { createUserEmbed, makeWFCRequest as makeWFCRequest, WiiLinkUser, wrapTryCatch } from "#src/utils.js";
+import { Service } from "#src/services/service.js";
 
 const config = getConfig();
 const channels = getChannels();

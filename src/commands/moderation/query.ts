@@ -1,9 +1,9 @@
-import { Command } from "#src/commands/shared/command.js";
 import { CacheType, ChatInputCommandInteraction, MessageFlags, SlashCommandBuilder } from "discord.js";
 import { getConfig } from "#src/config.js";
 import { makeWFCRequest, resolveModRestrictPermission, resolvePidFromString, validateID } from "#src/utils.js";
-import { hasPermissionBits, PermissionBit } from "#src/commands/shared/roles.js";
+import { Command } from "#src/commands/shared/command.js";
 import { replyUserEmbedList } from "#src/commands/shared/query.js";
+import { hasPermissionBits, PermissionBit } from "#src/commands/shared/roles.js";
 
 const config = getConfig();
 
