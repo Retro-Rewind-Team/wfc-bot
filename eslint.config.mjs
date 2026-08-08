@@ -22,9 +22,11 @@ export default tseslint.config(
         },
         rules: {
             indent: ["error", 4, {
-                "SwitchCase": 0,
+                SwitchCase: 0,
             }],
-            "@typescript-eslint/no-unused-vars": ["error", { "argsIgnorePattern": "^_" }],
+            "@typescript-eslint/no-unused-vars": ["error", {
+                argsIgnorePattern: "^_"
+            }],
             semi: ["warn", "always"],
             quotes: ["warn", "double"],
             "sort-imports": ["error", {
@@ -41,25 +43,25 @@ export default tseslint.config(
             "no-restricted-globals": [
                 "error",
                 {
-                    "name": "fetch",
-                    "message": "Use imported fetch instead."
+                    name: "fetch",
+                    message: "Use imported fetch instead."
                 }
             ],
             "no-restricted-imports": ["error", {
-                "patterns": [".*"]
+                patterns: [".*"]
             }],
             "@stylistic/member-delimiter-style": ["error", {
-                "multiline": {
-                    "delimiter": "semi",
-                    "requireLast": true
+                multiline: {
+                    delimiter: "semi",
+                    requireLast: true
                 },
-                "singleline": {
-                    "delimiter": "semi",
-                    "requireLast": false
+                singleline: {
+                    delimiter: "semi",
+                    requireLast: false
                 },
-                "multilineDetection": "brackets"
+                multilineDetection: "brackets"
             }],
-            "@stylistic/comma-dangle": ["error", "always-multiline"]
+            "@stylistic/comma-dangle": ["error", "always-multiline"],
         },
     }
 );
