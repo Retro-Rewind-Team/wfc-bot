@@ -1,20 +1,11 @@
 import { Command } from "#src/commands/shared/command.js";
-import { ActionRowBuilder, APIMessageTopLevelComponent, ButtonInteraction, CacheType, ChatInputCommandInteraction, EmbedBuilder, MessageFlags, SlashCommandBuilder } from "discord.js";
+import { CacheType, ChatInputCommandInteraction, MessageFlags, SlashCommandBuilder } from "discord.js";
 import { getConfig } from "#src/config.js";
-import { Dictionary } from "#src/dictionary.js";
-import { registerButtonHandlerByMessageID } from "#src/index.js";
-import { createUserEmbed, makeWFCRequest, resolveModRestrictPermission, resolvePidFromString, validateID } from "#src/utils.js";
+import { makeWFCRequest, resolveModRestrictPermission, resolvePidFromString, validateID } from "#src/utils.js";
 import { hasPermissionBits, PermissionBit } from "#src/commands/shared/roles.js";
-import { getNavigationButtons, newIndexFromButtonInteraction, validateButtonInteraction } from "#src/commands/shared/buttons.js";
+import { replyUserEmbedList } from "#src/commands/shared/query.js";
 
 const config = getConfig();
-
-interface QueryState {
-    Embeds: EmbedBuilder[];
-    Idx: number;
-}
-
-const stateByMessageID: Dictionary<QueryState> = {};
 
 export const command: Command = {
     permissions: PermissionBit.MODERATOR | PermissionBit.MINI_MODERATOR,
@@ -65,6 +56,7 @@ export const command: Command = {
             pid = resolvePidFromString(id);
         }
 
+        await interaction.deferReply({ flags: MessageFlags.Ephemeral });
 
         let hasban;
         if (banned == undefined || banned == null)
@@ -86,109 +78,28 @@ export const command: Command = {
         });
 
         if (!success) {
-            await interaction.reply({
+            await interaction.editReply({
                 content: `Failed to query users! ${res.Error ?? "no error message provided"}`,
-                flags: MessageFlags.Ephemeral,
             });
-
             return;
         }
 
         if (!res.Users || res.Users.length == 0) {
-            await interaction.reply({
-                content: "No users matching the query were found!",
-                flags: MessageFlags.Ephemeral,
-            });
-
+            await interaction.editReply({ content: "No users matching the query were found!" });
             return;
         }
 
-        const embeds: EmbedBuilder[] = [];
         // mini-mods don't get to see pii here.
         const showPII = hasPermissionBits(
             PermissionBit.SUPER_ADMIN | PermissionBit.ADMIN | PermissionBit.MODERATOR,
             interaction.user.id,
         );
 
-        for (let i = 0; i < res.Users.length; i++) {
-            const user = res.Users[i];
-
-            embeds.push(
-                createUserEmbed(user, {
-                    priv: true,
-                    verbose: verbose,
-                    showBanInfo: true,
-                    showPII: showPII,
-                }).setFooter({
-                    text: `User ${i + 1} of ${res.Users.length}`,
-                }),
-            );
-        }
-
-        if (embeds.length > 1) {
-            const row = new ActionRowBuilder()
-                .addComponents(getNavigationButtons(interaction.user.id));
-
-            const res = await interaction.reply({
-                embeds: [embeds[0]],
-                flags: MessageFlags.Ephemeral,
-                // I have to do this dumbass cast because apparently the docs
-                // lie or the typings are incorrect...
-                // https://discordjs.guide/message-components/buttons.html#sending-buttons
-                components: [row as unknown as APIMessageTopLevelComponent],
-            });
-
-            // Wrong ID is associated with the interaction's reply for some
-            // reason, but fetch gives the correct one!.
-            const message = await res.fetch();
-
-            registerButtonHandlerByMessageID(
-                message.id,
-                300000, // 5 minutes
-                (messageID) => {
-                    delete stateByMessageID[messageID];
-                },
-                handleButton,
-            );
-
-            stateByMessageID[message.id] = {
-                Embeds: embeds,
-                Idx: 0,
-            };
-        }
-        else {
-            await interaction.reply({
-                embeds: embeds,
-                flags: MessageFlags.Ephemeral,
-            });
-        }
+        await replyUserEmbedList(interaction, res.Users, {
+            priv: true,
+            verbose: verbose,
+            showBanInfo: true,
+            showPII: showPII,
+        });
     },
 };
-
-async function handleButton(buttonInteraction: ButtonInteraction<CacheType>): Promise<void> {
-    if (!await validateButtonInteraction(buttonInteraction))
-        return;
-
-    const state = stateByMessageID[buttonInteraction.message.id];
-
-    const maxIdx = state.Embeds.length - 1;
-    state.Idx = newIndexFromButtonInteraction(
-        buttonInteraction,
-        state.Idx,
-        maxIdx,
-    );
-
-    const row = new ActionRowBuilder()
-        .addComponents(
-            getNavigationButtons(
-                buttonInteraction.user.id,
-                state.Idx,
-                maxIdx,
-            ),
-        );
-
-    await buttonInteraction.update({
-        embeds: [state.Embeds[state.Idx]],
-        components: [row as unknown as APIMessageTopLevelComponent],
-    });
-}

@@ -1,9 +1,10 @@
-import { CacheType, ChatInputCommandInteraction, SlashCommandBuilder } from "discord.js";
+import { CacheType, ChatInputCommandInteraction, MessageFlags, SlashCommandBuilder } from "discord.js";
 import { getChannels, getConfig } from "#src/config.js";
 import { makeWFCRequest, pidToFc, resolvePidFromString, sendEmbedLog, validateID } from "#src/utils.js";
 import { PermissionBit } from "#src/commands/shared/roles.js";
 import { Command } from "#src/commands/shared/command.js";
 import { recover } from "#src/commands/shared/recover.js";
+import { replyUserEmbedList } from "#src/commands/shared/query.js";
 
 const config = getConfig();
 
@@ -14,6 +15,8 @@ export const command: Command = {
     data: new SlashCommandBuilder()
         .setName("self")
         .setDescription("Perform a command on yourself or a froom you host")
+        .addSubcommand(subcommand => subcommand.setName("list")
+            .setDescription("List your linked profiles"))
         .addSubcommand(subcommand => subcommand.setName("kick")
             .setDescription("Kick yourself"))
         .addSubcommand(subcommand => subcommand.setName("froom_kick")
@@ -41,6 +44,9 @@ export const command: Command = {
         const subcommand = interaction.options.getSubcommand(true);
 
         switch (subcommand) {
+        case "list":
+            await list(interaction);
+            break;
         case "froom_kick":
             await froomKick(interaction);
             break;
@@ -53,6 +59,37 @@ export const command: Command = {
         }
     },
 };
+
+async function list(interaction: ChatInputCommandInteraction<CacheType>): Promise<void> {
+    const discordID = interaction.user.id;
+
+    await interaction.deferReply({ flags: MessageFlags.Ephemeral });
+
+    const [success, res] = await makeWFCRequest("/query", "POST", {
+        secret: config.wfcSecret,
+        discordID: discordID,
+    });
+
+    if (!success) {
+        await interaction.editReply({
+            content: `Failed to query linked profiles! ${res.Error ?? "no error message provided"}`,
+        });
+        return;
+    }
+
+    if (!res.Users || res.Users.length == 0) {
+        await interaction.reply({
+            content: "No linked profiles were found",
+        });
+    }
+
+    await replyUserEmbedList(interaction, res.Users, {
+        priv: false,
+        verbose: false,
+        showBanInfo: true,
+        showPII: false,
+    });
+}
 
 async function froomKick(interaction: ChatInputCommandInteraction<CacheType>): Promise<void> {
     const discordID = interaction.user.id;
