@@ -64,6 +64,9 @@ export default tseslint.config(
                 },
                 multilineDetection: "brackets",
             }],
+            "@stylistic/max-len": ["error", {
+                code: 100,
+            }],
             "import/order": ["error", {
                 alphabetize: {
                     order: "asc",
