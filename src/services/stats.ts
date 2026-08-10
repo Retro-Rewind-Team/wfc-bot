@@ -32,7 +32,7 @@ async function fetchStats(): Promise<void> {
     const rooms = stats?.mariokartwii?.groups ?? 0;
 
     const presenceText =
-        `${playersInRooms}(${playersOnline}) ${utils.plural(playersInRooms, "player")} in ${rooms} ${utils.plural(rooms, "room")}!`;
+        `${playersInRooms}/${playersOnline} ${utils.plural(playersInRooms, "player")} in ${rooms} ${utils.plural(rooms, "room")}!`;
 
     client.user?.setPresence({
         status: "online",
