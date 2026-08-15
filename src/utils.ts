@@ -122,7 +122,7 @@ export async function makeWFCRequest(route: string, method: string, data?: objec
     catch (error) {
         console.error(`Failed to make request ${url}, error: ${error}`);
 
-        return [false, { error: error }];
+        return [false, { Error: error }];
     }
 }
 
