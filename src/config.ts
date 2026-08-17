@@ -34,6 +34,7 @@ export interface Config {
     leaderboardServer: string;
     leaderboardPort: number;
     logServices: boolean;
+    hasteServer: string;
     featureFlags: Record<FeatureFlag, boolean>;
 }
 
@@ -97,6 +98,7 @@ export async function initConfig(path: string): Promise<void> {
                 leaderboardPort: 5000,
                 leaderboardServer: "localhost",
                 logServices: false,
+                hasteServer: "https://paste.ppeb.me",
                 featureFlags: DefaultFeatureFlags,
             });
 
@@ -190,7 +192,9 @@ function migrateConfig(config: Config): boolean {
 
     const m5 = migrateConfigFeatureFlags(config);
 
-    return m1 || m2 || m3 || m4 || m5;
+    const m6 = migrateHasteServer(config);
+
+    return m1 || m2 || m3 || m4 || m5 || m6;
 }
 
 function migrateOldPermission(
@@ -229,6 +233,17 @@ function migrateAdminServers(config: Config): boolean {
         config.privilegedServers = adminServers;
 
         delete (oldConfig)["adminServers"];
+        return true;
+    }
+
+    return false;
+}
+
+function migrateHasteServer(config: Config): boolean {
+    if (!config.hasteServer || config.hasteServer.length == 0) {
+        console.log("Setting haste server to https://paste.ppeb.me");
+        config.hasteServer = "https://paste.ppeb.me";
+
         return true;
     }
 

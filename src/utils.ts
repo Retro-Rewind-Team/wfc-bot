@@ -480,7 +480,8 @@ export function createUserEmbed(
 }
 
 export async function haste(body: string): Promise<[number, string, string]> {
-    const res = await fetch("https://paste.ppeb.me/documents", {
+    const config = getConfig();
+    const res = await fetch(`${config.hasteServer}/documents`, {
         method: "POST",
         body: body,
     });
@@ -490,7 +491,7 @@ export async function haste(body: string): Promise<[number, string, string]> {
 
     const key = (await res.json()).key;
 
-    return [200, `https://paste.ppeb.me/${key}`, ""];
+    return [200, `${config.hasteServer}/${key}`, ""];
 }
 
 export function throwInline(err: string): never {
