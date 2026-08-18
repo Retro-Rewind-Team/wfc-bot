@@ -76,7 +76,7 @@ async function beginLink(
     }
     else {
         await interaction.editReply({
-            content: `Verification started for "${fc}"! Please add "${config.friendbot}" within 10 minutes!`,
+            content: `Verification started for "${fc}"! Please add "${config.friendbot}" in-game within 10 minutes!`,
         });
     }
 
