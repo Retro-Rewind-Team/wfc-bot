@@ -7,7 +7,7 @@ import { PermissionBit } from "#src/commands/shared/roles.js";
 const config = getConfig();
 const leaderboardUrl = `http://${config.leaderboardServer}:${config.leaderboardPort}`;
 
-interface MultiplierDto {
+interface Multiplier {
     id: number;
     channel: string;
     value: number;
@@ -15,30 +15,30 @@ interface MultiplierDto {
     endTime: string;
 }
 
-interface MultiplierResultDto {
+interface MultiplierResponse {
     success: boolean;
     message: string;
-    multiplier?: MultiplierDto;
+    multiplier?: Multiplier;
 }
 
-interface MultiplierListResultDto {
+interface MultiplierListResponse {
     success: boolean;
     count: number;
-    multipliers: MultiplierDto[];
+    multipliers: Multiplier[];
 }
 
-interface MultiplierDeletionResultDto {
+interface MultiplierDeleteResponse {
     success: boolean;
     message: string;
 }
 
-function fmtRange(multiplier: MultiplierDto): string {
+function fmtRange(multiplier: Multiplier): string {
     const start = Math.floor(new Date(multiplier.startTime).getTime() / 1000);
     const end = Math.floor(new Date(multiplier.endTime).getTime() / 1000);
     return `<t:${start}:F> to <t:${end}:F>`;
 }
 
-function fmtMultiplier(multiplier: MultiplierDto): string {
+function fmtMultiplier(multiplier: Multiplier): string {
     return `#${multiplier.id} [${multiplier.channel}] ${multiplier.value}x: ${fmtRange(multiplier)}`;
 }
 
@@ -86,7 +86,7 @@ async function set(interaction: ChatInputCommandInteraction<CacheType>): Promise
         return;
     }
 
-    const result: MultiplierResultDto = await response.json();
+    const result: MultiplierResponse = await response.json();
     if (!result.success) {
         await interaction.editReply({ content: `Failed to set multiplier: ${result.message}` });
         return;
@@ -110,7 +110,7 @@ async function list(interaction: ChatInputCommandInteraction<CacheType>): Promis
         return;
     }
 
-    const result: MultiplierListResultDto = await response.json();
+    const result: MultiplierListResponse = await response.json();
     if (result.count == 0) {
         await interaction.editReply({ content: "No scheduled multipliers." });
         return;
@@ -157,7 +157,7 @@ async function update(interaction: ChatInputCommandInteraction<CacheType>): Prom
         return;
     }
 
-    const result: MultiplierResultDto = await response.json();
+    const result: MultiplierResponse = await response.json();
     if (!result.success) {
         await interaction.editReply({ content: `Failed to update multiplier #${id}: ${result.message}` });
         return;
@@ -181,7 +181,7 @@ async function remove(interaction: ChatInputCommandInteraction<CacheType>): Prom
         return;
     }
 
-    const result: MultiplierDeletionResultDto = await response.json();
+    const result: MultiplierDeleteResponse = await response.json();
     if (!result.success) {
         await interaction.editReply({ content: `Failed to remove multiplier #${id}: ${result.message}` });
         return;
