@@ -278,6 +278,12 @@ export const wiiLinkErrorDefs: WiiLinkErrorDef[] = [
         description: "The payload version is outdated or invalid",
     },
     {
+        name: "WWFC_INVALID_PACK_VERSION",
+        regex: "22010",
+        card: "22010",
+        description: "The pack is outdated or invalid. Update your installation.",
+    },
+    {
         name: "WWFC_INVALID_ELO_ERROR",
         regex: "22009",
         card: "22009",
