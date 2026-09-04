@@ -40,7 +40,7 @@ export const command: Command = {
     exec: async function(interaction: ChatInputCommandInteraction<CacheType>): Promise<void> {
         await interaction.deferReply();
 
-        const leaderboardUrl = `http://${config.leaderboardServer}:${config.leaderboardPort}`;
+        const leaderboardUrl = config.leaderboardAPIBase;
         const response = await fetch(`${leaderboardUrl}/api/moderation/timetrial/profiles`, {
             method: "GET",
             headers: { "Authorization": `Bearer ${config.wfcSecret}` },

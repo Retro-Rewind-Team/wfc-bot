@@ -36,7 +36,7 @@ export const command: Command = {
 
         await interaction.deferReply({ flags: MessageFlags.Ephemeral });
 
-        const leaderboardUrl = `http://${config.leaderboardServer}:${config.leaderboardPort}`;
+        const leaderboardUrl = config.leaderboardAPIBase;
         try {
             const leaderboardResponse = await fetch(`${leaderboardUrl}/api/moderation/suspicious-jumps/${pid}`, {
                 method: "GET",

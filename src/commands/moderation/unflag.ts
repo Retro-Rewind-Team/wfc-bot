@@ -37,7 +37,7 @@ export const command: Command = {
         const fc = pidToFc(pid);
 
         // Call leaderboard API to unflag the player
-        const leaderboardUrl = `http://${config.leaderboardServer}:${config.leaderboardPort}`;
+        const leaderboardUrl = config.leaderboardAPIBase;
         try {
             const leaderboardResponse = await fetch(`${leaderboardUrl}/api/moderation/unflag`, {
                 method: "POST",

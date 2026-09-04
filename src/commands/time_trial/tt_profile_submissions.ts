@@ -59,7 +59,7 @@ export const command: Command = {
 
         await interaction.deferReply();
 
-        const leaderboardUrl = `http://${config.leaderboardServer}:${config.leaderboardPort}`;
+        const leaderboardUrl = config.leaderboardAPIBase;
         const response = await fetch(`${leaderboardUrl}/api/moderation/timetrial/submissions/search?ttProfileId=${profileId}&limit=${limit}`, {
             method: "GET",
             headers: { "Authorization": `Bearer ${config.wfcSecret}` },

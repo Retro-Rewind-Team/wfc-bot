@@ -40,7 +40,7 @@ export async function fetchTracks(): Promise<Track[]> {
         return tracksCache;
 
 
-    const leaderboardUrl = `http://${config.leaderboardServer}:${config.leaderboardPort}`;
+    const leaderboardUrl = config.leaderboardAPIBase;
     const response = await fetch(`${leaderboardUrl}/api/timetrial/tracks`, {
         method: "GET",
         headers: { "Authorization": `Bearer ${config.wfcSecret}` },
@@ -59,7 +59,7 @@ export async function fetchTracks(): Promise<Track[]> {
 }
 
 export async function fetchProfiles(): Promise<TTProfile[]> {
-    const leaderboardUrl = `http://${config.leaderboardServer}:${config.leaderboardPort}`;
+    const leaderboardUrl = config.leaderboardAPIBase;
     const response = await fetch(`${leaderboardUrl}/api/moderation/timetrial/profiles`, {
         method: "GET",
         headers: { "Authorization": `Bearer ${config.wfcSecret}` },
@@ -76,7 +76,7 @@ export async function fetchProfiles(): Promise<TTProfile[]> {
 }
 
 export async function fetchCountries(): Promise<Country[]> {
-    const leaderboardUrl = `http://${config.leaderboardServer}:${config.leaderboardPort}`;
+    const leaderboardUrl = config.leaderboardAPIBase;
     const response = await fetch(`${leaderboardUrl}/api/moderation/countries`, {
         method: "GET",
         headers: { "Authorization": `Bearer ${config.wfcSecret}` },

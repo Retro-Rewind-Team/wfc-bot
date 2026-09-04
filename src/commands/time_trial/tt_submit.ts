@@ -121,7 +121,7 @@ export const command: Command = {
         formData.append("glitch", glitch.toString());
         formData.append("isFlap", isFlap.toString());
 
-        const leaderboardUrl = `http://${config.leaderboardServer}:${config.leaderboardPort}`;
+        const leaderboardUrl = config.leaderboardAPIBase;
         const response = await fetch(`${leaderboardUrl}/api/moderation/timetrial/submit`, {
             method: "POST",
             headers: {

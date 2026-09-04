@@ -53,7 +53,7 @@ export const command: Command = {
         const sourceFc = pidToFc(sourcePid);
         const targetFc = pidToFc(targetPid);
 
-        const leaderboardUrl = `http://${config.leaderboardServer}:${config.leaderboardPort}`;
+        const leaderboardUrl = config.leaderboardAPIBase;
         try {
             const leaderboardResponse = await fetch(`${leaderboardUrl}/api/moderation/swap`, {
                 method: "POST",

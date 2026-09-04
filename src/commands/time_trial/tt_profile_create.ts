@@ -55,7 +55,7 @@ export const command: Command = {
 
         await interaction.deferReply();
 
-        const leaderboardUrl = `http://${config.leaderboardServer}:${config.leaderboardPort}`;
+        const leaderboardUrl = config.leaderboardAPIBase;
         const body: CreateProfileRequest = { displayName };
         if (countryCode)
             body.countryCode = parseInt(countryCode);

@@ -118,7 +118,7 @@ export const command: Command = {
 
         await interaction.deferReply();
 
-        const leaderboardUrl = `http://${config.leaderboardServer}:${config.leaderboardPort}`;
+        const leaderboardUrl = config.leaderboardAPIBase;
 
         const trackResponse = await fetch(`${leaderboardUrl}/api/timetrial/tracks/${trackId}`, {
             method: "GET",

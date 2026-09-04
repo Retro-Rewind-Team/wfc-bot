@@ -73,7 +73,7 @@ export const command: Command = {
 
         await interaction.deferReply();
 
-        const leaderboardUrl = `http://${config.leaderboardServer}:${config.leaderboardPort}`;
+        const leaderboardUrl = config.leaderboardAPIBase;
         const body: UpdateProfileRequest = {};
         if (displayName)
             body.displayName = displayName.trim();

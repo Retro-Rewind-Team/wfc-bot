@@ -49,7 +49,7 @@ export async function fetchStatsEmbed(
 ): Promise<[EmbedBuilder | null, string | null]> {
     const fc = typeof pid == "number" ? pidToFc(pid) : pidToFc(parseInt(pid));
 
-    const leaderboardUrl = `http://${config.leaderboardServer}:${config.leaderboardPort}`;
+    const leaderboardUrl = config.leaderboardAPIBase;
     try {
         const response = await fetch(`${leaderboardUrl}/api/racestats/player/${pid}/full`, {
             method: "GET",

@@ -11,7 +11,7 @@ import { fetchStatsEmbed, StatsSectionFlag } from "#src/commands/shared/stats_em
 import { getNavigationButtons, newIndexFromButtonInteraction, validateButtonInteraction } from "#src/commands/shared/buttons.js";
 
 const config = getConfig();
-const leaderboardUrl = `http://${config.leaderboardServer}:${config.leaderboardPort}`;
+const leaderboardUrl = config.leaderboardAPIBase;
 
 interface BadgeManageResponse {
     success: boolean;

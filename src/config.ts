@@ -11,6 +11,7 @@ export interface Config {
     applicationID: string;
     miiEndPoint: string;
     wfcAPIBase: string;
+    leaderboardAPIBase: string;
     wfcSecret: string;
     privilegedServers: string[];
     userPermissions: Dictionary<number>;
@@ -31,8 +32,6 @@ export interface Config {
     friendbot: string;
     packOwners: Dictionary<string[]>;
     pulsarToolsTag: string;
-    leaderboardServer: string;
-    leaderboardPort: number;
     logServices: boolean;
     hasteServer: string;
     featureFlags: Record<FeatureFlag, boolean>;
@@ -61,6 +60,9 @@ function verifyConfig(config: Config): void {
 
     if (!config.wfcAPIBase || config.wfcAPIBase.length == 0)
         throw "No wfcAPIBase is set! Please set one to continue.";
+
+    if (!config.leaderboardAPIBase || config.leaderboardAPIBase.length == 0)
+        throw "No leaderboardAPIBase is set! Please set one to continue.";
 }
 
 export async function initConfig(path: string): Promise<void> {
@@ -74,6 +76,7 @@ export async function initConfig(path: string): Promise<void> {
                 miiEndPoint: "https://rwfc.net/api/leaderboard/player/{fc}/mii",
                 wfcAPIBase: "base route for wfc apis. Something like http://rwfc.net/api",
                 wfcSecret: "your wfc secret key",
+                leaderboardAPIBase: "base route for leaderboard apis. Something like http://rwfc.net",
                 privilegedServers: [
                     "Allow guild ids here.",
                 ],
@@ -95,8 +98,6 @@ export async function initConfig(path: string): Promise<void> {
                 friendbot: "FC used to link discord accounts to WFC profiles.",
                 packOwners: {},
                 pulsarToolsTag: "Stored release of pulsar tools. Will be overwritten with the latest version",
-                leaderboardPort: 5000,
-                leaderboardServer: "localhost",
                 logServices: false,
                 hasteServer: "https://paste.ppeb.me",
                 featureFlags: DefaultFeatureFlags,
