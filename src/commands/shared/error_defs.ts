@@ -735,6 +735,12 @@ export const wiiLinkErrorDefs: WiiLinkErrorDef[] = [
         description: "Server failure",
     },
     {
+        name: "DWC_GS_NETWORK_FAILURE",
+        regex: "61020",
+        card: "61020",
+        description: "Failed to connect to GameSpy",
+    },
+    {
         name: "DWC_GS_DNS_FAILURE",
         regex: "[6-9].03.",
         card: "?x03x",
