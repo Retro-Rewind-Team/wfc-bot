@@ -5,7 +5,7 @@ import { getConfig } from "#src/config.js";
 import { PermissionBit } from "#src/commands/shared/roles.js";
 
 const config = getConfig();
-const leaderboardUrl = `http://${config.leaderboardServer}:${config.leaderboardPort}`;
+const leaderboardUrl = config.leaderboardAPIBase;
 
 interface Multiplier {
     id: number;
