@@ -192,6 +192,7 @@ async function remove(interaction: ChatInputCommandInteraction<CacheType>): Prom
 
 export const command: Command = {
     permissions: PermissionBit.ADMIN,
+    featureFlags: [ "multiplier" ],
 
     data: new SlashCommandBuilder()
         .setName("multiplier")

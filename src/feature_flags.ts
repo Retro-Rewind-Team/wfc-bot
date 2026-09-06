@@ -3,6 +3,7 @@ import { Config } from "#src/config.js";
 export const DefaultFeatureFlags = {
     selfCommand: false,
     serverSideVR: false,
+    multiplier: false,
 };
 
 export type FeatureFlag = keyof typeof DefaultFeatureFlags
