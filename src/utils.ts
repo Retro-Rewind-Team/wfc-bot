@@ -162,7 +162,7 @@ export interface SendEmbedLogOpts {
     noPublicEmbed?: boolean;
     verbose?: boolean;
     showBanInfo?: boolean;
-    // Show who sent the command publically
+    // Show who sent the command publicly
     showMember?: boolean;
     // Action was not performed by a moderator
     nonModerator?: boolean;

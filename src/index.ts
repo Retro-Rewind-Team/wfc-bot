@@ -277,7 +277,7 @@ async function refreshCommands(commands: Dictionary<Command>): Promise<void> {
 
     for (const cname in commands) {
         const permissions = commands[cname].permissions;
-        // Any command with restricted permissions is registered as a prvileged
+        // Any command with restricted permissions is registered as a privileged
         // command, and will only show on specified servers
         if (permissions != PermissionBit.NONE)
             privilegedCommands.push(commands[cname].data.toJSON());
