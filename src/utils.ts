@@ -126,6 +126,19 @@ export async function makeWFCRequest(route: string, method: string, data?: objec
     }
 }
 
+export interface MKWRatingsResponse {
+    vr: number;
+    br: number;
+    mmr_rt: number;
+    mmr_ct: number;
+    mmr_vanilla: number;
+}
+
+export async function getMKWRatings(pid: number): Promise<[boolean, MKWRatingsResponse | null]> {
+    const [success, response] = await makeWFCRequest(`/mkw_rr_ratings?pid=${pid}`, "GET");
+    return success ? [true, response as MKWRatingsResponse] : [false, null];
+}
+
 export interface WiiLinkUser {
     ProfileId: number;
     UserId: number;
@@ -393,6 +406,8 @@ export function createUserEmbed(
         { name: "Profile ID", value: `${user.ProfileId}` },
         { name: "Friend Code", value: fc },
         { name: "Mii Name", value: miiName },
+        { name: "Open Host", value: `${user.OpenHost}` },
+        { name: "Banned", value: `${user.Restricted}${expiredBan ? " (Expired)" : ""}` },
     );
 
     if (opts.verbose)
@@ -533,4 +548,15 @@ export function getMiiImageURL(fc: string): string {
 
 export function capitalize(str: string): string {
     return `${str.charAt(0).toUpperCase() + str.slice(1)}`;
+}
+
+export function commandOptsFromEnum<T>(e: Record<string, T | string>): { name: string; value: T }[] {
+    const ret: { name: string; value: T }[] = [];
+
+    Object.entries(e).forEach(entry => {
+        if (typeof entry[0] == "string"&& typeof entry[1] == "number")
+            ret.push({ name: entry[0], value: entry[1] });
+    });
+
+    return ret;
 }
