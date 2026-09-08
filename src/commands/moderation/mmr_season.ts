@@ -8,6 +8,7 @@ const config = getConfig();
 
 export const command: Command = {
     permissions: PermissionBit.ADMIN,
+    featureFlags: [ "serverSideVR" ],
 
     data: new SlashCommandBuilder()
         .setName("mmr_season")

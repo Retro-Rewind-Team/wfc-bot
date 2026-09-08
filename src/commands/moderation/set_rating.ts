@@ -59,6 +59,7 @@ function mkwUserRatingGetByRatingType(rating: MKWUserRating, ratingType: RatingT
 
 export const command: Command = {
     permissions: PermissionBit.PROFILE_MODERATOR,
+    featureFlags: [ "serverSideVR" ],
 
     data: new SlashCommandBuilder()
         .setName("set_rating")
