@@ -13,7 +13,6 @@ interface Stat {
 
 interface Stats {
     global: Stat;
-    mariokartwii: Stat;
 }
 
 let stats: Stats | null = null;
@@ -22,14 +21,14 @@ export function getStats(): Stats | null {
     return stats;
 }
 
-const fetchStatsUrl = `${config.wfcAPIBase}/stats`;
+const fetchStatsUrl = `${config.wfcAPIBase}/mkw_stats`;
 
 async function fetchStats(): Promise<void> {
     stats = await utils.queryJson<Stats>(fetchStatsUrl)
         ?? utils.throwInline("Empty or no json response from stats api.");
-    const playersInRooms = stats?.mariokartwii?.active ?? 0;
-    const playersOnline = stats?.mariokartwii?.online ?? 0;
-    const rooms = stats?.mariokartwii?.groups ?? 0;
+    const playersInRooms = stats?.global?.active ?? 0;
+    const playersOnline = stats?.global?.online ?? 0;
+    const rooms = stats?.global?.groups ?? 0;
 
     const presenceText =
         `${playersInRooms}/${playersOnline} ${utils.plural(playersInRooms, "player")} in ${rooms} ${utils.plural(rooms, "room")}!`;
