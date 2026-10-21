@@ -27,20 +27,47 @@ interface PlayerStatsResponse {
     raceStats: {
         totalRaces: number;
         trackedSince: string;
-        topCombos: { name: string; raceCount: number }[];
+        topCharacters: { name: string; raceCount: number }[];
+        topVehicles: { name: string; raceCount: number }[];
+        topCombosByWinRate: { name: string; raceCount: number; winCount: number; winRate: number }[];
         topTracks: { trackName: string; raceCount: number }[];
         avgFramesIn1stPerRace: number;
+        recentRaces: { trackName: string; finishPos: number | null }[];
     } | null;
     badges: BadgeType[];
 }
 
+const TOP_TRACK_COUNT = 3;
+const RECENT_RACE_COUNT = 5;
+
 function formatVRChange(change: number): string {
     if (change > 0)
         return `+${change}`;
-    if (change < 0)
-        return `${change}`;
 
     return `${change}`;
+}
+
+function ordinal(n: number): string {
+    const lastTwo = n % 100;
+    if (lastTwo >= 11 && lastTwo <= 13)
+        return `${n}th`;
+
+    switch (n % 10) {
+    case 1: return `${n}st`;
+    case 2: return `${n}nd`;
+    case 3: return `${n}rd`;
+    default: return `${n}th`;
+    }
+}
+
+function codeBlock(rows: [string, string][], alignRight = false): string {
+    const leftWidth = Math.max(...rows.map(([left]) => left.length));
+    const rightWidth = Math.max(...rows.map(([, right]) => right.length));
+
+    const lines = rows.map(([left, right]) =>
+        `${left.padEnd(leftWidth)}  ${alignRight ? right.padStart(rightWidth) : right}`);
+
+    return `\`\`\`\n${lines.join("\n")}\n\`\`\``;
 }
 
 export async function fetchStatsEmbed(
@@ -67,40 +94,39 @@ export async function fetchStatsEmbed(
 
         const embed = new EmbedBuilder()
             .setColor(stats.isSuspicious ? 0xff0000 : getColor())
-            .setTitle(`📊 Player Stats: ${stats.name || "Unknown"}`)
-            .setDescription(`**Friend Code:** \`${fc}\`\n**Player ID:** \`${stats.pid}\`\n\u200B`)
+            .setTitle(stats.name || "Unknown")
+            .setDescription(`Friend code \`${fc}\`\nPlayer ID \`${stats.pid}\``)
             .setThumbnail(getMiiImageURL(fc));
 
         if (flags & StatsSectionFlag.RANK) {
             embed.addFields(
                 {
-                    name: "🏆 Rating",
-                    value: `**${stats.vr.toLocaleString()}** VR`,
+                    name: "Rating",
+                    value: `${stats.vr.toLocaleString()} VR`,
                     inline: true,
                 },
                 {
-                    name: "📈 Rank",
+                    name: "Rank",
                     value: `#${stats.rank.toLocaleString()}`,
                     inline: true,
                 },
                 {
-                    name: "📅 Last Seen",
+                    name: "Last seen",
                     value: `<t:${Math.floor(lastSeenDate.getTime() / 1000)}:R>`,
                     inline: true,
                 },
-                { name: "\u200B", value: "" },
                 {
-                    name: "VR Gain (24h)",
+                    name: "VR (24h)",
                     value: formatVRChange(stats.vrGain24h),
                     inline: true,
                 },
                 {
-                    name: "VR Gain (7d)",
+                    name: "VR (7d)",
                     value: formatVRChange(stats.vrGain7d),
                     inline: true,
                 },
                 {
-                    name: "VR Gain (30d)",
+                    name: "VR (30d)",
                     value: formatVRChange(stats.vrGain30d),
                     inline: true,
                 },
@@ -108,60 +134,60 @@ export async function fetchStatsEmbed(
         }
 
         if (stats.raceStats && flags & StatsSectionFlag.RACESTATS) {
-            const trackedSince = new Date(stats.raceStats.trackedSince).toLocaleDateString("nl-NL");
-            const topCombo = stats.raceStats.topCombos?.[0];
-            const topTrack = stats.raceStats.topTracks?.[0];
+            const race = stats.raceStats;
+            const trackedSince = new Date(race.trackedSince).toLocaleDateString("nl-NL");
+            const topCharacter = race.topCharacters?.[0];
+            const topVehicle = race.topVehicles?.[0];
+            const bestCombo = race.topCombosByWinRate?.[0];
 
-            embed.addFields(
-                { name: "\u200B", value: "" },
-                {
-                    name: `🎮 Race Stats (since ${trackedSince})`,
-                    value: "\u200B",
-                    inline: false,
-                },
-                {
-                    name: "Total Races",
-                    value: stats.raceStats.totalRaces.toLocaleString(),
-                    inline: true,
-                },
-                {
-                    name: "Avg Frames in 1st",
-                    value: stats.raceStats.avgFramesIn1stPerRace.toFixed(1),
-                    inline: true,
-                },
-                { name: "\u200B", value: "\u200B", inline: true },
-                {
-                    name: "Favourite Setup",
-                    value: topCombo ? topCombo.name : "N/A",
-                    inline: true,
-                },
-                {
-                    name: "Most Played Track",
-                    value: topTrack ? `${topTrack.trackName} (${topTrack.raceCount}x)` : "N/A",
-                    inline: true,
-                },
-            );
+            const summary: [string, string][] = [
+                ["Races", race.totalRaces.toLocaleString()],
+                ["Avg frames in 1st", race.avgFramesIn1stPerRace.toFixed(1)],
+            ];
+            if (topCharacter)
+                summary.push(["Character", topCharacter.name]);
+            if (topVehicle)
+                summary.push(["Vehicle", topVehicle.name]);
+            if (bestCombo)
+                summary.push(["Best combo", `${bestCombo.name} (${Math.round(bestCombo.winRate * 100)}%)`]);
+
+            embed.addFields({
+                name: `Race stats (since ${trackedSince})`,
+                value: codeBlock(summary),
+            });
+
+            const topTracks = race.topTracks?.slice(0, TOP_TRACK_COUNT) ?? [];
+            if (topTracks.length != 0) {
+                embed.addFields({
+                    name: "Top tracks",
+                    value: codeBlock(topTracks.map((t): [string, string] => [t.trackName, `${t.raceCount}x`]), true),
+                });
+            }
+
+            const recentRaces = race.recentRaces?.slice(0, RECENT_RACE_COUNT) ?? [];
+            if (recentRaces.length != 0) {
+                embed.addFields({
+                    name: "Recent races",
+                    value: codeBlock(recentRaces.map((r): [string, string] => [
+                        r.finishPos == null ? "-" : ordinal(r.finishPos),
+                        r.trackName,
+                    ])),
+                });
+            }
         }
 
         if (flags & StatsSectionFlag.BADGES && stats.badges && stats.badges.length != 0) {
-            if (flags != StatsSectionFlag.BADGES)
-                embed.addFields({ name: "\u200B", value: "" });
-
-            const badgeNames = listBadges(stats.badges);
             embed.addFields({
                 name: "Badges",
-                value: badgeNames,
-                inline: true,
+                value: listBadges(stats.badges),
             });
-
         }
 
-        embed.addFields({ name: "\u200B", value: "" });
         embed
             .setTimestamp()
             .setFooter({
                 text: stats.isSuspicious
-                    ? "⚠ This player has been flagged as suspicious"
+                    ? "This player has been flagged as suspicious"
                     : "Retro Rewind Leaderboard",
             });
 
