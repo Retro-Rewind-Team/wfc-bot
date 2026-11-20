@@ -1,4 +1,7 @@
 // NOTE: The order of these should not be modified. Badges should only be added
+
+import { commandOptsFromEnum } from "#src/utils.js";
+
 // onto the end of each section. Expunged badges should be labeled "UnusedX"
 export enum BadgeType {
     // Core Devs for Retro Rewind or RWFC Services (projects under the Retro
@@ -46,7 +49,7 @@ export enum BadgeType {
     BotBBronze,
 }
 
-export const BadgeOpts: { name: string; value: BadgeType }[] = [];
+export const BadgeOpts = commandOptsFromEnum(BadgeType).filter(e => !e.name.startsWith("Unused"));
 
 Object.entries(BadgeType).forEach(entry => {
     if (typeof entry[0] == "string"
