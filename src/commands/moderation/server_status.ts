@@ -1,6 +1,6 @@
 import { Command } from "#src/commands/shared/command.js";
 import { CacheType, ChatInputCommandInteraction, PermissionFlagsBits, SlashCommandBuilder } from "discord.js";
-import { getChannels, getConfig } from "#src/config.js";
+import { getChannels, getConfig, getSecondaryChannels } from "#src/config.js";
 import { getStatusColorEmoji, getStatusText, replaceGlyphsForDiscord, StatusColor } from "#src/commands/shared/server_status.js";
 import { loadState, State } from "#src/state.js";
 import { makeWFCRequest } from "#src/utils.js";
@@ -9,6 +9,7 @@ import { PermissionBit } from "#src/commands/shared/roles.js";
 const config = getConfig();
 const state: State = await loadState();
 const channels = getChannels();
+const secondaryChannels = getSecondaryChannels();
 
 const ColorOpts = [
     { name: "Red", value: StatusColor.RED },
@@ -71,8 +72,15 @@ export const command: Command = {
             channelEditSuccess = true;
         }
         catch (e) {
-            await interaction.followUp({ content: `Failed to modify the status channel: ${e}` });
+            await interaction.followUp({ content: `Failed to modify the RR status channel: ${e}` });
             return;
+        }
+
+        try {
+            await secondaryChannels.ctgpc_status?.setName(channelName, "status update");
+        }
+        catch (e) {
+            await interaction.followUp({ content: `Failed to modify the CTGP-C status channel: ${e}` });
         }
 
         state.status = { color: color, message: message };

@@ -35,6 +35,9 @@ export interface Config {
     logServices: boolean;
     hasteServer: string;
     featureFlags: Record<FeatureFlag, boolean>;
+    secondaryChannels: {
+        ctgpc_status: string;
+    };
 }
 
 let _config: Config;
@@ -101,6 +104,9 @@ export async function initConfig(path: string): Promise<void> {
                 logServices: false,
                 hasteServer: "https://paste.ppeb.me",
                 featureFlags: DefaultFeatureFlags,
+                secondaryChannels: {
+                    ctgpc_status: "channel id in the CTGP-C server to mirror status updates.",
+                },
             });
 
             throw "No config.json was provided. One has been generated for you, please adjust it before retrying!";
@@ -146,7 +152,13 @@ interface Channels {
     status: VoiceChannel;
 }
 
+// "Optional" channels not directly managed by RWFC staff in the RR server
+interface SecondaryChannels {
+    ctgpc_status?: VoiceChannel;
+}
+
 let _channels: Channels;
+let _secondaryChannels: SecondaryChannels;
 
 export async function initChannels(client: Client<boolean>): Promise<void> {
     _channels = {
@@ -159,6 +171,10 @@ export async function initChannels(client: Client<boolean>): Promise<void> {
         roomPing: await fetchChannel<TextChannel>(client, _config.roomPingChannel, "roomPing"),
         status: await fetchChannel<VoiceChannel>(client, _config.statusChannel, "status"),
     };
+
+    _secondaryChannels = {
+        ctgpc_status: await fetchChannelSafe<VoiceChannel>(client, _config.secondaryChannels.ctgpc_status, "ctgpc_status"),
+    };
 }
 
 export function getChannels(): Channels {
@@ -166,6 +182,13 @@ export function getChannels(): Channels {
         throw "_channels accessed before being initialized";
 
     return _channels;
+}
+
+export function getSecondaryChannels(): SecondaryChannels {
+    if (!_secondaryChannels)
+        throw "_secondaryChannels accessed before being initialized";
+
+    return _secondaryChannels;
 }
 
 async function fetchChannel<T>(client: Client<boolean>, channelID: string, fieldName: string): Promise<T> {
@@ -180,6 +203,18 @@ async function fetchChannel<T>(client: Client<boolean>, channelID: string, field
         console.log(`${fieldName} set to channel ${(ret as GuildChannel).name}`);
 
     return ret as T;
+}
+
+// This is a wrapper for fetch channel to be used for secondary channels. Channels not in the main
+// RR discord server aren't managed by RWFC staff, so we can't let breaking changes block deployment of the bot
+async function fetchChannelSafe<T>(client: Client<boolean>, channelID: string, fieldName: string): Promise<T | undefined> {
+    try {
+        return await fetchChannel<T>(client, channelID, fieldName);
+    }
+    catch (e) {
+        console.error(`Failed to resolve optional channel ${fieldName}, error: ${e}`);
+        return undefined;
+    }
 }
 
 function migrateConfig(config: Config): boolean {
