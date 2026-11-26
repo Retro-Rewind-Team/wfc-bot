@@ -1,8 +1,8 @@
-import { getNavigationButtons, newIndexFromButtonInteraction, validateButtonInteraction } from "#src/commands/shared/buttons.js";
+import { ActionRowBuilder, APIMessageTopLevelComponent, ButtonInteraction, CacheType, ChatInputCommandInteraction, EmbedBuilder } from "discord.js";
 import { Dictionary } from "#src/dictionary.js";
 import { registerButtonHandlerByMessageID } from "#src/index.js";
 import { createUserEmbed, CreateUserEmbedOpts, WiiLinkUser } from "#src/utils.js";
-import { ActionRowBuilder, APIMessageTopLevelComponent, ButtonInteraction, CacheType, ChatInputCommandInteraction, EmbedBuilder } from "discord.js";
+import { getNavigationButtons, newIndexFromButtonInteraction, validateButtonInteraction } from "#src/commands/shared/buttons.js";
 
 interface QueryState {
     Embeds: EmbedBuilder[];
